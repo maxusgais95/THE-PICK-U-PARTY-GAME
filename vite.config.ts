@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(() => {
   // Correct base path matching your actual repository name
-  const repoName = 'PICK-U-PARTY-NEON-GAME';
+  const repoName = 'THE-PICK-U-PARTY-GAME';
   const base = process.env.NODE_ENV === 'development' ? '/' : (process.env.VITE_BASE || `/${repoName}/`);
 
   return {
