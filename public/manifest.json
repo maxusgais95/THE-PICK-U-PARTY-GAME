@@ -1,0 +1,44 @@
+{
+  "id": "/PICK-U-PARTY-NEON-GAME/",
+  "name": "PICK'U PARTY",
+  "short_name": "PICK'U PARTY",
+  "description": "Multiplayer Finger Roulette, Team Splitter, and Swipe Bottle Spin for Mobile Parties",
+  "theme_color": "#030712",
+  "background_color": "#030712",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/PICK-U-PARTY-NEON-GAME/",
+  "scope": "/PICK-U-PARTY-NEON-GAME/",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "app-icon.jpeg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { KaboomCommand, KaboomGridConfig, KaboomGridDimension } from '../../types';
+
+export const KABOOM_GRID_CONFIGS: Record<KaboomGridDimension, KaboomGridConfig> = {
+  2: {
+    dimension: 2,
+    title: '2×2 QUICK',
+    tagline: 'QUICK',
+    difficulty: 'Instant Danger',
+    totalTiles: 4,
+    bombs: 1,
+    bonusCountMin: 0,
+    bonusCountMax: 1,
+    bonusProbabilityText: '0 – 1 Bonuses',
+    description: 'High-speed sudden death. 1 bomb, 0 to 1 bonus.',
+    accentColor: 'from-sky-500 to-cyan-400',
+  },
+  3: {
+    dimension: 3,
+    title: '3×3 CLASSIC',
+    tagline: 'CLASSIC',
+    difficulty: 'Snappy Rounds',
+    totalTiles: 9,
+    bombs: 1,
+    bonusCountMin: 0,
+    bonusCountMax: 2,
+    bonusProbabilityText: '0 – 2 Bonuses',
+    description: 'Quick group rounds with 0 to 2 bonuses hidden in 9 tiles.',
+    accentColor: 'from-blue-600 to-indigo-500',
+  },
+  4: {
+    dimension: 4,
+    title: '4×4 EXTREME',
+    tagline: 'EXTREME',
+    difficulty: 'Balanced Thrill',
+    totalTiles: 16,
+    bombs: 1,
+    bonusCountMin: 1,
+    bonusCountMax: 3,
+    bonusProbabilityText: '1 – 3 Bonuses',
+    description: 'High stakes party round with 1 to 3 tactical commands.',
+    accentColor: 'from-pink-600 to-fuchsia-500',
+    badge: 'POPULAR',
+  },
+  5: {
+    dimension: 5,
+    title: '5×5 CHAOS',
+    tagline: 'CHAOS',
+    difficulty: 'Intense Tension',
+    totalTiles: 25,
+    bombs: 1,
+    bonusCountMin: 1,
+    bonusCountMax: 4,
+    bonusProbabilityText: '1 – 4 Bonuses',
+    description: 'High stakes party round with 1 to 4 command bonuses.',
+    accentColor: 'from-purple-600 to-violet-500',
+  },
+  6: {
+    dimension: 6,
+    title: '6×6 ULTIMATE',
+    tagline: 'ULTIMATE',
+    difficulty: 'Ultimate Gauntlet',
+    totalTiles: 36,
+    bombs: 1,
+    bonusCountMin: 2,
+    bonusCountMax: 5,
+    bonusProbabilityText: '2 – 5 Bonuses',
+    description: '36 tiles with 2 to 5 randomized commands.',
+    accentColor: 'from-amber-600 to-orange-500',
+    badge: 'ULTIMATE',
+  },
+};
+
+export const KABOOM_COMMANDS: KaboomCommand[] = [
+  {
+    id: 'target_lock',
+    title: 'TARGET LOCK',
+    category: 'tactical',
+    description: 'You pick ANY player in the room who MUST tap the very next ball!',
+    icon: 'Crosshair',
+    tag: 'TACTICAL POWER',
+  },
+  {
+    id: 'uno_reverse',
+    title: 'UNO REVERSE',
+    category: 'tactical',
+    description: 'The turn order immediately reverses! Danger turns back around.',
+    icon: 'RotateCcw',
+    tag: 'DIRECTION SWAP',
+  },
+  {
+    id: 'skip_turn',
+    title: 'SKIP PASS',
+    category: 'tactical',
+    description: 'The bomb is ticking! Skip the next player and pass danger forward.',
+    icon: 'FastForward',
+    tag: 'TURN SKIP',
+  },
+  {
+    id: 'bomb_radar',
+    title: 'BOMB RADAR PING',
+    category: 'tactical',
+    description: 'Radar activated! One safe ball on the board has been safely uncovered for you!',
+    icon: 'Radio',
+    tag: 'RADAR SCAN',
+  },
+  {
+    id: 'immunity_shield',
+    title: 'IMMUNITY SHIELD',
+    category: 'privilege',
+    description: 'Divine luck! If you tap the bomb on your very next turn, the blast is absorbed once!',
+    icon: 'ShieldAlert',
+    tag: 'SHIELD BUFF',
+  },
+  {
+    id: 'double_tap',
+    title: 'DOUBLE TAP CURSE',
+    category: 'tactical',
+    description: 'Select a player: they must tap TWO balls consecutively on their next turn!',
+    icon: 'Zap',
+    tag: 'PENALTY TRAP',
+  },
+  {
+    id: 'drink_sip',
+    title: 'SIP OR SHOT',
+    category: 'party',
+    description: 'Nominate any player to take a drink or sip of their beverage right now!',
+    icon: 'Wine',
+    tag: 'PARTY TOAST',
+  },
+  {
+    id: 'truth_or_dare',
+    title: 'TRUTH OR DARE',
+    category: 'dare',
+    description: 'Choose any player: they must answer 1 honest truth or perform 1 hilarious dare!',
+    icon: 'Flame',
+    tag: 'HOT SEAT',
+  },
+  {
+    id: 'staring_contest',
+    title: 'STARING DUEL',
+    category: 'dare',
+    description: 'Challenge the person opposite you to an immediate 10-second staring contest. First blink takes a penalty!',
+    icon: 'Eye',
+    tag: 'FACE OFF',
+  },
+  {
+    id: 'accent_master',
+    title: 'ACCENT MASTER',
+    category: 'dare',
+    description: 'Select a player: they must speak with a dramatic foreign accent until this round ends!',
+    icon: 'Mic',
+    tag: 'PARTY DARE',
+  },
+  {
+    id: 'victory_dance',
+    title: 'DANCE BREAK',
+    category: 'dare',
+    description: 'Choose someone to show off their best 5-second victory dance move right now!',
+    icon: 'Sparkles',
+    tag: 'PARTY VIBE',
+  },
+  {
+    id: 'silent_treatment',
+    title: 'SILENT TAPPER',
+    category: 'dare',
+    description: 'The next player cannot speak or make any sound during their turn, or they tap again!',
+    icon: 'VolumeX',
+    tag: 'SILENT CHALLENGE',
+  },
+  {
+    id: 'roast_toast',
+    title: 'ROAST OR TOAST',
+    category: 'party',
+    description: 'Pick another player: give them a heartfelt 20-second tribute or a friendly playful roast!',
+    icon: 'HeartHandshake',
+    tag: 'SOCIAL DARE',
+  },
+  {
+    id: 'custom_rule',
+    title: 'THE LAWMAKER',
+    category: 'privilege',
+    description: 'Invent any silly party rule (e.g., must cheer "KABOOM!" before tapping). Anyone who forgets takes a sip!',
+    icon: 'Crown',
+    tag: 'ROYAL DECREE',
+  },
+  {
+    id: 'thumb_war',
+    title: 'THUMB WAR ARENA',
+    category: 'party',
+    description: 'Engage in an immediate 1-2-3-4 thumb war with the player to your right!',
+    icon: 'Swords',
+    tag: 'MINI GAME',
+  },
+  {
+    id: 'photo_roulette',
+    title: 'CAMERA ROLL PEEK',
+    category: 'dare',
+    description: 'Choose a player: they must flash the 3rd most recent photo on their phone camera roll!',
+    icon: 'Camera',
+    tag: 'SPICY DARE',
+  },
+  {
+    id: 'safe_reveal_double',
+    title: 'GOLDEN SCOUT',
+    category: 'privilege',
+    description: 'Instant Intel! Two safe balls are immediately scouted and marked safe on the board!',
+    icon: 'Search',
+    tag: 'BONUS INTEL',
+  },
+  {
+    id: 'robot_lock',
+    title: 'ROBOT MODE',
+    category: 'dare',
+    description: 'Select a player: they must talk and move like a mechanical robot until their next turn!',
+    icon: 'Bot',
+    tag: 'PARTY DARE',
+  },
+];
+
+/**
+ * Returns a randomized command from the library, preferring unused ones
+ */
+export function getRandomCommand(usedCommandIds: Set<string> = new Set()): KaboomCommand {
+  const unused = KABOOM_COMMANDS.filter((c) => !usedCommandIds.has(c.id));
+  const pool = unused.length > 0 ? unused : KABOOM_COMMANDS;
+  const index = Math.floor(Math.random() * pool.length);
+  return pool[index];
+}
