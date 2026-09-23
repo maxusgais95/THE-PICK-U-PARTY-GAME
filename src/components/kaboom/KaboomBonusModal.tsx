@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { KaboomCommand, KaboomBonusItem } from '../../types';
 import { SoundEngine, Haptics } from '../../lib/audio';
-import currencyStarImg from '../../assets/images/Currency Star Sprite.png';
+import currencyStarImg from '../../assets/images/Currency Star Sprite.webp';
 
 interface KaboomBonusModalProps {
   command: KaboomCommand;

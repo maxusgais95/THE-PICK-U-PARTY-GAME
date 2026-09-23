@@ -6,9 +6,9 @@
 import React from 'react';
 import { Check, Star, Bomb } from 'lucide-react';
 import { KaboomTile } from '../../types';
-import kaboomBombImg from '../../assets/images/Bomb Sprite.png';
-import kaboomBallImg from '../../assets/images/Ball Sprite.png';
-import currencyStarImg from '../../assets/images/Currency Star Sprite.png';
+import kaboomBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
+import kaboomBallImg from '../../assets/images/balls/Ball Sprite.webp';
+import currencyStarImg from '../../assets/images/Currency Star Sprite.webp';
 
 interface KaboomBallProps {
   tile: KaboomTile;

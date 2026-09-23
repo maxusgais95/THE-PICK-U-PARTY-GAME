@@ -7,13 +7,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, Upload, Image as ImageIcon, Check, Star } from 'lucide-react';
 import { StoreItem, StoreCategory } from '../../lib/economy';
 import { SoundEngine, Haptics } from '../../lib/audio';
-import { BOTTLE_SKINS } from '../../lib/bottleSkins';
-import kaboomBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
-import kaboomBallImg from '../../assets/images/balls/Ball Sprite.webp';
 
 interface StoreItemModalProps {
   isOpen: boolean;
-  item: StoreItem | null; // null means adding a new item
+  item: StoreItem | null;
   defaultCategory?: StoreCategory;
   onClose: () => void;
   onSave: (item: StoreItem) => void;
@@ -33,7 +30,7 @@ const CATEGORY_OPTIONS: { id: StoreCategory; label: string }[] = [
   { id: 'accessories', label: 'Accessories' },
 ];
 
-const SOLAR_AMBER_FILTER = 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)';
+const ENHANCE_FILTER = 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)';
 
 export const StoreItemModal: React.FC<StoreItemModalProps> = ({
   isOpen,
@@ -52,7 +49,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
   const [imageUrl, setImageUrl] = useState('');
   const [isEnhanced, setIsEnhanced] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -66,38 +62,35 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
         setRarity(item.rarity || 'Common');
         setBadge(item.badge || '');
         setImageUrl(item.image || '');
-        setIsEnhanced(item.cssFilter === 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)');
+        setIsEnhanced(item.cssFilter === ENHANCE_FILTER);
       } else {
         setCategory(defaultCategory);
         setName('');
         setSubtitle('');
         setDescription('');
-        setPrice(100);
+        setPrice(0);
         setRarity('Common');
         setBadge('');
-        // Default preset image based on category
-        if (defaultCategory === 'bottles') setImageUrl(BOTTLE_SKINS[0].image);
-        else if (defaultCategory === 'bombs') setImageUrl(kaboomBombImg);
-        else if (defaultCategory === 'balls') setImageUrl(kaboomBallImg);
-        else setImageUrl('');
-        setCssFilter('');
+        setImageUrl('');
+        setIsEnhanced(false);
       }
       setValidationError(null);
     }
   }, [isOpen, item, defaultCategory]);
 
-  if (!isOpen) return null;
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+    if (file.size > 2 * 1024 * 1024) {
+      setValidationError('Image file size must be under 2MB.');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setImageUrl(dataUrl);
-        SoundEngine.playButtonClick();
+      const result = event.target?.result as string;
+      if (result) {
+        setImageUrl(result);
+        setValidationError(null);
       }
     };
     reader.readAsDataURL(file);
@@ -105,19 +98,16 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     const trimmedName = name.trim();
     if (!trimmedName) {
       setValidationError('Item name is required.');
       return;
     }
-
     if (price < 0 || isNaN(price)) {
       setValidationError('Price must be 0 or a positive number.');
       return;
     }
 
-    // Determine gradients & glow based on rarity
     let accentGradient = 'from-zinc-400 to-zinc-600';
     let borderGlow = 'border-zinc-500/50';
     if (rarity === 'Rare') {
@@ -127,31 +117,24 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
       accentGradient = 'from-purple-400 to-fuchsia-600';
       borderGlow = 'border-purple-400/60 shadow-[0_0_15px_rgba(168,85,247,0.4)]';
     } else if (rarity === 'Legendary') {
-      accentGradient = 'from-amber-400 via-orange-500 to-yellow-500';
-      borderGlow = 'border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]';
+      accentGradient = 'from-amber-400 via-orange-500 to-yellow-300';
+      borderGlow = 'border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.6)] animate-pulse';
     }
 
-    const iconTypeMap: Record<StoreCategory, 'bottle' | 'bomb' | 'ball' | 'accessory'> = {
-      bottles: 'bottle',
-      bombs: 'bomb',
-      balls: 'ball',
-      accessories: 'accessory',
-    };
-
     const newItem: StoreItem = {
-      id: item?.id || `${category}_${Date.now()}`,
+      id: item ? item.id : 'custom_' + Date.now(),
       category,
       name: trimmedName,
-      subtitle: subtitle.trim(),
-      description: description.trim(),
-      price: Math.max(0, Math.floor(price)),
+      subtitle: subtitle.trim() || undefined,
+      description: description.trim() || undefined,
+      price,
       rarity,
-      badge: badge.trim() || undefined,
+      badge: badge.trim().toUpperCase() || undefined,
+      image: imageUrl || undefined,
+      cssFilter: isEnhanced ? ENHANCE_FILTER : undefined,
       accentGradient,
       borderGlow,
-      iconType: iconTypeMap[category],
-      image: imageUrl || undefined,
-      cssFilter: isEnhanced ? 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)' : undefined,
+      isCustom: true,
     };
 
     SoundEngine.playButtonClick();
@@ -160,10 +143,11 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
     <div
-      id="store-item-modal-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center pt-[max(1rem,calc(env(safe-area-inset-top)+0.5rem))] pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))] px-3 sm:px-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn"
       onClick={onClose}
     >
       <div
@@ -173,12 +157,11 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
         role="dialog"
         aria-modal="true"
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 shrink-0 bg-zinc-900/90">
           <div className="flex items-center gap-2.5">
             <Sparkles className="w-5 h-5 text-amber-400" />
             <h3 className="text-base font-bold text-zinc-100">
-              {item ? `Edit Store Item: ${item.name}` : 'Add New Store Item'}
+              {item ? 'Edit Store Item: ' + item.name : 'Add New Store Item'}
             </h3>
           </div>
           <button
@@ -192,7 +175,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
           </button>
         </div>
 
-        {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
             {validationError && (
@@ -201,7 +183,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
               </div>
             )}
 
-            {/* Live Preview Card (Side-by-side on desktop, stacked on mobile) */}
             <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col sm:flex-row items-center gap-4">
               <div className="w-24 h-24 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center p-2 relative overflow-hidden shrink-0">
                 {imageUrl ? (
@@ -209,7 +190,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                     src={imageUrl}
                     alt="Preview"
                     className="max-w-full max-h-full object-contain"
-                    style={{ filter: isEnhanced ? 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)' : undefined }}
+                    style={{ filter: isEnhanced ? ENHANCE_FILTER : undefined }}
                   />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-zinc-600" />
@@ -247,14 +228,12 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 </p>
                 <div className="flex items-center justify-center sm:justify-start gap-1 mt-2 text-xs font-bold text-amber-400">
                   <Star className="w-3.5 h-3.5 fill-amber-400" />
-                  <span>{price === 0 ? 'FREE / DEFAULT' : `${price} Stars`}</span>
+                  <span>{price === 0 ? 'FREE / DEFAULT' : price + ' Stars'}</span>
                 </div>
               </div>
             </div>
 
-            {/* Grid Form Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Category */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Category
@@ -262,16 +241,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 <select
                   id="store-item-category-select"
                   value={category}
-                  onChange={(e) => {
-                    const newCat = e.target.value as StoreCategory;
-                    setCategory(newCat);
-                    // Default image for new category if empty or preset
-                    if (!item) {
-                      if (newCat === 'bottles') setImageUrl(BOTTLE_SKINS[0].image);
-                      else if (newCat === 'bombs') setImageUrl(kaboomBombImg);
-                      else if (newCat === 'balls') setImageUrl(kaboomBallImg);
-                    }
-                  }}
+                  onChange={(e) => setCategory(e.target.value as StoreCategory)}
                   className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-zinc-500 cursor-pointer"
                 >
                   {CATEGORY_OPTIONS.map((cat) => (
@@ -282,7 +252,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 </select>
               </div>
 
-              {/* Rarity */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Rarity Tier
@@ -301,7 +270,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 </select>
               </div>
 
-              {/* Item Name */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Item Name <span className="text-red-400">*</span>
@@ -312,12 +280,11 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Celestial Starlight Decider"
+                  placeholder="e.g. Celestial Starlight"
                   className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-xl text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
-              {/* Subtitle */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Subtitle / Edition Tagline
@@ -332,7 +299,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 />
               </div>
 
-              {/* Price in Stars */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Price (Stars) <span className="text-zinc-500 text-[11px]">(0 = Free)</span>
@@ -348,7 +314,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 />
               </div>
 
-              {/* Custom Badge */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                   Card Badge <span className="text-zinc-500 text-[11px]">(Optional)</span>
@@ -364,7 +329,6 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
               </div>
             </div>
 
-            {/* Description */}
             <div>
               <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                 Description
@@ -379,41 +343,24 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
               />
             </div>
 
-            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button
-                  type="button"
-                  id="btn-upload-item-image"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-semibold text-zinc-200 flex items-center gap-2 transition-colors cursor-pointer shrink-0"
-                >
-                  <Upload className="w-4 h-4 text-amber-400" />
-                  <span>Upload Image File</span>
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
+            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-4">
+              <button
+                type="button"
+                id="btn-upload-item-image"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-semibold text-zinc-200 flex items-center gap-2 transition-colors cursor-pointer"
+              >
+                <Upload className="w-4 h-4 text-amber-400" />
+                <span>Upload Image File</span>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
 
-                {/* Upload Bounding Box Preview */}
-                <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-dashed border-zinc-700 flex items-center justify-center p-1 relative overflow-hidden shrink-0">
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt="Uploaded preview"
-                      className="max-w-full max-h-full object-contain"
-                      style={{ filter: isEnhanced ? ENHANCE_FILTER : undefined }}
-                    />
-                  ) : (
-                    <ImageIcon className="w-5 h-5 text-zinc-600" />
-                  )}
-                </div>
-              </div>
-
-              {/* Enhance Checkbox */}
               <div className="flex items-center gap-2.5">
                 <input
                   type="checkbox"
@@ -427,9 +374,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 </label>
               </div>
             </div>
-
           </div>
-          {/* Footer Actions */}
 
           <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-zinc-800 bg-zinc-900/90 shrink-0">
             <button

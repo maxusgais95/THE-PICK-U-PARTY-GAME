@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
-import currencyStarImg from '../../assets/images/Currency Star Sprite.png';
+import currencyStarImg from '../../assets/images/Currency Star Sprite.webp';
 import { SoundEngine } from '../../lib/audio';
 
 export interface FlyingStarBatch {

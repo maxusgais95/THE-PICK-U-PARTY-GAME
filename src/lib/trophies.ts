@@ -4,64 +4,64 @@
  */
 
 // Trophy 001 - Roulette Virtuoso
-import bronzeTrophy001 from '../assets/images/trophies/Bronze Trophy 001.png';
-import silverTrophy001 from '../assets/images/trophies/Silver Trophy 001.png';
-import goldTrophy001 from '../assets/images/trophies/Gold Trophy 001.png';
-import platinumTrophy001 from '../assets/images/trophies/Platinum Trophy 001.png';
+import bronzeTrophy001 from '../assets/images/trophies/Bronze Trophy 001.webp';
+import silverTrophy001 from '../assets/images/trophies/Silver Trophy 001.webp';
+import goldTrophy001 from '../assets/images/trophies/Gold Trophy 001.webp';
+import platinumTrophy001 from '../assets/images/trophies/Platinum Trophy 001.webp';
 
 // Trophy 002 - Party Monarch
-import bronzeTrophy002 from '../assets/images/trophies/Bronze Trophy 002.png';
-import silverTrophy002 from '../assets/images/trophies/Silver Trophy 002.png';
-import goldTrophy002 from '../assets/images/trophies/Gold Trophy 002.png';
-import platinumTrophy002 from '../assets/images/trophies/Platinum Trophy 002.png';
+import bronzeTrophy002 from '../assets/images/trophies/Bronze Trophy 002.webp';
+import silverTrophy002 from '../assets/images/trophies/Silver Trophy 002.webp';
+import goldTrophy002 from '../assets/images/trophies/Gold Trophy 002.webp';
+import platinumTrophy002 from '../assets/images/trophies/Platinum Trophy 002.webp';
 
 // Trophy 003 - Bomb Defender Grandmaster
-import bronzeTrophy003 from '../assets/images/trophies/Bronze Trophy 003.png';
-import silverTrophy003 from '../assets/images/trophies/Silver Trophy 003.png';
-import goldTrophy003 from '../assets/images/trophies/Gold Trophy 003.png';
-import platinumTrophy003 from '../assets/images/trophies/Platinum Trophy 003.png';
+import bronzeTrophy003 from '../assets/images/trophies/Bronze Trophy 003.webp';
+import silverTrophy003 from '../assets/images/trophies/Silver Trophy 003.webp';
+import goldTrophy003 from '../assets/images/trophies/Gold Trophy 003.webp';
+import platinumTrophy003 from '../assets/images/trophies/Platinum Trophy 003.webp';
 
 // Trophy 004 - Vortex Dynamo
-import bronzeTrophy004 from '../assets/images/trophies/Bronze Trophy 004.png';
-import silverTrophy004 from '../assets/images/trophies/Silver Trophy 004.png';
-import goldTrophy004 from '../assets/images/trophies/Gold Trophy 004.png';
-import platinumTrophy004 from '../assets/images/trophies/Platinum Trophy 004.png';
+import bronzeTrophy004 from '../assets/images/trophies/Bronze Trophy 004.webp';
+import silverTrophy004 from '../assets/images/trophies/Silver Trophy 004.webp';
+import goldTrophy004 from '../assets/images/trophies/Gold Trophy 004.webp';
+import platinumTrophy004 from '../assets/images/trophies/Platinum Trophy 004.webp';
 
 // Trophy 005 - Relic Archeologist
-import bronzeTrophy005 from '../assets/images/trophies/Bronze Trophy 005.png';
-import silverTrophy005 from '../assets/images/trophies/Silver Trophy 005.png';
-import goldTrophy005 from '../assets/images/trophies/Gold Trophy 005.png';
-import platinumTrophy005 from '../assets/images/trophies/Platinum Trophy 005.png';
+import bronzeTrophy005 from '../assets/images/trophies/Bronze Trophy 005.webp';
+import silverTrophy005 from '../assets/images/trophies/Silver Trophy 005.webp';
+import goldTrophy005 from '../assets/images/trophies/Gold Trophy 005.webp';
+import platinumTrophy005 from '../assets/images/trophies/Platinum Trophy 005.webp';
 
 // Trophy 006 - Cyber Couture Icon
-import bronzeTrophy006 from '../assets/images/trophies/Bronze Trophy 006.png';
-import silverTrophy006 from '../assets/images/trophies/Silver Trophy 006.png';
-import goldTrophy006 from '../assets/images/trophies/Gold Trophy 006.png';
-import platinumTrophy006 from '../assets/images/trophies/Platinum Trophy 006.png';
+import bronzeTrophy006 from '../assets/images/trophies/Bronze Trophy 006.webp';
+import silverTrophy006 from '../assets/images/trophies/Silver Trophy 006.webp';
+import goldTrophy006 from '../assets/images/trophies/Gold Trophy 006.webp';
+import platinumTrophy006 from '../assets/images/trophies/Platinum Trophy 006.webp';
 
 // Trophy 007 - Eternal Devotee (Total Logins)
-import bronzeTrophy007 from '../assets/images/trophies/Bronze Trophy 007.png';
-import silverTrophy007 from '../assets/images/trophies/Silver Trophy 007.png';
-import goldTrophy007 from '../assets/images/trophies/Gold Trophy 007.png';
-import platinumTrophy007 from '../assets/images/trophies/Platinum Trophy 007.png';
+import bronzeTrophy007 from '../assets/images/trophies/Bronze Trophy 007.webp';
+import silverTrophy007 from '../assets/images/trophies/Silver Trophy 007.webp';
+import goldTrophy007 from '../assets/images/trophies/Gold Trophy 007.webp';
+import platinumTrophy007 from '../assets/images/trophies/Platinum Trophy 007.webp';
 
 // Trophy 008 - The Midas Touch (Star Wealth)
-import bronzeTrophy008 from '../assets/images/trophies/Bronze Trophy 008.png';
-import silverTrophy008 from '../assets/images/trophies/Silver Trophy 008.png';
-import goldTrophy008 from '../assets/images/trophies/Gold Trophy 008.png';
-import platinumTrophy008 from '../assets/images/trophies/Platinum Trophy 008.png';
+import bronzeTrophy008 from '../assets/images/trophies/Bronze Trophy 008.webp';
+import silverTrophy008 from '../assets/images/trophies/Silver Trophy 008.webp';
+import goldTrophy008 from '../assets/images/trophies/Gold Trophy 008.webp';
+import platinumTrophy008 from '../assets/images/trophies/Platinum Trophy 008.webp';
 
 // Trophy 009 - Vault Sovereign (Milestone Chests)
-import bronzeTrophy009 from '../assets/images/trophies/Bronze Trophy 009.png';
-import silverTrophy009 from '../assets/images/trophies/Silver Trophy 009.png';
-import goldTrophy009 from '../assets/images/trophies/Gold Trophy 009.png';
-import platinumTrophy009 from '../assets/images/trophies/Platinum Trophy 009.png';
+import bronzeTrophy009 from '../assets/images/trophies/Bronze Trophy 009.webp';
+import silverTrophy009 from '../assets/images/trophies/Silver Trophy 009.webp';
+import goldTrophy009 from '../assets/images/trophies/Gold Trophy 009.webp';
+import platinumTrophy009 from '../assets/images/trophies/Platinum Trophy 009.webp';
 
 // Trophy 010 - Quest Virtuoso (Daily Quests)
-import bronzeTrophy010 from '../assets/images/trophies/Bronze Trophy 010.png';
-import silverTrophy010 from '../assets/images/trophies/Silver Trophy 010.png';
-import goldTrophy010 from '../assets/images/trophies/Gold Trophy 010.png';
-import platinumTrophy010 from '../assets/images/trophies/Platinum Trophy 010.png';
+import bronzeTrophy010 from '../assets/images/trophies/Bronze Trophy 010.webp';
+import silverTrophy010 from '../assets/images/trophies/Silver Trophy 010.webp';
+import goldTrophy010 from '../assets/images/trophies/Gold Trophy 010.webp';
+import platinumTrophy010 from '../assets/images/trophies/Platinum Trophy 010.webp';
 import { EconomyState, getEconomyState } from './economy';
 
 export type TrophyTier = 'locked' | 'bronze' | 'silver' | 'gold' | 'platinum';

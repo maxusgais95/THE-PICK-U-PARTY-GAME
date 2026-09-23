@@ -6,8 +6,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Star, Check, ShoppingBag, Sparkles, AlertCircle, Lock } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
-import kaboomBombImg from '../assets/images/Bomb Sprite.webp';
-import kaboomBallImg from '../assets/images/Ball Sprite.webp';
+import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
+import kaboomBallImg from '../assets/images/balls/Ball Sprite.webp';
 import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
 import {
   StoreCategory,
@@ -31,10 +31,10 @@ interface StoreModalProps {
   onUpdateSettings: (newSettings: Partial<AppSettings>) => void;
 }
 
-const CATEGORIES: { id: StoreCategory; label: string; icon: string }[] = [
-  { id: 'bottles', label: 'BOTTLES', icon: '🍾' },
-  { id: 'bombs', label: 'BOMBS', icon: '💣' },
-  { id: 'balls', label: 'BALLS', icon: '⚽' },
+const CATEGORIES: { id: StoreCategory; label: string;}[] = [
+  { id: 'bottles', label: 'BOTTLES'},
+  { id: 'bombs', label: 'BOMBS'},
+  { id: 'balls', label: 'BALLS'},
 ];
 
 export const StoreModal: React.FC<StoreModalProps> = ({
@@ -377,7 +377,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-300">💣 Bomb Victory</span>
+                        <span className="text-gray-300">Bomb Victory</span>
                         {economy.starEarrings?.bombVictory ? (
                           <span className="text-emerald-400 font-bold">✓ Done</span>
                         ) : (
@@ -385,7 +385,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                         )}
                       </div>
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-300">🍾 Bottle Spin</span>
+                        <span className="text-gray-300">Bottle Spin</span>
                         {economy.starEarrings?.bottleSpin ? (
                           <span className="text-emerald-400 font-bold">✓ Done</span>
                         ) : (
@@ -393,7 +393,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                         )}
                       </div>
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-300">☝️ Finger Game</span>
+                        <span className="text-gray-300">Finger Game</span>
                         {economy.starEarrings?.fingerGame ? (
                           <span className="text-emerald-400 font-bold">✓ Done</span>
                         ) : (

@@ -5,35 +5,35 @@
 
 import { BottleBuiltinStyle } from '../types';
 import { BOTTLE_SKINS } from './bottleSkins';
-import kaboomBombImg from '../assets/images/Bomb Sprite.png';
-import kaboomBallImg from '../assets/images/Ball Sprite.png';
-import day7BundleChestImg from '../assets/images/day7_bundle_chest.jpg';
+import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
+import kaboomBallImg from '../assets/images/balls/Ball Sprite.webp';
+import day7BundleChestImg from '../assets/images/day7_bundle_chest.webp';
 
 // Ball skin assets from src/assets/images/balls
-import ballCelestialImg from '../assets/images/balls/Ball Celestial.png';
-import ballFireCoralImg from '../assets/images/balls/Ball Fire Coral.png';
-import ballFishImg from '../assets/images/balls/Ball Fish.png';
-import ballGrassImg from '../assets/images/balls/Ball Grass.png';
-import ballJewelryImg from '../assets/images/balls/Ball Jewelry.png';
-import ballKittyImg from '../assets/images/balls/Ball Kitty.png';
-import ballMushroomImg from '../assets/images/balls/Ball Mushroom.png';
-import ballPartyImg from '../assets/images/balls/Ball Party.png';
-import ballPrismsImg from '../assets/images/balls/Ball Prisms.png';
-import ballSpaceshipImg from '../assets/images/balls/Ball Spaceship.png';
+import ballCelestialImg from '../assets/images/balls/Ball Celestial.webp';
+import ballFireCoralImg from '../assets/images/balls/Ball Fire Coral.webp';
+import ballFishImg from '../assets/images/balls/Ball Fish.webp';
+import ballGrassImg from '../assets/images/balls/Ball Grass.webp';
+import ballJewelryImg from '../assets/images/balls/Ball Jewelry.webp';
+import ballKittyImg from '../assets/images/balls/Ball Kitty.webp';
+import ballMushroomImg from '../assets/images/balls/Ball Mushroom.webp';
+import ballPartyImg from '../assets/images/balls/Ball Party.webp';
+import ballPrismsImg from '../assets/images/balls/Ball Prisms.webp';
+import ballSpaceshipImg from '../assets/images/balls/Ball Spaceship.webp';
 
 // Bomb skin assets from src/assets/images/bombs
-import bombBassImg from '../assets/images/bombs/Bomb Bass.png';
-import bombBioToxicImg from '../assets/images/bombs/Bomb Bio Toxic.png';
-import bombCelestialImg from '../assets/images/bombs/Bomb Celestial.png';
-import bombDynamoImg from '../assets/images/bombs/Bomb Dynamo.png';
-import bombElvishImg from '../assets/images/bombs/Bomb Elvish.png';
-import bombLanternImg from '../assets/images/bombs/Bomb Lantern.png';
-import bombMicImg from '../assets/images/bombs/Bomb Mic.png';
-import bombPerfumeImg from '../assets/images/bombs/Bomb Perfume.png';
-import bombPrismImg from '../assets/images/bombs/Bomb Prism.png';
-import bombSamuraiImg from '../assets/images/bombs/Bomb Samurai.png';
-import bombSonicImg from '../assets/images/bombs/Bomb Sonic.png';
-import bombSpriteImg from '../assets/images/bombs/Bomb Sprite.png';
+import bombBassImg from '../assets/images/bombs/Bomb Bass.webp';
+import bombBioToxicImg from '../assets/images/bombs/Bomb Bio Toxic.webp';
+import bombCelestialImg from '../assets/images/bombs/Bomb Celestial.webp';
+import bombDynamoImg from '../assets/images/bombs/Bomb Dynamo.webp';
+import bombElvishImg from '../assets/images/bombs/Bomb Elvish.webp';
+import bombLanternImg from '../assets/images/bombs/Bomb Lantern.webp';
+import bombMicImg from '../assets/images/bombs/Bomb Mic.webp';
+import bombPerfumeImg from '../assets/images/bombs/Bomb Perfume.webp';
+import bombPrismImg from '../assets/images/bombs/Bomb Prism.webp';
+import bombSamuraiImg from '../assets/images/bombs/Bomb Samurai.webp';
+import bombSonicImg from '../assets/images/bombs/Bomb Sonic.webp';
+import bombSpriteImg from '../assets/images/bombs/Bomb Sprite.webp';
 
 export const DAY7_BUNDLE_BOMB_ID = 'bomb_dynamo';
 export const DAY7_BUNDLE_BALL_ID = 'ball_celestial';

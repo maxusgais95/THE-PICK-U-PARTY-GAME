@@ -4,11 +4,11 @@
  */
 
 import { KaboomBonusItem, KaboomBonusSpriteId } from '../../types';
-import bonusMusicalNoteImg from '../../assets/images/Music Note Sprite.png';
-import bonusHeadsetImg from '../../assets/images/Headsets Sprite.png';
-import bonusCuteStarImg from '../../assets/images/Star Sprite.png';
-import bonusCrystalRoseImg from '../../assets/images/Crystal Rose Sprite.png';
-import bonusDiamondKeyImg from '../../assets/images/Key Sprite.png';
+import bonusMusicalNoteImg from '../../assets/images/Music Note Sprite.webp';
+import bonusHeadsetImg from '../../assets/images/Headsets Sprite.webp';
+import bonusCuteStarImg from '../../assets/images/Star Sprite.webp';
+import bonusCrystalRoseImg from '../../assets/images/Crystal Rose Sprite.webp';
+import bonusDiamondKeyImg from '../../assets/images/Key Sprite.webp';
 
 export const KABOOM_BONUS_ITEMS: KaboomBonusItem[] = [
   {

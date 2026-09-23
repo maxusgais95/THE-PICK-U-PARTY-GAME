@@ -7,11 +7,11 @@ import React from 'react';
 import { KaboomGridDimension } from '../../types';
 import { SoundEngine, Haptics } from '../../lib/audio';
 import chibiBombImg from '../../assets/images/Chibi Bomb Game.webp';
-import quickModeBg from '../../assets/images/Quick Mode Background.jpeg';
-import classicModeBg from '../../assets/images/Classic Mode Background.jpeg';
-import extremeModeBg from '../../assets/images/Extreme Mode Background.jpeg';
-import chaosModeBg from '../../assets/images/Chaos Mode Background.jpeg';
-import ultimateModeBg from '../../assets/images/Ultimate Mode Background.jpeg';
+import quickModeBg from '../../assets/images/Quick Mode Background.webp';
+import classicModeBg from '../../assets/images/Classic Mode Background.webp';
+import extremeModeBg from '../../assets/images/Extreme Mode Background.webp';
+import chaosModeBg from '../../assets/images/Chaos Mode Background.webp';
+import ultimateModeBg from '../../assets/images/Ultimate Mode Background.webp';
 
 // Preload the image assets at module level so the browser caches and never re-fetches
 if (typeof window !== 'undefined') {

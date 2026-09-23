@@ -265,13 +265,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete, onOpenVe
         {/* Feature Game Mode Chips */}
         <div className="mt-3.5 sm:mt-4 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
           <span className="px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/40 text-[10px] sm:text-[11px] font-header font-bold text-cyan-300 tracking-wider shadow-[0_0_10px_rgba(0,240,255,0.25)] backdrop-blur-sm">
-            🎯 FINGER ROULETTE
+            FINGER ROULETTE
           </span>
           <span className="px-2.5 py-0.5 rounded-full bg-pink-950/70 border border-pink-500/40 text-[10px] sm:text-[11px] font-header font-bold text-pink-300 tracking-wider shadow-[0_0_10px_rgba(236,72,153,0.25)] backdrop-blur-sm">
-            🍾 BOTTLE SPIN
+            BOTTLE SPIN
           </span>
           <span className="px-2.5 py-0.5 rounded-full bg-amber-950/70 border border-amber-500/40 text-[10px] sm:text-[11px] font-header font-bold text-amber-300 tracking-wider shadow-[0_0_10px_rgba(245,158,11,0.25)] backdrop-blur-sm">
-            💥 KABOOM
+            KABOOM
           </span>
         </div>
 

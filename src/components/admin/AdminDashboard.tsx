@@ -310,11 +310,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               SoundEngine.playButtonClick();
               setActiveTab('store');
             }}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-              activeTab === 'store'
-                ? 'bg-zinc-100 text-zinc-950 shadow-sm'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
-            }`}
+             className="px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
           >
             <ShoppingBag className="w-4 h-4" />
             <span>Store Items Manager</span>
@@ -444,17 +440,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   >
                     {/* Visual Art Preview Area */}
                     <div className="w-full h-32 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-center p-3 relative overflow-hidden">
-                      {item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="max-w-full max-h-full object-contain pointer-events-none group-hover:scale-105 transition-transform"
-                          style={{ filter: item.cssFilter || undefined }}
-                        />
-                      ) : (
-                        <Sparkles className="w-8 h-8 text-zinc-600" />
-                      )}
-
                       {/* Badges */}
                       <div className="absolute top-2 left-2 flex items-center gap-1.5">
                         <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-850/90 text-zinc-300 border border-zinc-700">
