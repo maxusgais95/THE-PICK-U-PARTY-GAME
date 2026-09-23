@@ -82,7 +82,7 @@ export const VersionNotesModal: React.FC<VersionNotesModalProps> = ({
 
             {/* Major Highlights */}
             <p className="font-subbody text-gray-300 text-[11px] leading-relaxed mt-2.5">
-              Introduced realistic 4-point optical diamond star flares with screen blending, solved trophy glow clipping boundaries, added 4 new milestone trophies, and launched the Day 7 Grand Vault Bundle with exclusive skins!
+              Introduced realistic 4-point optical diamond star flares with screen blending, solved trophy glow clipping boundaries, added 4 new milestone trophies, launched the Day 7 Grand Vault Bundle with exclusive skins, standardized 1.5x bomb scaling across game & store, and unclipped custom ball silhouettes!
             </p>
 
             <div className="mt-3 space-y-2">
@@ -112,7 +112,17 @@ export const VersionNotesModal: React.FC<VersionNotesModalProps> = ({
                   <span>Day 7 Grand Vault Bundle & Exclusive Skins</span>
                 </div>
                 <p className="text-[11px] text-gray-300 mt-1 leading-relaxed">
-                  Claiming Day 7 now grants an opened treasure vault chest delivering 1,000 Stars plus two exclusive legendary skins: <strong>Vault Dynamo Bomb</strong> and <strong>Celestial Nebula Orbs</strong>!
+                  Claiming Day 7 now grants an opened treasure vault chest delivering 1,000 Stars plus two exclusive legendary skins: <strong>Dynamo Reactor Bomb</strong> and <strong>Celestial Astral Orb</strong>!
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-rose-950/30 border border-rose-500/30">
+                <div className="flex items-center gap-1.5 font-header font-bold text-rose-300 text-[11px] uppercase tracking-wide">
+                  <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Bomb 1.5x Scale & Uncropped Ball Sprites</span>
+                </div>
+                <p className="text-[11px] text-gray-300 mt-1 leading-relaxed">
+                  Standardized all custom bomb models to a prominent 1.5x scale with elevated z-indexes across the Kaboom grid, Store showcase pedestals, and rewards. Removed hard circular clipping masks so Kawaii Neko Orb whiskers, ears, and custom contours render cleanly.
                 </p>
               </div>
             </div>

@@ -240,7 +240,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete, onOpenVe
             className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/70 border border-white/15 hover:border-pink-500/50 backdrop-blur-md text-gray-300 hover:text-white transition-all shadow-md group"
           >
             <span className="font-subbody text-[11px] sm:text-xs tracking-wider font-semibold text-gray-300 group-hover:text-pink-300">
-              v1.4.02
+              v1.4.03
             </span>
             <ChevronRight className="w-3 h-3 text-pink-400 group-hover:translate-x-0.5 transition-transform" />
           </button>

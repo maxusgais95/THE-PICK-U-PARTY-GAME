@@ -246,17 +246,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {toastMessage && (
         <div
           id="admin-toast"
-          className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 shadow-2xl text-xs font-semibold text-zinc-100 flex items-center gap-2 animate-fadeIn"
+          className="fixed bottom-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))] right-[max(1.5rem,calc(env(safe-area-inset-right)+1rem))] z-50 px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-700 shadow-2xl text-xs font-semibold text-zinc-100 flex items-center gap-2 animate-fadeIn"
         >
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Header Bar */}
+      {/* Top Header Bar with Safe-Area Notch Inset Support */}
       <header
         id="admin-header"
-        className="w-full bg-zinc-900/90 border-b border-zinc-800/80 px-4 sm:px-6 py-3.5 sticky top-0 z-30 backdrop-blur-md"
+        className="w-full bg-zinc-900/90 border-b border-zinc-800/80 px-4 sm:px-6 pt-[max(0.875rem,calc(env(safe-area-inset-top)+0.625rem))] pb-3.5 sticky top-0 z-30 backdrop-blur-md"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -297,7 +297,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex-1 flex flex-col gap-6">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6 pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+1.5rem))] flex-1 flex flex-col gap-6">
         {/* Navigation Tabs */}
         <div
           id="admin-tab-navigation"
@@ -744,7 +744,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Reset Catalogue to Defaults Modal */}
       {isResetCatalogueModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center pt-[max(1.5rem,calc(env(safe-area-inset-top)+1rem))] pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))] px-4 bg-black/85 backdrop-blur-md animate-fadeIn"
           onClick={() => setIsResetCatalogueModalOpen(false)}
         >
           <div

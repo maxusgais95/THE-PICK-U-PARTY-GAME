@@ -172,12 +172,12 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
   return (
     <div
       id="store-item-modal-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center pt-[max(1rem,calc(env(safe-area-inset-top)+0.5rem))] pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem))] px-3 sm:px-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn"
       onClick={onClose}
     >
       <div
         id="store-item-modal-dialog"
-        className="relative w-full max-w-2xl max-h-[90vh] bg-zinc-900 border border-zinc-700/80 rounded-2xl shadow-2xl text-zinc-100 flex flex-col overflow-hidden my-auto"
+        className="relative w-full max-w-2xl max-h-[calc(100vh-max(2rem,calc(env(safe-area-inset-top)+env(safe-area-inset-bottom)+1rem)))] bg-zinc-900 border border-zinc-700/80 rounded-2xl shadow-2xl text-zinc-100 flex flex-col overflow-hidden my-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

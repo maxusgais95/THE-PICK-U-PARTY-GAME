@@ -493,7 +493,7 @@ export default function App() {
         }}
       />
 
-      {/* Version Notes Modal (Changelog History & v1.4.02 Updates) */}
+      {/* Version Notes Modal (Changelog History & v1.4.03 Updates) */}
       <VersionNotesModal
         isOpen={isVersionNotesOpen}
         onClose={() => setIsVersionNotesOpen(false)}
