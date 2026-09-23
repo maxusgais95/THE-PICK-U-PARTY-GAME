@@ -29,7 +29,7 @@ export default defineConfig(() => {
           id: `./`,
           name: "PICK'U PARTY",
           short_name: "PICK'U PARTY",
-          description: 'Multiplayer Finger Roulette, Team Splitter, and Swipe Bottle Spin for Mobile Parties',
+          description: 'Multiplayer Finger Roulette, Avoiding Bomb, and Swipe Bottle Spin for Mobile Parties',
           theme_color: '#030712',
           background_color: '#030712',
           display: 'standalone',
