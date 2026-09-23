@@ -7,7 +7,7 @@ import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { DailyQuest } from '../lib/economy';
 import { SoundEngine, Haptics } from '../lib/audio';
-import chestSpriteImg from '../assets/images/Chest Sprite.png';
+import chestSpriteImg from '../assets/images/Chest Sprite.webp';
 
 interface DailyQuestsWidgetProps {
   quests: DailyQuest[];

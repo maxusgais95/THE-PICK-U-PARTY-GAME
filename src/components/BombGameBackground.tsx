@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import bombGameBg from '../assets/images/Bomb Game Background.jpeg';
+import bombGameBg from '../assets/images/Bomb Game Background.webp';
 import { getAssetUrl } from '../lib/assetPreloader';
 
 interface BombGameBackgroundProps {

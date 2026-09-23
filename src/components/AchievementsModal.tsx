@@ -32,12 +32,12 @@ import { AppStats } from '../types';
 import { getStats } from '../lib/db';
 import { EconomyState, addStars, getEconomyState } from '../lib/economy';
 import { SoundEngine, Haptics } from '../lib/audio';
-import currencyStarImg from '../assets/images/Currency Star Sprite.png';
-import diamondStarSparklePng from '../assets/images/diamond_star_sparkle.png';
-import bronzeBlendBg from '../assets/images/Trophy BG Bronze 01.jpeg';
-import silverBlendBg from '../assets/images/Trophy BG Silver 01.jpeg';
-import goldBlendBg from '../assets/images/Trophy BG Gold 01.jpeg';
-import platBlendBg from '../assets/images/Trophy BG Platinum 01.jpeg';
+import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
+import diamondStarSparklePng from '../assets/images/diamond_star_sparkle.webp';
+import bronzeBlendBg from '../assets/images/Trophy BG Bronze 01.webp';
+import silverBlendBg from '../assets/images/Trophy BG Silver 01.webp';
+import goldBlendBg from '../assets/images/Trophy BG Gold 01.webp';
+import platBlendBg from '../assets/images/Trophy BG Platinum 01.webp';
 
 const TIER_BLEND_BACKGROUNDS: Record<TrophyTier, string | null> = {
   bronze: bronzeBlendBg,

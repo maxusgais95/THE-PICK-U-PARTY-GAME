@@ -15,8 +15,8 @@ import {
 } from '../lib/economy';
 import { SoundEngine, Haptics } from '../lib/audio';
 import { ScreenView } from '../types';
-import chestSpriteImg from '../assets/images/Chest Sprite.png';
-import currencyStarImg from '../assets/images/Currency Star Sprite.png';
+import chestSpriteImg from '../assets/images/Chest Sprite.webp';
+import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
 
 interface DailyQuestsModalProps {
   isOpen: boolean;

@@ -8,8 +8,8 @@ import { X, Sparkles, Upload, Image as ImageIcon, Check, Star } from 'lucide-rea
 import { StoreItem, StoreCategory } from '../../lib/economy';
 import { SoundEngine, Haptics } from '../../lib/audio';
 import { BOTTLE_SKINS } from '../../lib/bottleSkins';
-import kaboomBombImg from '../../assets/images/Bomb Sprite.png';
-import kaboomBallImg from '../../assets/images/Ball Sprite.png';
+import kaboomBombImg from '../../assets/images/Bomb Sprite.webp';
+import kaboomBallImg from '../../assets/images/Ball Sprite.webp';
 
 interface StoreItemModalProps {
   isOpen: boolean;

@@ -6,10 +6,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, Gift, Star, Check, Sparkles, Calendar, Clock, Crown, ShieldAlert } from 'lucide-react';
 import { SoundEngine, Haptics } from '../lib/audio';
-import currencyStarImg from '../assets/images/Currency Star Sprite.png';
-import day7BundleChestImg from '../assets/images/day7_bundle_chest.jpg';
-import bombDynamoImg from '../assets/images/bombs/Bomb Dynamo.png';
-import ballCelestialImg from '../assets/images/balls/Ball Celestial.png';
+import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
+import day7BundleChestImg from '../assets/images/day7_bundle_chest.webp';
+import bombDynamoImg from '../assets/images/bombs/Bomb Dynamo.webp';
+import ballCelestialImg from '../assets/images/balls/Ball Celestial.webp';
 import {
   EconomyState,
   claimDailyLoginReward,
