@@ -44,6 +44,8 @@ import {
   STORE_CATALOGUE,
   getStoreCatalogue,
   getEconomyState,
+  StoreCategory,
+  StoreItem,
 } from '../../lib/economy';
 
 interface KaboomGameProps {
@@ -115,11 +117,30 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
   onStatsUpdated,
   onEconomyUpdated,
 }) => {
+  const [catalogue, setCatalogue] = useState<Record<StoreCategory, StoreItem[]>>(() => getStoreCatalogue());
+
+  useEffect(() => {
+    const handleCatUpdate = () => {
+      setCatalogue(getStoreCatalogue());
+    };
+    const handleEcoUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<EconomyState>;
+      if (customEvent.detail && onEconomyUpdated) {
+        onEconomyUpdated(customEvent.detail);
+      }
+    };
+    window.addEventListener('picku_store_catalogue_updated', handleCatUpdate);
+    window.addEventListener('picku_economy_updated', handleEcoUpdate);
+    return () => {
+      window.removeEventListener('picku_store_catalogue_updated', handleCatUpdate);
+      window.removeEventListener('picku_economy_updated', handleEcoUpdate);
+    };
+  }, [onEconomyUpdated]);
+
   const currentEconomy = propEconomy || getEconomyState();
   const equippedBombId = currentEconomy?.equippedSkins?.bombs || 'bomb_classic_tnt';
   const equippedBallId = currentEconomy?.equippedSkins?.balls || 'ball_cyan_orbs';
 
-  const catalogue = getStoreCatalogue();
   const equippedBombItem = catalogue.bombs.find((b) => b.id === equippedBombId) || STORE_CATALOGUE.bombs.find((b) => b.id === equippedBombId);
   const equippedBallItem = catalogue.balls.find((b) => b.id === equippedBallId) || STORE_CATALOGUE.balls.find((b) => b.id === equippedBallId);
 

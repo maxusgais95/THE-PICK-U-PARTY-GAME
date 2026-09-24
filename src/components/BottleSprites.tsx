@@ -7,9 +7,10 @@ import React from 'react';
 import { BottleBlendMode, BottleBuiltinStyle, CustomBottleSprite, ThemeColors } from '../types';
 import { getBottleSkin } from '../lib/bottleSkins';
 import { useTransparentImage } from '../lib/bottleAlphaCache';
+import { getStoreCatalogue } from '../lib/economy';
 
 interface BottleSpriteProps {
-  styleType: BottleBuiltinStyle | 'custom';
+  styleType: BottleBuiltinStyle | 'custom' | string;
   customSprite: CustomBottleSprite | null;
   themeColors: ThemeColors;
   className?: string;
@@ -22,10 +23,6 @@ export const BottleSpriteRenderer: React.FC<BottleSpriteProps> = ({
   className,
   blendMode,
 }) => {
-  const skin = getBottleSkin(styleType);
-  const transparentPresetSrc = useTransparentImage(skin.image);
-  const transparentCustomSrc = useTransparentImage(customSprite?.dataUrl);
-
   // If custom uploaded sprite exists and selected
   if (styleType === 'custom' && customSprite && customSprite.dataUrl) {
     const customClass = className || 'w-[min(93vw,88vh)] h-[min(93vw,88vh)] max-w-[762px] max-h-[906px]';
@@ -41,7 +38,7 @@ export const BottleSpriteRenderer: React.FC<BottleSpriteProps> = ({
         }}
       >
         <img
-          src={transparentCustomSrc || customSprite.dataUrl}
+          src={customSprite.dataUrl}
           alt="Custom Bottle"
           className="w-full h-full object-contain pointer-events-none scale-[1.13] sm:scale-[1.24] md:scale-[1.34]"
           style={{
@@ -55,8 +52,15 @@ export const BottleSpriteRenderer: React.FC<BottleSpriteProps> = ({
     );
   }
 
-  // Built-in Bottle Skins (Btl_E_001 to Btl_E_004)
-  // Renders with dynamically auto-keyed transparent PNG - zero black background on iOS Safari and all browsers!
+  // Look for matching store catalogue bottle (supports custom created store bottles and preset skins)
+  const storeBottles = getStoreCatalogue().bottles;
+  const matchedStoreBottle = storeBottles.find(
+    (b) => b.builtInBottleStyle === styleType || b.id === styleType
+  );
+
+  const skin = getBottleSkin(styleType);
+  const bottleImgSrc = matchedStoreBottle?.image || skin.image;
+  const transparentSrc = useTransparentImage(bottleImgSrc);
   const skinClass = className || 'w-[min(93vw,88vh)] h-[min(93vw,88vh)] max-w-[762px] max-h-[906px]';
 
   return (
@@ -65,11 +69,12 @@ export const BottleSpriteRenderer: React.FC<BottleSpriteProps> = ({
       style={{ overflow: 'visible' }}
     >
       <img
-        src={transparentPresetSrc || skin.image}
-        alt="Bottle"
+        src={transparentSrc || bottleImgSrc}
+        alt={matchedStoreBottle?.name || "Bottle"}
         className="w-full h-full object-contain pointer-events-none scale-[1.13] sm:scale-[1.24] md:scale-[1.34] select-none"
         style={{
           overflow: 'visible',
+          ...(matchedStoreBottle?.cssFilter ? { filter: matchedStoreBottle.cssFilter } : {}),
         }}
       />
     </div>

@@ -47,6 +47,8 @@ const BottlePresetThumbnail: React.FC<{ image: string; alt: string }> = ({ image
   );
 };
 
+import { equipItem, EconomyState } from '../lib/economy';
+
 interface SettingsModalProps {
   isOpen: boolean;
   settings: AppSettings;
@@ -58,6 +60,7 @@ interface SettingsModalProps {
   onRefreshStats: () => void;
   onOpenStore?: () => void;
   onOpenAdmin?: () => void;
+  onEconomyUpdated?: (state: EconomyState) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -71,6 +74,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onRefreshStats,
   onOpenStore,
   onOpenAdmin,
+  onEconomyUpdated,
 }) => {
   const [activeTab, setActiveTab] = useState<'game' | 'bottle' | 'stats'>('game');
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -108,6 +112,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           bottleStyle: 'custom',
           selectedCustomSpriteId: newSprite.id,
         });
+        const ecoRes = equipItem('bottles', `custom_${newSprite.id}`);
+        if (ecoRes.success && onEconomyUpdated) {
+          onEconomyUpdated(ecoRes.updatedState);
+        }
         onRefreshSprites();
         SoundEngine.playButtonClick();
       }
@@ -164,6 +172,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         bottleStyle: 'btl_e_001',
         selectedCustomSpriteId: null,
       });
+      const ecoRes = equipItem('bottles', 'bottle_btl_001');
+      if (ecoRes.success && onEconomyUpdated) {
+        onEconomyUpdated(ecoRes.updatedState);
+      }
     }
     onRefreshSprites();
   };
@@ -506,6 +518,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               bottleStyle: 'custom',
                               selectedCustomSpriteId: sprite.id,
                             });
+                            const ecoRes = equipItem('bottles', `custom_${sprite.id}`);
+                            if (ecoRes.success && onEconomyUpdated) {
+                              onEconomyUpdated(ecoRes.updatedState);
+                            }
                           }}
                           style={{
                             backgroundColor: isSelected ? `${currentTheme.primary}18` : 'rgba(255, 255, 255, 0.04)',

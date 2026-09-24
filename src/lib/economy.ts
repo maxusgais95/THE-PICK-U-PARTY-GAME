@@ -843,7 +843,7 @@ export function getEconomyState(): EconomyState {
     const validBombIds = STORE_CATALOGUE.bombs.map((b) => b.id);
     const validBallIds = STORE_CATALOGUE.balls.map((b) => b.id);
     const validAccessoryIds = STORE_CATALOGUE.accessories.map((a) => a.id);
-    const allValidIds = new Set([...validBottleIds, ...validBombIds, ...validBallIds, ...validAccessoryIds, 'btl_e_001', 'bomb_day7_vault_core', 'ball_day7_nebula_orb']);
+    const allValidIds = new Set([...validBottleIds, ...validBombIds, ...validBallIds, ...validAccessoryIds, 'btl_e_001', 'bomb_day7_vault_core', 'ball_day7_nebula_orb', 'accessory_star_earrings']);
 
     // Parse Star Earrings Condition progress
     const rawEarrings = parsed.starEarrings || {};
@@ -867,7 +867,8 @@ export function getEconomyState(): EconomyState {
     const cleanUnlocked = rawUnlocked.filter((id) => allValidIds.has(id));
 
     let equippedBottles = parsed.equippedSkins?.bottles;
-    if (!validBottleIds.includes(equippedBottles)) {
+    const isCustomBottle = equippedBottles === 'custom' || (typeof equippedBottles === 'string' && equippedBottles.startsWith('custom_'));
+    if (!validBottleIds.includes(equippedBottles) && !isCustomBottle) {
       equippedBottles = 'bottle_btl_001';
     }
 
@@ -1312,6 +1313,41 @@ export function purchaseItem(itemId: string): { success: boolean; message: strin
 
 export function equipItem(category: StoreCategory, itemId: string): { success: boolean; updatedState: EconomyState } {
   const state = getEconomyState();
+
+  // If custom bottle is equipped (e.g. 'custom' or 'custom_<spriteId>')
+  if (category === 'bottles' && (itemId === 'custom' || itemId.startsWith('custom_'))) {
+    const updated: EconomyState = {
+      ...state,
+      equippedSkins: {
+        ...state.equippedSkins,
+        bottles: itemId,
+      },
+    };
+    saveEconomyState(updated);
+    return { success: true, updatedState: updated };
+  }
+
+  // Handle star earrings accessory
+  if (itemId === 'accessory_star_earrings') {
+    if (!state.starEarrings?.unlocked && !state.unlockedItems.includes(itemId)) {
+      return { success: false, updatedState: state };
+    }
+    const unlocked = [...state.unlockedItems];
+    if (!unlocked.includes(itemId)) {
+      unlocked.push(itemId);
+    }
+    const updated: EconomyState = {
+      ...state,
+      unlockedItems: unlocked,
+      equippedSkins: {
+        ...state.equippedSkins,
+        accessories: itemId,
+      },
+    };
+    saveEconomyState(updated);
+    return { success: true, updatedState: updated };
+  }
+
   if (!state.unlockedItems.includes(itemId)) {
     return { success: false, updatedState: state };
   }

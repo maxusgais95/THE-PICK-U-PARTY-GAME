@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Volume2, VolumeX, Settings, Home, Maximize, Minimize, Info, BookOpen, Disc } from 'lucide-react';
+import { Volume2, VolumeX, Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
 import { CurrencyHud } from './CurrencyHud';
 import { AppSettings, ScreenView } from '../types';
@@ -25,6 +25,7 @@ interface HeaderProps {
   onToggleHaptics: () => void;
   onToggleBottleSprite?: () => void;
   onToggleBallSkin?: () => void;
+  onToggleBombSkin?: () => void;
   onEconomyUpdated?: (state: EconomyState) => void;
   onRefillStars?: (amount: number) => void;
 }
@@ -42,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleHaptics,
   onToggleBottleSprite,
   onToggleBallSkin,
+  onToggleBombSkin,
   onEconomyUpdated,
   onRefillStars,
 }) => {
@@ -196,6 +198,22 @@ export const Header: React.FC<HeaderProps> = ({
             className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-pink-400/50 shadow-[0_0_12px_rgba(236,72,153,0.3)] flex items-center justify-center text-pink-300 active:scale-95 transition-all"
           >
             <ChampagneBottleIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-pink-300 drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
+          </button>
+        )}
+
+        {/* Bomb Skin Quick Switcher in Kaboom Mode */}
+        {currentView === 'kaboom' && onToggleBombSkin && (
+          <button
+            onClick={() => {
+              SoundEngine.playButtonClick();
+              Haptics.buttonClick();
+              onToggleBombSkin();
+            }}
+            aria-label="Switch Bomb Skin"
+            title="Switch Bomb Skin"
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.3)] flex items-center justify-center text-red-300 active:scale-95 transition-all cursor-pointer"
+          >
+            <Bomb className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
           </button>
         )}
 

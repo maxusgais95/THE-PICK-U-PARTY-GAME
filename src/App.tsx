@@ -25,7 +25,7 @@ import { LandscapeBlocker } from './components/LandscapeBlocker';
 import { SplashScreen } from './components/SplashScreen';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { KaboomGame } from './components/kaboom/KaboomGame';
-import { getEconomyState, EconomyState, STORE_CATALOGUE, equipItem } from './lib/economy';
+import { getEconomyState, EconomyState, getStoreCatalogue, equipItem } from './lib/economy';
 import { StoreModal } from './components/StoreModal';
 import { DailyQuestsModal } from './components/DailyQuestsModal';
 import { AchievementsModal } from './components/AchievementsModal';
@@ -85,11 +85,28 @@ export default function App() {
 
       // Ensure valid bottle style and screen blend mode
       const validSkins = ['btl_e_001', 'btl_e_002', 'btl_e_003', 'btl_e_004'];
-      if (
-        !validSkins.includes(loadedSettings.bottleStyle) &&
-        loadedSettings.bottleStyle !== 'custom'
-      ) {
-        loadedSettings.bottleStyle = 'btl_e_001';
+      const currentEconomyState = getEconomyState();
+      const equippedBottleSkin = currentEconomyState.equippedSkins?.bottles || 'bottle_btl_001';
+
+      if (loadedSettings.bottleStyle === 'custom' && loadedSettings.selectedCustomSpriteId) {
+        if (!equippedBottleSkin.startsWith('custom')) {
+          equipItem('bottles', `custom_${loadedSettings.selectedCustomSpriteId}`);
+        }
+      } else {
+        const catalogue = getStoreCatalogue();
+        const foundStoreBottle = catalogue.bottles.find((b) => b.id === equippedBottleSkin);
+        if (foundStoreBottle) {
+          loadedSettings.bottleStyle = (foundStoreBottle.builtInBottleStyle || foundStoreBottle.id) as any;
+          loadedSettings.selectedCustomSpriteId = null;
+        } else if (validSkins.includes(loadedSettings.bottleStyle)) {
+          const matchingStore = catalogue.bottles.find((b) => b.builtInBottleStyle === loadedSettings.bottleStyle);
+          if (matchingStore && equippedBottleSkin !== matchingStore.id) {
+            equipItem('bottles', matchingStore.id);
+          }
+        } else {
+          loadedSettings.bottleStyle = 'btl_e_001';
+          loadedSettings.selectedCustomSpriteId = null;
+        }
       }
       loadedSettings.bottleBlendMode = 'screen';
       loadedSettings.theme = 'cyber-neon';
@@ -204,19 +221,19 @@ export default function App() {
 
   // Quick bottle sprite cycle for header action: ONLY switches between purchased bottles!
   const handleCycleBottleSprite = useCallback(() => {
-    // Only include unlocked/purchased bottles from STORE_CATALOGUE
-    const unlockedBottles = STORE_CATALOGUE.bottles.filter((b) =>
+    const catalogue = getStoreCatalogue();
+    const unlockedBottles = catalogue.bottles.filter((b) =>
       economy.unlockedItems.includes(b.id)
     );
 
     type SpriteOption = {
-      style: BottleBuiltinStyle | 'custom';
+      style: BottleBuiltinStyle | 'custom' | string;
       spriteId: string | null;
       storeItemId: string | null;
     };
 
     const options: SpriteOption[] = unlockedBottles.map((b) => ({
-      style: b.builtInBottleStyle || 'btl_e_001',
+      style: b.builtInBottleStyle || b.id,
       spriteId: null,
       storeItemId: b.id,
     }));
@@ -242,13 +259,18 @@ export default function App() {
     const nextOpt = options[nextIndex];
 
     handleUpdateSettings({
-      bottleStyle: nextOpt.style,
+      bottleStyle: nextOpt.style as any,
       selectedCustomSpriteId: nextOpt.spriteId,
     });
 
     // Sync with economy equippedSkins so the store reflects the selected skin
     if (nextOpt.storeItemId) {
       const res = equipItem('bottles', nextOpt.storeItemId);
+      if (res.success) {
+        setEconomy(res.updatedState);
+      }
+    } else if (nextOpt.spriteId) {
+      const res = equipItem('bottles', `custom_${nextOpt.spriteId}`);
       if (res.success) {
         setEconomy(res.updatedState);
       }
@@ -260,7 +282,8 @@ export default function App() {
 
   // Quick ball skin cycle for header action in Kaboom mode: ONLY switches between purchased balls!
   const handleCycleBallSkin = useCallback(() => {
-    const unlockedBalls = STORE_CATALOGUE.balls.filter((b) =>
+    const catalogue = getStoreCatalogue();
+    const unlockedBalls = catalogue.balls.filter((b) =>
       economy.unlockedItems.includes(b.id)
     );
     if (unlockedBalls.length <= 1) {
@@ -281,6 +304,31 @@ export default function App() {
       Haptics.touchSuccess();
     }
   }, [economy.unlockedItems, economy.equippedSkins?.balls]);
+
+  // Quick bomb skin cycle for header action in Kaboom mode: ONLY switches between purchased bombs!
+  const handleCycleBombSkin = useCallback(() => {
+    const catalogue = getStoreCatalogue();
+    const unlockedBombs = catalogue.bombs.filter((b) =>
+      economy.unlockedItems.includes(b.id)
+    );
+    if (unlockedBombs.length <= 1) {
+      SoundEngine.playButtonClick();
+      Haptics.buttonClick();
+      return;
+    }
+
+    const currentBombId = economy.equippedSkins?.bombs || 'bomb_classic_tnt';
+    const currentIndex = unlockedBombs.findIndex((b) => b.id === currentBombId);
+    const nextIndex = (currentIndex + 1) % unlockedBombs.length;
+    const nextBomb = unlockedBombs[nextIndex];
+
+    const res = equipItem('bombs', nextBomb.id);
+    if (res.success) {
+      setEconomy(res.updatedState);
+      SoundEngine.playButtonClick();
+      Haptics.touchSuccess();
+    }
+  }, [economy.unlockedItems, economy.equippedSkins?.bombs]);
 
   const handleNavigateToGame = useCallback((targetView: ScreenView) => {
     setCurrentTouches([]);
@@ -417,6 +465,7 @@ export default function App() {
         onToggleHaptics={handleToggleHaptics}
         onToggleBottleSprite={handleCycleBottleSprite}
         onToggleBallSkin={handleCycleBallSkin}
+        onToggleBombSkin={handleCycleBombSkin}
         onEconomyUpdated={setEconomy}
       />
 
@@ -491,6 +540,7 @@ export default function App() {
           setIsSettingsOpen(false);
           setCurrentView('admin');
         }}
+        onEconomyUpdated={setEconomy}
       />
 
       {/* Version Notes Modal (Changelog History & v1.4.03 Updates) */}

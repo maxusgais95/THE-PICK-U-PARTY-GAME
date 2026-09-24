@@ -35,6 +35,7 @@ const CATEGORIES: { id: StoreCategory; label: string;}[] = [
   { id: 'bottles', label: 'BOTTLES'},
   { id: 'bombs', label: 'BOMBS'},
   { id: 'balls', label: 'BALLS'},
+  { id: 'accessories', label: 'SPECIAL'},
 ];
 
 export const StoreModal: React.FC<StoreModalProps> = ({
@@ -65,7 +66,6 @@ export const StoreModal: React.FC<StoreModalProps> = ({
   if (!isOpen) return null;
 
   const currentItems = catalogue[activeCategory] || [];
-  const equippedId = economy.equippedSkins[activeCategory];
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setNotification({ message, type });
@@ -81,10 +81,10 @@ export const StoreModal: React.FC<StoreModalProps> = ({
       Haptics.touchSuccess();
       onEconomyUpdated(res.updatedState);
 
-      // If this is a bottle item with built-in style, update app settings directly
-      if (item.category === 'bottles' && item.builtInBottleStyle) {
+      // If this is a bottle item, update app settings directly
+      if (item.category === 'bottles') {
         onUpdateSettings({
-          bottleStyle: item.builtInBottleStyle,
+          bottleStyle: item.builtInBottleStyle || (item.id as any),
           selectedCustomSpriteId: null,
         });
       }
@@ -104,9 +104,9 @@ export const StoreModal: React.FC<StoreModalProps> = ({
     if (res.success) {
       onEconomyUpdated(res.updatedState);
 
-      if (item.category === 'bottles' && item.builtInBottleStyle) {
+      if (item.category === 'bottles') {
         onUpdateSettings({
-          bottleStyle: item.builtInBottleStyle,
+          bottleStyle: item.builtInBottleStyle || (item.id as any),
           selectedCustomSpriteId: null,
         });
       }
@@ -293,8 +293,26 @@ export const StoreModal: React.FC<StoreModalProps> = ({
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           <div className="grid grid-cols-2 gap-3.5 sm:gap-4">
             {currentItems.map((item) => {
-              const isUnlocked = economy.unlockedItems.includes(item.id);
-              const isEquipped = equippedId === item.id;
+              const isUnlocked = economy.unlockedItems.includes(item.id) || (item.id === 'accessory_star_earrings' && Boolean(economy.starEarrings?.unlocked));
+              const isEquipped = (() => {
+                if (item.category === 'bottles') {
+                  if (settings.bottleStyle === 'custom') return false;
+                  return (
+                    economy.equippedSkins?.bottles === item.id ||
+                    (Boolean(item.builtInBottleStyle) && settings.bottleStyle === item.builtInBottleStyle)
+                  );
+                }
+                if (item.category === 'bombs') {
+                  return (economy.equippedSkins?.bombs || 'bomb_classic_tnt') === item.id;
+                }
+                if (item.category === 'balls') {
+                  return (economy.equippedSkins?.balls || 'ball_cyan_orbs') === item.id;
+                }
+                if (item.category === 'accessories') {
+                  return (economy.equippedSkins?.accessories || '') === item.id;
+                }
+                return false;
+              })();
               const canAfford = economy.stars >= item.price;
               const isDay7Exclusive =
                 item.id === DAY7_BUNDLE_BOMB_ID ||
