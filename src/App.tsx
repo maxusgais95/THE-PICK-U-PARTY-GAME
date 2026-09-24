@@ -30,6 +30,7 @@ import { StoreModal } from './components/StoreModal';
 import { DailyQuestsModal } from './components/DailyQuestsModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { RewardsModal } from './components/RewardsModal';
+import { EventModal } from './components/EventModal';
 import { GamePreloader } from './components/GamePreloader';
 import { preloadGameAssets, GameModeId } from './lib/assetPreloader';
 import { AdminDashboard } from './components/admin/AdminDashboard';
@@ -47,6 +48,7 @@ export default function App() {
   const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState<boolean>(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
   const [isRewardsOpen, setIsRewardsOpen] = useState<boolean>(false);
+  const [isEventsOpen, setIsEventsOpen] = useState<boolean>(false);
   const [economy, setEconomy] = useState<EconomyState>(() => getEconomyState());
   const [settings, setSettings] = useState<AppSettings>({
     minPlayers: 2,
@@ -158,8 +160,15 @@ export default function App() {
         setEconomy(getEconomyState());
       }
     };
+    const handleOpenEventsEvent = () => {
+      setIsEventsOpen(true);
+    };
     window.addEventListener('picku_economy_updated', handleEconomyEvent);
-    return () => window.removeEventListener('picku_economy_updated', handleEconomyEvent);
+    window.addEventListener('picku_open_events', handleOpenEventsEvent);
+    return () => {
+      window.removeEventListener('picku_economy_updated', handleEconomyEvent);
+      window.removeEventListener('picku_open_events', handleOpenEventsEvent);
+    };
   }, []);
 
   const refreshSprites = useCallback(async () => {
@@ -485,6 +494,7 @@ export default function App() {
             onOpenDailyQuests={() => setIsDailyQuestsOpen(true)}
             onOpenAchievements={() => setIsAchievementsOpen(true)}
             onOpenRewards={() => setIsRewardsOpen(true)}
+            onOpenEvents={() => setIsEventsOpen(true)}
           />
         )}
 
@@ -597,6 +607,15 @@ export default function App() {
         economy={economy}
         onClose={() => setIsRewardsOpen(false)}
         onEconomyUpdated={setEconomy}
+      />
+
+      {/* Events Hub Modal (XP Progression, Milestones, Point Store) */}
+      <EventModal
+        isOpen={isEventsOpen}
+        onClose={() => setIsEventsOpen(false)}
+        economy={economy}
+        onEconomyUpdated={setEconomy}
+        onNavigateToGame={handleNavigateToGame}
       />
 
       {/* Portrait-Only Guard: Landscape Blocker Overlay */}

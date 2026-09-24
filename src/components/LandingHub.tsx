@@ -13,6 +13,7 @@ import { AppSettings, AppStats } from '../types';
 import { SoundEngine, Haptics } from '../lib/audio';
 import { LeftSidebarStack } from './LeftSidebarStack';
 import { DailyQuestsWidget } from './DailyQuestsWidget';
+import { EventPanel } from './EventPanel';
 import { EconomyState, getDailyRewardStatus } from '../lib/economy';
 
 interface LandingHubProps {
@@ -28,6 +29,7 @@ interface LandingHubProps {
   onOpenDailyQuests?: () => void;
   onOpenAchievements?: () => void;
   onOpenRewards?: () => void;
+  onOpenEvents?: () => void;
 }
 
 interface GameCard {
@@ -57,6 +59,7 @@ export const LandingHub: React.FC<LandingHubProps> = ({
   onOpenDailyQuests,
   onOpenAchievements,
   onOpenRewards,
+  onOpenEvents,
 }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -237,14 +240,15 @@ export const LandingHub: React.FC<LandingHubProps> = ({
         />
       </div>
 
-      {/* 2. Top-Right Daily Quests Widget */}
+      {/* 2. Top-Right Daily Quests Widget & Event Panel */}
       {economy && (
-        <div className="absolute top-[max(6.25rem,calc(env(safe-area-inset-top)+5rem))] right-3 sm:right-4 z-30 flex flex-col items-end">
+        <div className="absolute top-[max(6.25rem,calc(env(safe-area-inset-top)+5rem))] right-3 sm:right-4 z-30 flex flex-col items-end gap-2.5">
           <DailyQuestsWidget
             quests={economy.dailyQuests}
             milestoneChestClaimed={economy.milestoneChestClaimed}
             onOpenQuests={onOpenDailyQuests || (() => {})}
           />
+          <EventPanel onOpenEvents={onOpenEvents || (() => {})} />
         </div>
       )}
 

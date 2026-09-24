@@ -5,6 +5,7 @@
 
 import { AppSettings, AppStats, CustomBottleSprite, KaboomStats } from '../types';
 import { recordDailyQuestProgress } from './economy';
+import { addEventExperience } from './events';
 
 const DB_NAME = 'NeonPartyHubDB_v1';
 const DB_VERSION = 1;
@@ -238,9 +239,11 @@ export async function recordGameEvent(type: 'roulette' | 'bottle'): Promise<AppS
   if (type === 'roulette') {
     current.totalRouletteRounds += 1;
     recordDailyQuestProgress('roulette_round', 1);
+    addEventExperience(35, 'roulette');
   } else if (type === 'bottle') {
     current.totalBottleSpins += 1;
     recordDailyQuestProgress('bottle_spin', 1);
+    addEventExperience(25, 'bottle');
   }
   current.lastPlayedAt = Date.now();
   await saveStats(current);
@@ -258,12 +261,14 @@ export async function recordKaboomEvent(event: {
   if (event.type === 'bonus') {
     current.kaboom.bonusCollected += 1;
     recordDailyQuestProgress('kaboom_tile', 1);
+    addEventExperience(15, 'kaboom_bonus');
   } else if (event.type === 'victory') {
     // End a round without tapping the bomb
     current.totalKaboomRounds += 1;
     current.kaboom.totalRounds += 1;
     current.kaboom.victories += 1;
     recordDailyQuestProgress('kaboom_victory', 1);
+    addEventExperience(50, 'kaboom_victory');
   } else if (event.type === 'bomb_hit') {
     current.totalKaboomRounds += 1;
     current.kaboom.totalRounds += 1;

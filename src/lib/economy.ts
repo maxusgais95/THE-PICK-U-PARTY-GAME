@@ -1498,3 +1498,16 @@ export function equipStarEarrings(equip: boolean): EconomyState {
   return updatedState;
 }
 
+export function unlockStoreSkin(itemId: string): EconomyState {
+  const state = getEconomyState();
+  if (state.unlockedItems.includes(itemId)) {
+    return state;
+  }
+  const updatedState: EconomyState = {
+    ...state,
+    unlockedItems: [...state.unlockedItems, itemId],
+  };
+  saveEconomyState(updatedState);
+  return updatedState;
+}
+

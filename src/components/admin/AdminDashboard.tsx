@@ -23,6 +23,8 @@ import {
   CheckCircle2,
   Sliders,
   Filter,
+  Calendar,
+  Award,
 } from 'lucide-react';
 import {
   StoreItem,
@@ -42,6 +44,7 @@ import { SoundEngine, Haptics } from '../../lib/audio';
 import { StoreItemModal } from './StoreItemModal';
 import { DeleteItemConfirmModal } from './DeleteItemConfirmModal';
 import { ResetStatsConfirmModal } from './ResetStatsConfirmModal';
+import { AdminEventsManager } from './AdminEventsManager';
 
 interface AdminDashboardProps {
   settings: AppSettings;
@@ -60,7 +63,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onRefreshStats,
   onEconomyUpdated,
 }) => {
-  const [activeTab, setActiveTab] = useState<'store' | 'stats' | 'economy'>('store');
+  const [activeTab, setActiveTab] = useState<'store' | 'stats' | 'economy' | 'events'>('store');
   const [catalogue, setCatalogue] = useState<Record<StoreCategory, StoreItem[]>>(() => getStoreCatalogue());
   const [activeCategory, setActiveCategory] = useState<StoreCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -355,6 +358,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           >
             <Coins className="w-4 h-4" />
             <span>Player Economy & Wallet</span>
+          </button>
+
+          <button
+            type="button"
+            id="admin-tab-events"
+            onClick={() => {
+              SoundEngine.playButtonClick();
+              setActiveTab('events');
+            }}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              activeTab === 'events'
+                ? 'bg-zinc-100 text-zinc-950 shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+            }`}
+          >
+            <Award className="w-4 h-4 text-cyan-400" />
+            <span>Events & Schedule Hub</span>
           </button>
         </div>
 
@@ -706,6 +726,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
           </div>
+        )}
+
+        {/* TAB 4: EVENTS & SCHEDULE MANAGER */}
+        {activeTab === 'events' && (
+          <AdminEventsManager onShowToast={showToast} />
         )}
       </main>
 
