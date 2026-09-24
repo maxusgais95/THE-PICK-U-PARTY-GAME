@@ -127,7 +127,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                 src={item.image}
                 alt={item.name}
                 className="max-h-24 w-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.8)] transform -rotate-12 group-hover:rotate-0 group-hover:scale-105 transition-all duration-300 pointer-events-none"
-                style={{ mixBlendMode: 'screen' }}
+                style={{ ...(item.cssFilter ? { filter: item.cssFilter } : {}), ...(item.image.endsWith('.webp') ? { mixBlendMode: 'screen' } : {}) }}
               />
             </div>
           );
@@ -162,18 +162,31 @@ export const StoreModal: React.FC<StoreModalProps> = ({
             />
           </div>
         );
-      case 'accessory':
+      case "accessory":
+        if (item.image) {
+          return (
+            <div className="relative flex items-center justify-center w-full h-full p-2 overflow-hidden">
+              <div className={`absolute w-20 h-20 rounded-full bg-gradient-to-tr ${item.accentGradient} opacity-35 blur-lg`} />
+              <img
+                src={item.image}
+                alt={item.name}
+                className="max-h-20 sm:max-h-24 w-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.85)] transform group-hover:scale-110 transition-all duration-300 pointer-events-none"
+                style={item.cssFilter ? { filter: item.cssFilter } : undefined}
+              />
+            </div>
+          );
+        }
         return (
           <div className="relative flex items-center justify-center w-full h-full gap-2">
             <div className={`absolute w-20 h-20 rounded-full bg-gradient-to-tr ${item.accentGradient} opacity-40 blur-lg animate-pulse`} />
             {/* Pair of glowing star earrings */}
             <div className="relative flex items-center gap-3">
-              <div className="flex flex-col items-center animate-bounce" style={{ animationDuration: '2.5s' }}>
+              <div className="flex flex-col items-center animate-bounce" style={{ animationDuration: "2.5s" }}>
                 <div className="w-1.5 h-2 rounded-full border border-amber-300 bg-amber-200 shadow-sm" />
                 <div className="w-0.5 h-2.5 bg-gradient-to-b from-amber-300 to-yellow-400" />
                 <Star className="w-6 h-6 fill-amber-300 text-yellow-100 drop-shadow-[0_0_10px_rgba(251,191,36,0.95)]" />
               </div>
-              <div className="flex flex-col items-center animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.4s' }}>
+              <div className="flex flex-col items-center animate-bounce" style={{ animationDuration: "2.5s", animationDelay: "0.4s" }}>
                 <div className="w-1.5 h-2 rounded-full border border-amber-300 bg-amber-200 shadow-sm" />
                 <div className="w-0.5 h-2.5 bg-gradient-to-b from-amber-300 to-yellow-400" />
                 <Star className="w-6 h-6 fill-amber-300 text-yellow-100 drop-shadow-[0_0_10px_rgba(251,191,36,0.95)]" />
@@ -270,7 +283,6 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                     : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
                 }`}
               >
-                <span>{cat.icon}</span>
                 <span>{cat.label}</span>
               </button>
             );

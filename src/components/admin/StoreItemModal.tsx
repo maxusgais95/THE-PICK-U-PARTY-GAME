@@ -4,12 +4,9 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Sparkles, Upload, Image as ImageIcon, Check, Star } from 'lucide-react';
+import { X, Sparkles, Upload, Image as ImageIcon, Check, Star, Loader2 } from 'lucide-react';
 import { StoreItem, StoreCategory } from '../../lib/economy';
 import { SoundEngine, Haptics } from '../../lib/audio';
-import { BOTTLE_SKINS } from '../../lib/bottleSkins';
-import kaboomBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
-import kaboomBallImg from '../../assets/images/balls/Ball Sprite.webp';
 
 interface StoreItemModalProps {
   isOpen: boolean;
@@ -33,7 +30,7 @@ const CATEGORY_OPTIONS: { id: StoreCategory; label: string }[] = [
   { id: 'accessories', label: 'Accessories' },
 ];
 
-const SOLAR_AMBER_FILTER = 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)';
+const ENHANCE_FILTER = 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)';
 
 export const StoreItemModal: React.FC<StoreItemModalProps> = ({
   isOpen,
@@ -46,11 +43,12 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
   const [name, setName] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number>(100);
   const [rarity, setRarity] = useState<'Common' | 'Rare' | 'Epic' | 'Legendary'>('Common');
   const [badge, setBadge] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isEnhanced, setIsEnhanced] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -66,7 +64,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
         setRarity(item.rarity || 'Common');
         setBadge(item.badge || '');
         setImageUrl(item.image || '');
-        setIsEnhanced(item.cssFilter === 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)');
+        setIsEnhanced(Boolean(item.cssFilter));
       } else {
         setCategory(defaultCategory);
         setName('');
@@ -75,12 +73,8 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
         setPrice(100);
         setRarity('Common');
         setBadge('');
-        // Default preset image based on category
-        if (defaultCategory === 'bottles') setImageUrl(BOTTLE_SKINS[0].image);
-        else if (defaultCategory === 'bombs') setImageUrl(kaboomBombImg);
-        else if (defaultCategory === 'balls') setImageUrl(kaboomBallImg);
-        else setImageUrl('');
-        setCssFilter('');
+        setImageUrl('');
+        setIsEnhanced(false);
       }
       setValidationError(null);
     }
@@ -88,22 +82,120 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Automatically convert any uploaded image File into a .webp Data URL using HTML5 Canvas.
+   * Target resolution specifications:
+   * - Balls: 512x512px
+   * - Bombs: 1024x1024px
+   * - Bottles / Accessories: up to 1024px max dimension (maintaining native aspect ratio)
+   */
+  const convertFileToWebp = (file: File, itemCategory: StoreCategory, quality = 0.92): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Failed to read image file."));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("Failed to decode image data."));
+        img.onload = () => {
+          try {
+            const naturalW = img.naturalWidth || img.width;
+            const naturalH = img.naturalHeight || img.height;
+
+            let targetWidth = naturalW;
+            let targetHeight = naturalH;
+            let isSquareCanvas = false;
+
+            if (itemCategory === "balls") {
+              // Ball specification: exactly 512x512px square canvas with centered sprite
+              targetWidth = 512;
+              targetHeight = 512;
+              isSquareCanvas = true;
+            } else if (itemCategory === "bombs") {
+              // Bomb specification: exactly 1024x1024px square canvas with centered sprite
+              targetWidth = 1024;
+              targetHeight = 1024;
+              isSquareCanvas = true;
+            } else {
+              // Bottles, accessories, etc.
+              const maxDim = 1024;
+              if (targetWidth > maxDim || targetHeight > maxDim) {
+                if (targetWidth >= targetHeight) {
+                  targetHeight = Math.round((targetHeight * maxDim) / targetWidth);
+                  targetWidth = maxDim;
+                } else {
+                  targetWidth = Math.round((targetWidth * maxDim) / targetHeight);
+                  targetHeight = maxDim;
+                }
+              }
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              resolve(reader.result as string);
+              return;
+            }
+
+            ctx.clearRect(0, 0, targetWidth, targetHeight);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+
+            if (isSquareCanvas) {
+              // Fit image inside the square box centered, keeping original aspect ratio
+              const scale = Math.min(targetWidth / naturalW, targetHeight / naturalH);
+              const drawW = naturalW * scale;
+              const drawH = naturalH * scale;
+              const offsetX = (targetWidth - drawW) / 2;
+              const offsetY = (targetHeight - drawH) / 2;
+              ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+            } else {
+              ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+            }
+
+            const webpDataUrl = canvas.toDataURL("image/webp", quality);
+            if (webpDataUrl.startsWith("data:image/webp")) {
+              resolve(webpDataUrl);
+            } else {
+              resolve(canvas.toDataURL("image/png"));
+            }
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.src = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setImageUrl(dataUrl);
-        SoundEngine.playButtonClick();
-      }
-    };
-    reader.readAsDataURL(file);
+    if (file.size > 8 * 1024 * 1024) {
+      setValidationError("Image size exceeds 8MB limit. Please choose a smaller image.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    setValidationError(null);
+    setIsConverting(true);
+
+    try {
+      const webpUrl = await convertFileToWebp(file, category);
+      setImageUrl(webpUrl);
+      SoundEngine.playButtonClick();
+    } catch {
+      setValidationError("Could not convert image to WebP. Please try another file.");
+    } finally {
+      setIsConverting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedName = name.trim();
@@ -151,7 +243,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
       borderGlow,
       iconType: iconTypeMap[category],
       image: imageUrl || undefined,
-      cssFilter: isEnhanced ? 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)' : undefined,
+      cssFilter: isEnhanced ? ENHANCE_FILTER : undefined,
     };
 
     SoundEngine.playButtonClick();
@@ -209,7 +301,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                     src={imageUrl}
                     alt="Preview"
                     className="max-w-full max-h-full object-contain"
-                    style={{ filter: isEnhanced ? 'hue-rotate(25deg) saturate(2.2) contrast(1.2) brightness(1.1)' : undefined }}
+                    style={{ filter: isEnhanced ? ENHANCE_FILTER : undefined }}
                   />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-zinc-600" />
@@ -265,12 +357,7 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                   onChange={(e) => {
                     const newCat = e.target.value as StoreCategory;
                     setCategory(newCat);
-                    // Default image for new category if empty or preset
-                    if (!item) {
-                      if (newCat === 'bottles') setImageUrl(BOTTLE_SKINS[0].image);
-                      else if (newCat === 'bombs') setImageUrl(kaboomBombImg);
-                      else if (newCat === 'balls') setImageUrl(kaboomBallImg);
-                    }
+
                   }}
                   className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-zinc-500 cursor-pointer"
                 >
@@ -384,11 +471,20 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 <button
                   type="button"
                   id="btn-upload-item-image"
+                  disabled={isConverting}
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-semibold text-zinc-200 flex items-center gap-2 transition-colors cursor-pointer shrink-0"
+                  className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-xs font-semibold text-zinc-200 flex items-center gap-2 transition-colors cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Upload className="w-4 h-4 text-amber-400" />
-                  <span>Upload Image File</span>
+                  {isConverting ? (
+                    <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4 text-amber-400" />
+                  )}
+                  <span>
+                    {isConverting
+                      ? "Converting to .webp..."
+                      : `Upload Image (Auto .webp${category === "balls" ? " 512x512" : category === "bombs" ? " 1024x1024" : ""})`}
+                  </span>
                 </button>
                 <input
                   ref={fileInputRef}
@@ -399,16 +495,30 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
                 />
 
                 {/* Upload Bounding Box Preview */}
-                <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-dashed border-zinc-700 flex items-center justify-center p-1 relative overflow-hidden shrink-0">
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt="Uploaded preview"
-                      className="max-w-full max-h-full object-contain"
-                      style={{ filter: isEnhanced ? ENHANCE_FILTER : undefined }}
-                    />
-                  ) : (
-                    <ImageIcon className="w-5 h-5 text-zinc-600" />
+                <div className="flex items-center gap-2">
+                  <div className="w-14 h-14 rounded-xl bg-zinc-900 border-2 border-dashed border-amber-500/50 flex items-center justify-center p-1.5 relative overflow-hidden shrink-0 shadow-inner group">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt="Uploaded preview"
+                        className="max-w-full max-h-full object-contain"
+                        style={{ filter: isEnhanced ? ENHANCE_FILTER : undefined }}
+                      />
+                    ) : (
+                      <ImageIcon className="w-5 h-5 text-zinc-600" />
+                    )}
+                  </div>
+                  {imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageUrl('');
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                      className="text-[11px] font-semibold text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
                   )}
                 </div>
               </div>

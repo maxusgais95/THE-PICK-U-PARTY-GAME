@@ -440,6 +440,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   >
                     {/* Visual Art Preview Area */}
                     <div className="w-full h-32 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-center p-3 relative overflow-hidden">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className={`object-contain pointer-events-none group-hover:scale-105 transition-transform ${item.category === "bombs" ? "w-[150%] h-[150%] max-w-none max-h-none" : "max-w-full max-h-full"}`}
+                          style={{ filter: item.cssFilter || undefined }}
+                        />
+                      ) : (
+                        <Sparkles className="w-8 h-8 text-zinc-700" />
+                      )}
                       {/* Badges */}
                       <div className="absolute top-2 left-2 flex items-center gap-1.5">
                         <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-850/90 text-zinc-300 border border-zinc-700">

@@ -124,8 +124,8 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
     title: 'Roulette Virtuoso',
     category: 'roulette',
     categoryLabel: 'Finger Roulette',
-    description: 'Survive and conquer dramatic finger roulette showdowns.',
-    metricLabel: 'Rounds Won',
+    description: 'Play and finish dramatic finger roulette showdowns with friends.',
+    metricLabel: 'Rounds Played',
     iconType: 'target',
     images: {
       bronze: bronzeTrophy001,

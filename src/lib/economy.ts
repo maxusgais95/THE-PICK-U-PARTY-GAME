@@ -943,9 +943,14 @@ export function getEconomyState(): EconomyState {
       dailyLoginRewards,
       claimedLoginDay: claimedDays.length,
       milestoneChestsOpened: typeof parsed.milestoneChestsOpened === 'number' ? parsed.milestoneChestsOpened : (milestoneChestClaimed ? 1 : 0),
-      totalLoginsCount: typeof parsed.totalLoginsCount === 'number' ? parsed.totalLoginsCount : Math.max(1, claimedDays.length),
+      totalLoginsCount: isNewDay
+        ? (typeof parsed.totalLoginsCount === 'number' ? parsed.totalLoginsCount + 1 : Math.max(1, claimedDays.length) + 1)
+        : (typeof parsed.totalLoginsCount === 'number' ? parsed.totalLoginsCount : Math.max(1, claimedDays.length)),
       lifetimeStarsEarned: typeof parsed.lifetimeStarsEarned === 'number' ? Math.max(parsed.lifetimeStarsEarned, typeof parsed.stars === 'number' ? parsed.stars : 0) : (typeof parsed.stars === 'number' ? parsed.stars : DEFAULT_STATE.stars),
-      questsCompletedCount: typeof parsed.questsCompletedCount === 'number' ? parsed.questsCompletedCount : 0,
+      questsCompletedCount: Math.max(
+        typeof parsed.questsCompletedCount === 'number' ? parsed.questsCompletedCount : 0,
+        dailyQuests.filter((q) => q.currentCount >= q.targetCount).length
+      ),
     };
 
     if (isNewDay) {
@@ -971,12 +976,17 @@ export function checkAndResetDailyQuests(): EconomyState {
   const current = getEconomyState();
   const today = getTodayDateString();
   if (current.lastDailyResetDate !== today) {
+    const newQuests = createDefaultQuests();
+    // Daily attendance quest is fulfilled immediately upon daily check-in
+    const initialCompleted = newQuests.filter((q) => q.currentCount >= q.targetCount).length;
     const updated: EconomyState = {
       ...current,
-      dailyQuests: createDefaultQuests(),
+      dailyQuests: newQuests,
       milestoneChestClaimed: false,
       lastDailyResetDate: today,
       lastDailyReset: Date.now(),
+      totalLoginsCount: (current.totalLoginsCount || 1) + 1,
+      questsCompletedCount: (current.questsCompletedCount || 0) + initialCompleted,
     };
     saveEconomyState(updated);
     return updated;
@@ -1008,6 +1018,7 @@ export function recordDailyQuestProgress(
     return { updatedState: state, completedQuests: [] };
   }
 
+  const completedNow = (quest.currentCount + amount) >= quest.targetCount && quest.currentCount < quest.targetCount;
   const nextCount = Math.min(quest.targetCount, quest.currentCount + amount);
   const updatedQuests = [...state.dailyQuests];
   updatedQuests[questIndex] = {
@@ -1018,11 +1029,14 @@ export function recordDailyQuestProgress(
   const updatedState: EconomyState = {
     ...state,
     dailyQuests: updatedQuests,
+    // Increment lifetime quests completed count permanently whenever a quest is completed
+    questsCompletedCount: completedNow
+      ? (state.questsCompletedCount || 0) + 1
+      : (state.questsCompletedCount || 0),
   };
 
   saveEconomyState(updatedState);
 
-  const completedNow = nextCount >= quest.targetCount && quest.currentCount < quest.targetCount;
   return {
     updatedState,
     completedQuests: completedNow ? [updatedQuests[questIndex]] : [],
@@ -1212,7 +1226,7 @@ export function claimDailyLoginReward(day: number): {
     ...state,
     stars: state.stars + starAmount,
     lifetimeStarsEarned: (state.lifetimeStarsEarned || state.stars) + starAmount,
-    totalLoginsCount: (state.totalLoginsCount || 0) + 1,
+    totalLoginsCount: Math.max(state.totalLoginsCount || 1, updatedClaimedDays.length),
     unlockedItems: newUnlockedItems,
     dailyLoginRewards: updatedLoginRewards,
     claimedLoginDay: updatedClaimedDays.length,
@@ -1332,6 +1346,11 @@ export function claimQuestReward(questId: string): { success: boolean; starsAdde
   const updatedState: EconomyState = {
     ...state,
     stars: state.stars + quest.starReward,
+    lifetimeStarsEarned: (state.lifetimeStarsEarned || state.stars) + quest.starReward,
+    questsCompletedCount: Math.max(
+      state.questsCompletedCount || 0,
+      updatedQuests.filter((q) => q.currentCount >= q.targetCount).length
+    ),
     dailyQuests: updatedQuests,
   };
 
@@ -1341,9 +1360,14 @@ export function claimQuestReward(questId: string): { success: boolean; starsAdde
 
 export function addStars(amount: number): EconomyState {
   const state = getEconomyState();
+  const nextStars = Math.max(0, state.stars + amount);
   const updated: EconomyState = {
     ...state,
-    stars: Math.max(0, state.stars + amount),
+    stars: nextStars,
+    // When positive stars are added (rewards, gifts, game wins, bonuses), also accumulate lifetime stars
+    lifetimeStarsEarned: amount > 0
+      ? (state.lifetimeStarsEarned || state.stars) + amount
+      : (state.lifetimeStarsEarned || state.stars),
   };
   saveEconomyState(updated);
   return updated;
