@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Heart,
   Sparkles,
+  Zap,
 } from 'lucide-react';
 import { AppSettings } from '../../types';
 import { SoundEngine, Haptics } from '../../lib/audio';
@@ -19,6 +20,8 @@ import {
   getStoreCatalogue,
   STORE_CATALOGUE,
   EconomyState,
+  TRAIL_WEBP_PARTICLE_SPRITES,
+  TRAIL_PARTICLE_FILES,
 } from '../../lib/economy';
 import { BombPongGameOverModal } from './BombPongGameOverModal';
 import { BombPongBackground } from '../BombPongBackground';
@@ -39,13 +42,14 @@ interface Particle {
   vx: number;
   vy: number;
   color: string;
+  glowColor?: string;
   size: number;
   alpha: number;
   life: number;
   maxLife: number;
   rotation: number;
   rotSpeed: number;
-  type: 'flame' | 'spark' | 'ember';
+  type: 'webp_sprite' | 'glow_light' | 'spark' | 'flame' | 'ember';
   spriteIndex?: number;
 }
 
@@ -82,7 +86,33 @@ const PARTICLE_CORE_COLORS: Record<string, [string, string, string]> = {
   particle_nature_leaves: ['rgba(255, 255, 240, 0.95)', 'rgba(52, 211, 153, 0.85)', 'rgba(34, 197, 94, 0.4)'],
 };
 
+// High-performance offscreen canvas glow cache with tight optical radius (smaller glow)
+const glowCanvasCache = new Map<string, HTMLCanvasElement>();
+function getCachedGlowCanvas(color: string): HTMLCanvasElement {
+  let cached = glowCanvasCache.get(color);
+  if (!cached) {
+    cached = document.createElement('canvas');
+    cached.width = 40;
+    cached.height = 40;
+    const gctx = cached.getContext('2d');
+    if (gctx) {
+      const grad = gctx.createRadialGradient(20, 20, 0, 20, 20, 20);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.2, color);
+      grad.addColorStop(0.5, color);
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      gctx.fillStyle = grad;
+      gctx.beginPath();
+      gctx.arc(20, 20, 20, 0, Math.PI * 2);
+      gctx.fill();
+    }
+    glowCanvasCache.set(color, cached);
+  }
+  return cached;
+}
+
 type BotDifficulty = 'easy' | 'normal' | 'hard';
+type PongGameMode = 'solo' | 'pvp' | 'bot';
 type PongGamePhase = 'mode_select' | 'ready' | 'countdown' | 'playing' | 'detonated' | 'gameover';
 
 export const BombPongGame: React.FC<BombPongGameProps> = ({
@@ -136,9 +166,9 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
 
   // Game Setup & Modes
   const [gamePhase, setGamePhase] = useState<PongGamePhase>('mode_select');
+  const [gameMode, setGameMode] = useState<PongGameMode>('solo');
   const [isBotMode, setIsBotMode] = useState<boolean>(false);
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('normal');
-  const [trailsEnabled, setTrailsEnabled] = useState<boolean>(true);
 
   // Game States
   const [player1Score, setPlayer1Score] = useState<number>(0);
@@ -174,26 +204,24 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     };
   }, [bombImageUrl]);
 
-  // Multi-sprite image collection for particle effects with screen blending
-  const spriteImageUrls = equippedParticleItem?.spriteImages || [particleImageUrl];
-  const particleImagesRef = useRef<HTMLImageElement[]>([]);
+  // Preload the 2 dedicated independent .webp particle images for screen blending trail effects
+  const webpParticleImagesRef = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
+    const files =
+      equippedParticleItem?.spriteImages && equippedParticleItem.spriteImages.length >= 2
+        ? equippedParticleItem.spriteImages
+        : TRAIL_PARTICLE_FILES[equippedParticleId] || TRAIL_WEBP_PARTICLE_SPRITES;
     const loaded: HTMLImageElement[] = [];
-    spriteImageUrls.forEach((url) => {
+    files.slice(0, 2).forEach((url, idx) => {
       const img = new Image();
       img.src = url;
       img.onload = () => {
-        loaded.push(img);
+        loaded[idx] = img;
       };
+      loaded[idx] = img;
     });
-    particleImagesRef.current = loaded;
-  }, [spriteImageUrls]);
-
-  const fireImageRef = {
-    get current() {
-      return particleImagesRef.current[0] || null;
-    }
-  };
+    webpParticleImagesRef.current = loaded;
+  }, [equippedParticleId, equippedParticleItem]);
 
   // Arena Dimensions & Logical Resolution
   const arenaRef = useRef({
@@ -772,6 +800,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       const fuseLocalY = -bomb.radius * 0.95;
       const fuseWorldX = bomb.x + (fuseLocalX * cosR - fuseLocalY * sinR) * bomb.pulse;
       const fuseWorldY = bomb.y + (fuseLocalX * sinR + fuseLocalY * cosR) * bomb.pulse;
+      const activePalette = PARTICLE_COLOR_PALETTES[equippedParticleId] || PARTICLE_COLOR_PALETTES.particle_classic_blaze;
 
       if (bomb.active && gamePhase === 'playing') {
         bomb.x += bomb.vx;
@@ -779,31 +808,32 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         bomb.rotation += bomb.speed * 0.04;
         bomb.pulse = 1 + Math.sin(time * 0.015) * 0.1;
 
-        // Dynamic Fuse Blaze & Sparks Generator
-        const activePalette = PARTICLE_COLOR_PALETTES[equippedParticleId] || PARTICLE_COLOR_PALETTES.particle_classic_blaze;
-        const spawnCount = bomb.speed > bomb.baseSpeed * 1.3 ? 3 : 2;
-        if (trailsEnabled) {
+        // Dynamic Fuse Blaze & Glowing Light Sparks Generator (capped and silky smooth)
+        if (particlesRef.current.length < 32) {
+          const spawnCount = bomb.speed > bomb.baseSpeed * 1.3 ? 2 : 1;
           for (let s = 0; s < spawnCount; s++) {
             const sparkAngle = bomb.rotation - Math.PI / 4 + (Math.random() - 0.5) * 1.2;
-            const sparkSpeed = 1.0 + Math.random() * 3.5;
-            const trailVx = -bomb.vx * 0.2;
-            const trailVy = -bomb.vy * 0.2 - 0.4;
-            const isFlame = Math.random() < 0.55;
+            const sparkSpeed = 1.0 + Math.random() * 2.8;
+            const trailVx = -bomb.vx * 0.22;
+            const trailVy = -bomb.vy * 0.22 - 0.35;
+            const roll = Math.random();
+            const pType: Particle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
+            const themeColor = activePalette[Math.floor(Math.random() * activePalette.length)];
 
             particlesRef.current.push({
-              x: fuseWorldX + (Math.random() - 0.5) * 4,
-              y: fuseWorldY + (Math.random() - 0.5) * 4,
+              x: fuseWorldX + (Math.random() - 0.5) * 3,
+              y: fuseWorldY + (Math.random() - 0.5) * 3,
               vx: Math.cos(sparkAngle) * sparkSpeed + trailVx,
               vy: Math.sin(sparkAngle) * sparkSpeed + trailVy,
-              color: activePalette[Math.floor(Math.random() * activePalette.length)],
-              size: isFlame ? 12 + Math.random() * 18 : 2 + Math.random() * 4,
+              color: themeColor,
+              size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
               alpha: 1,
               life: 0,
-              maxLife: isFlame ? 18 + Math.random() * 16 : 12 + Math.random() * 14,
+              maxLife: pType === 'webp_sprite' ? 18 + Math.random() * 10 : pType === 'glow_light' ? 14 + Math.random() * 8 : 8 + Math.random() * 6,
               rotation: Math.random() * Math.PI * 2,
               rotSpeed: (Math.random() - 0.5) * 0.25,
-              type: isFlame ? 'flame' : 'spark',
-              spriteIndex: particleImagesRef.current.length > 0 ? Math.floor(Math.random() * particleImagesRef.current.length) : 0,
+              type: pType,
+              spriteIndex: Math.floor(Math.random() * 2),
             });
           }
         }
@@ -845,24 +875,27 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           bomb.vy = -Math.cos(bounceAngle) * bomb.speed;
           bomb.y = p1Top - bomb.radius - 1;
 
-          // Spawn blazing impact sparks with equipped particle theme
-          for (let k = 0; k < 12; k++) {
+          // Spawn blazing impact sparks and glowing light particles with equipped particle theme
+          for (let k = 0; k < 6; k++) {
             const angle = Math.random() * Math.PI * 2;
-            const spd = 2 + Math.random() * 7;
+            const spd = 2 + Math.random() * 5;
+            const roll = Math.random();
+            const pType: Particle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
+            const themeColor = activePalette[Math.floor(Math.random() * activePalette.length)];
             particlesRef.current.push({
               x: bomb.x,
               y: bomb.y,
               vx: Math.cos(angle) * spd,
               vy: Math.sin(angle) * spd,
-              color: activePalette[Math.floor(Math.random() * activePalette.length)],
-              size: 14 + Math.random() * 18,
+              color: themeColor,
+              size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
               alpha: 1,
               life: 0,
-              maxLife: 18 + Math.random() * 14,
+              maxLife: 14 + Math.random() * 8,
               rotation: Math.random() * Math.PI * 2,
-              rotSpeed: (Math.random() - 0.5) * 0.3,
-              type: 'flame',
-              spriteIndex: particleImagesRef.current.length > 0 ? Math.floor(Math.random() * particleImagesRef.current.length) : 0,
+              rotSpeed: (Math.random() - 0.5) * 0.25,
+              type: pType,
+              spriteIndex: Math.floor(Math.random() * 2),
             });
           }
 
@@ -898,24 +931,27 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           bomb.vy = Math.cos(bounceAngle) * bomb.speed;
           bomb.y = p2Bottom + bomb.radius + 1;
 
-          // Spawn blazing impact sparks with equipped particle theme
-          for (let k = 0; k < 12; k++) {
+          // Spawn blazing impact sparks and glowing light particles with equipped particle theme
+          for (let k = 0; k < 6; k++) {
             const angle = Math.random() * Math.PI * 2;
-            const spd = 2 + Math.random() * 7;
+            const spd = 2 + Math.random() * 5;
+            const roll = Math.random();
+            const pType: Particle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
+            const themeColor = activePalette[Math.floor(Math.random() * activePalette.length)];
             particlesRef.current.push({
               x: bomb.x,
               y: bomb.y,
               vx: Math.cos(angle) * spd,
               vy: Math.sin(angle) * spd,
-              color: activePalette[Math.floor(Math.random() * activePalette.length)],
-              size: 14 + Math.random() * 18,
+              color: themeColor,
+              size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
               alpha: 1,
               life: 0,
-              maxLife: 18 + Math.random() * 14,
+              maxLife: 14 + Math.random() * 8,
               rotation: Math.random() * Math.PI * 2,
-              rotSpeed: (Math.random() - 0.5) * 0.3,
-              type: 'flame',
-              spriteIndex: particleImagesRef.current.length > 0 ? Math.floor(Math.random() * particleImagesRef.current.length) : 0,
+              rotSpeed: (Math.random() - 0.5) * 0.25,
+              type: pType,
+              spriteIndex: Math.floor(Math.random() * 2),
             });
           }
 
@@ -1041,43 +1077,37 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         ctx.restore();
       }
 
-      // 7. Realistic Fire Blaze & Flame Particles FX with Additive Blending ('lighter')
+      // 7. CSS Glow Light & 2 .webp Particle Effects with Screen Blending Mode (Optimized, Zero shadowBlur)
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = 'screen';
 
-      // 7a. Core Fire Blaze at the tip of the bomb
+      // 7a. Core Glow Light at the tip of the bomb
       if (bomb.active || gamePhase === 'ready' || gamePhase === 'countdown') {
-        if (fireImageRef.current && fireImageRef.current.complete && fireImageRef.current.naturalWidth > 0) {
-          const blazeSize = bomb.radius * (1.15 + Math.sin(time * 0.04) * 0.25 + (Math.random() - 0.5) * 0.15);
+        const coreRadius = bomb.radius * 0.42 * (0.85 + Math.sin(time * 0.02) * 0.15);
+        const glowCanvas = getCachedGlowCanvas(activePalette[0] || '#f59e0b');
+        ctx.drawImage(
+          glowCanvas,
+          fuseWorldX - coreRadius,
+          fuseWorldY - coreRadius,
+          coreRadius * 2,
+          coreRadius * 2
+        );
+
+        // Tip .webp sparkle with screen blending
+        const webpImages = webpParticleImagesRef.current;
+        if (webpImages[0] && webpImages[0].complete) {
+          const sparkleSize = bomb.radius * (0.85 + Math.sin(time * 0.04) * 0.15);
           ctx.save();
           ctx.translate(fuseWorldX, fuseWorldY);
-          ctx.rotate(bomb.rotation + Math.PI / 4 + Math.sin(time * 0.03) * 0.3);
+          ctx.rotate(bomb.rotation + time * 0.004);
           ctx.globalAlpha = 0.95;
-          ctx.drawImage(
-            fireImageRef.current,
-            -blazeSize / 2,
-            -blazeSize / 2,
-            blazeSize,
-            blazeSize
-          );
+          ctx.drawImage(webpImages[0], -sparkleSize / 2, -sparkleSize / 2, sparkleSize, sparkleSize);
           ctx.restore();
         }
-
-        // Inner incandescent core gradient
-        const coreRadius = bomb.radius * 0.55 * (0.85 + Math.random() * 0.25);
-        const coreGrad = ctx.createRadialGradient(fuseWorldX, fuseWorldY, 0, fuseWorldX, fuseWorldY, coreRadius);
-        const activeCore = PARTICLE_CORE_COLORS[equippedParticleId] || PARTICLE_CORE_COLORS.particle_classic_blaze;
-        coreGrad.addColorStop(0, activeCore[0]);
-        coreGrad.addColorStop(0.35, activeCore[1]);
-        coreGrad.addColorStop(0.7, activeCore[2]);
-        coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = coreGrad;
-        ctx.beginPath();
-        ctx.arc(fuseWorldX, fuseWorldY, coreRadius, 0, Math.PI * 2);
-        ctx.fill();
       }
 
-      // 7b. Floating / Trailing Flame Particles and Glowing Embers
+      // 7b. Floating / Trailing Particles with Screen Blending Mode & CSS Glow Light (Zero shadowBlur)
+      const webpImages = webpParticleImagesRef.current;
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
         const p = particlesRef.current[i];
         p.x += p.vx;
@@ -1087,46 +1117,41 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         p.rotation += p.rotSpeed;
         p.life += 1;
         const progress = p.life / p.maxLife;
-        // Smooth ease-out alpha decay animation over lifespan for elegant fading out
-        p.alpha = Math.max(0, Math.pow(1 - progress, 1.6));
+        p.alpha = Math.max(0, Math.pow(1 - progress, 1.4));
 
-        const imgs = particleImagesRef.current;
-        const targetImg = imgs.length > 0 && imgs[p.spriteIndex || 0] && imgs[p.spriteIndex || 0].complete ? imgs[p.spriteIndex || 0] : fireImageRef.current;
-
-        if (p.type === 'flame' && targetImg && targetImg.complete) {
-          const curSize = p.size * (1 - (p.life / p.maxLife) * 0.35);
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rotation);
-          ctx.globalAlpha = p.alpha * 0.92;
-          ctx.globalCompositeOperation = 'screen';
-          ctx.drawImage(
-            targetImg,
-            -curSize / 2,
-            -curSize / 2,
-            curSize,
-            curSize
-          );
-          ctx.restore();
+        if (p.type === 'webp_sprite') {
+          const targetImg = webpImages.length > 0 ? webpImages[(p.spriteIndex ?? 0) % webpImages.length] : null;
+          if (targetImg && targetImg.complete) {
+            const curSize = p.size * (1 - progress * 0.28);
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.globalAlpha = p.alpha * 0.95;
+            // Draw tighter optical glow behind sprite with cached canvas
+            const glowCanvas = getCachedGlowCanvas(p.color);
+            ctx.drawImage(glowCanvas, -curSize * 0.5, -curSize * 0.5, curSize, curSize);
+            ctx.drawImage(targetImg, -curSize / 2, -curSize / 2, curSize, curSize);
+            ctx.restore();
+          }
+        } else if (p.type === 'glow_light') {
+          // CSS Glow Light: Tighter hardware-accelerated radial aura
+          const curSize = Math.max(1, p.size * (1 - progress * 0.3));
+          ctx.globalAlpha = p.alpha * 0.9;
+          const glowCanvas = getCachedGlowCanvas(p.color);
+          ctx.drawImage(glowCanvas, p.x - curSize * 0.75, p.y - curSize * 0.75, curSize * 1.5, curSize * 1.5);
         } else {
-          // Glowing Sparks & Embers
-          ctx.save();
+          // Glowing Sparks with screen blending, zero shadowBlur
           ctx.globalAlpha = p.alpha;
           ctx.fillStyle = p.color;
-          ctx.shadowColor = p.color;
-          ctx.shadowBlur = 8;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, Math.max(0.6, p.size * (1 - p.life / p.maxLife)), 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, Math.max(0.6, p.size * (1 - progress)), 0, Math.PI * 2);
           ctx.fill();
-          ctx.restore();
         }
 
         if (p.life >= p.maxLife) {
           particlesRef.current.splice(i, 1);
         }
       }
-
-      ctx.restore();
 
       ctx.restore();
       animFrameIdRef.current = requestAnimationFrame(loop);
@@ -1223,29 +1248,6 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
             </div>
           </div>
         </>
-      )}
-
-      {/* Gameplay Trail Effects Toggle Button */}
-      {gamePhase !== 'mode_select' && (
-        <div className="absolute top-3 right-3 z-30 pointer-events-auto">
-          <button
-            type="button"
-            onClick={() => {
-              SoundEngine.playButtonClick();
-              Haptics.buttonClick();
-              setTrailsEnabled((prev) => !prev);
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-header font-bold uppercase backdrop-blur-md border transition-all shadow-lg cursor-pointer ${
-              trailsEnabled
-                ? 'bg-purple-950/80 text-purple-200 border-purple-400/60 shadow-[0_0_12px_rgba(168,85,247,0.4)]'
-                : 'bg-neutral-900/80 text-gray-400 border-white/20'
-            }`}
-            title="Toggle Particle Trails"
-          >
-            <Sparkles className={`w-3.5 h-3.5 ${trailsEnabled ? 'text-purple-300 animate-spin' : 'text-gray-500'}`} style={{ animationDuration: '6s' }} />
-            <span>TRAILS: {trailsEnabled ? 'ON' : 'OFF'}</span>
-          </button>
-        </div>
       )}
 
       {/* VIEW: MODE SELECTION OVERLAY */}

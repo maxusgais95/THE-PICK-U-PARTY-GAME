@@ -372,6 +372,31 @@ export default function App() {
     }
   }, [economy.unlockedItems, economy.equippedSkins?.bombs]);
 
+  // Quick particle trail effect cycle for header action in Pong mode: ONLY switches between purchased trail effects!
+  const handleCycleParticleSkin = useCallback(() => {
+    const catalogue = getStoreCatalogue();
+    const unlockedParticles = (catalogue.particles || []).filter((p) =>
+      economy.unlockedItems.includes(p.id)
+    );
+    if (unlockedParticles.length <= 1) {
+      SoundEngine.playButtonClick();
+      Haptics.buttonClick();
+      return;
+    }
+
+    const currentParticleId = economy.equippedSkins?.particles || 'particle_classic_blaze';
+    const currentIndex = unlockedParticles.findIndex((p) => p.id === currentParticleId);
+    const nextIndex = (currentIndex + 1) % unlockedParticles.length;
+    const nextParticle = unlockedParticles[nextIndex];
+
+    const res = equipItem('particles', nextParticle.id);
+    if (res.success) {
+      setEconomy(res.updatedState);
+      SoundEngine.playButtonClick();
+      Haptics.touchSuccess();
+    }
+  }, [economy.unlockedItems, economy.equippedSkins?.particles]);
+
   const handleNavigateToGame = useCallback((targetView: ScreenView) => {
     setCurrentTouches([]);
     setShowTeamLines(false);
@@ -524,6 +549,7 @@ export default function App() {
         onToggleBottleSprite={handleCycleBottleSprite}
         onToggleBallSkin={handleCycleBallSkin}
         onToggleBombSkin={handleCycleBombSkin}
+        onToggleParticleSkin={handleCycleParticleSkin}
         onEconomyUpdated={setEconomy}
       />
 

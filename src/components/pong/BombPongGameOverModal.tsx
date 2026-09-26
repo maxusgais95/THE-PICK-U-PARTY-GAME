@@ -16,6 +16,7 @@ interface BombPongGameOverModalProps {
   totalBounces: number;
   maxSpeed: number;
   isBotGame: boolean;
+  isSoloGame?: boolean;
   rewardCoins: number;
   onPlayAgain: () => void;
   onExit: () => void;
@@ -30,6 +31,7 @@ export const BombPongGameOverModal: React.FC<BombPongGameOverModalProps> = ({
   totalBounces,
   maxSpeed,
   isBotGame,
+  isSoloGame = false,
   rewardCoins,
   onPlayAgain,
   onExit,
@@ -44,7 +46,9 @@ export const BombPongGameOverModal: React.FC<BombPongGameOverModalProps> = ({
   if (!isOpen) return null;
 
   const isP1Winner = winner === 'player1';
-  const winnerTitle = isBotGame
+  const winnerTitle = isSoloGame
+    ? 'SOLO RALLY COMPLETE!'
+    : isBotGame
     ? isP1Winner
       ? 'VICTORY!'
       : 'CYBER BOT WINS!'
@@ -52,7 +56,9 @@ export const BombPongGameOverModal: React.FC<BombPongGameOverModalProps> = ({
     ? 'PLAYER 1 WINS!'
     : 'PLAYER 2 WINS!';
 
-  const winnerSubtitle = isBotGame
+  const winnerSubtitle = isSoloGame
+    ? `Masterful dual control! Longest rally streak: ${longestRally} volleys!`
+    : isBotGame
     ? isP1Winner
       ? 'You detonated the Cyber Bot!'
       : 'The Cyber Bot survived the bombardment!'
@@ -60,8 +66,10 @@ export const BombPongGameOverModal: React.FC<BombPongGameOverModalProps> = ({
     ? 'Bottom Neon Striker prevailed!'
     : 'Top Cyber Defender prevailed!';
 
-  const winnerColor = isP1Winner ? 'text-cyan-400' : 'text-pink-400';
-  const winnerBorder = isP1Winner
+  const winnerColor = isSoloGame ? 'text-purple-400' : isP1Winner ? 'text-cyan-400' : 'text-pink-400';
+  const winnerBorder = isSoloGame
+    ? 'border-purple-500/50 shadow-[0_0_35px_rgba(168,85,247,0.4)]'
+    : isP1Winner
     ? 'border-cyan-500/50 shadow-[0_0_35px_rgba(6,182,212,0.4)]'
     : 'border-pink-500/50 shadow-[0_0_35px_rgba(236,72,153,0.4)]';
 
@@ -101,34 +109,46 @@ export const BombPongGameOverModal: React.FC<BombPongGameOverModalProps> = ({
 
         {/* Score Board */}
         <div className="w-full grid grid-cols-2 gap-3 mb-4">
-          {/* Player 1 Box */}
+          {/* Box 1 */}
           <div
             className={`p-3 rounded-2xl border ${
-              isP1Winner
+              isSoloGame
+                ? 'bg-purple-950/40 border-purple-500/60 shadow-[0_0_12px_rgba(168,85,247,0.3)]'
+                : isP1Winner
                 ? 'bg-cyan-950/40 border-cyan-500/60 shadow-[0_0_12px_rgba(6,182,212,0.3)]'
                 : 'bg-slate-800/40 border-slate-700/60'
             }`}
           >
-            <div className="text-[11px] font-bold text-cyan-400 tracking-wider">
-              {isBotGame ? 'YOU (P1)' : 'PLAYER 1'}
+            <div className={`text-[11px] font-bold tracking-wider ${isSoloGame ? 'text-purple-400' : 'text-cyan-400'}`}>
+              {isSoloGame ? 'TOTAL BOUNCES' : isBotGame ? 'YOU (P1)' : 'PLAYER 1'}
             </div>
-            <div className="text-2xl font-black text-white mt-0.5">{player1Score}</div>
-            <div className="text-[10px] text-slate-400">Wins</div>
+            <div className="text-2xl font-black text-white mt-0.5">
+              {isSoloGame ? totalBounces : player1Score}
+            </div>
+            <div className="text-[10px] text-slate-400">
+              {isSoloGame ? 'Volleys' : 'Wins'}
+            </div>
           </div>
 
-          {/* Player 2 / Bot Box */}
+          {/* Box 2 */}
           <div
             className={`p-3 rounded-2xl border ${
-              !isP1Winner
+              isSoloGame
+                ? 'bg-indigo-950/40 border-indigo-500/60 shadow-[0_0_12px_rgba(99,102,241,0.3)]'
+                : !isP1Winner
                 ? 'bg-pink-950/40 border-pink-500/60 shadow-[0_0_12px_rgba(236,72,153,0.3)]'
                 : 'bg-slate-800/40 border-slate-700/60'
             }`}
           >
-            <div className="text-[11px] font-bold text-pink-400 tracking-wider">
-              {isBotGame ? 'CYBER BOT' : 'PLAYER 2'}
+            <div className={`text-[11px] font-bold tracking-wider ${isSoloGame ? 'text-indigo-400' : 'text-pink-400'}`}>
+              {isSoloGame ? 'BEST RALLY' : isBotGame ? 'CYBER BOT' : 'PLAYER 2'}
             </div>
-            <div className="text-2xl font-black text-white mt-0.5">{player2Score}</div>
-            <div className="text-[10px] text-slate-400">Wins</div>
+            <div className="text-2xl font-black text-white mt-0.5">
+              {isSoloGame ? longestRally : player2Score}
+            </div>
+            <div className="text-[10px] text-slate-400">
+              {isSoloGame ? 'Streak' : 'Wins'}
+            </div>
           </div>
         </div>
 

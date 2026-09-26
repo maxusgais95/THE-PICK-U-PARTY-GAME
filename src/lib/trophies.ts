@@ -83,7 +83,7 @@ export interface TrophyTierConfig {
 export interface AchievementTrophy {
   id: string;
   title: string;
-  category: 'roulette' | 'bottle' | 'kaboom' | 'collector' | 'party';
+  category: 'roulette' | 'bottle' | 'kaboom' | 'pong' | 'collector' | 'party';
   categoryLabel: string;
   description: string;
   metricLabel: string;
@@ -809,6 +809,144 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
       },
     },
   },
+  {
+    id: 'pong_master',
+    title: 'Bomb Pong Grandmaster',
+    category: 'pong',
+    categoryLabel: 'Bomb Pong',
+    description: 'Score decisive match points and conquer rival paddles in explosive Bomb Pong duels.',
+    metricLabel: 'Matches Won',
+    iconType: 'crown',
+    images: {
+      bronze: bronzeTrophy003,
+      silver: silverTrophy003,
+      gold: goldTrophy003,
+      platinum: platinumTrophy003,
+    },
+    tiers: {
+      bronze: {
+        tier: 'bronze',
+        threshold: 2,
+        title: 'Cyber Paddle Scout',
+        badgeName: 'Bronze',
+        colorName: 'Amber Bronze',
+        textColor: 'text-amber-400',
+        gradient: 'from-[#613612] via-[#8c4f1c] to-[#b36b2d]',
+        borderColor: 'border-amber-700/60',
+        glowColor: 'shadow-[0_0_15px_rgba(180,83,9,0.4)]',
+        starBonus: 60,
+        image: bronzeTrophy003,
+      },
+      silver: {
+        tier: 'silver',
+        threshold: 8,
+        title: 'Neon Net Striker',
+        badgeName: 'Silver',
+        colorName: 'Sterling Silver',
+        textColor: 'text-slate-200',
+        gradient: 'from-[#334155] via-[#64748b] to-[#94a3b8]',
+        borderColor: 'border-slate-400/60',
+        glowColor: 'shadow-[0_0_20px_rgba(148,163,184,0.5)]',
+        starBonus: 180,
+        image: silverTrophy003,
+      },
+      gold: {
+        tier: 'gold',
+        threshold: 20,
+        title: 'Court Sovereign',
+        badgeName: 'Gold',
+        colorName: 'Radiant Gold',
+        textColor: 'text-yellow-300',
+        gradient: 'from-[#854d0e] via-[#ca8a04] to-[#fde047]',
+        borderColor: 'border-yellow-400/80',
+        glowColor: 'shadow-[0_0_25px_rgba(234,179,8,0.6)]',
+        starBonus: 450,
+        image: goldTrophy003,
+      },
+      platinum: {
+        tier: 'platinum',
+        threshold: 50,
+        title: 'Omnipotent Pong Titan',
+        badgeName: 'Platinum',
+        colorName: 'Cyber Platinum',
+        textColor: 'text-cyan-300',
+        gradient: 'from-[#083344] via-[#0891b2] to-[#67e8f9]',
+        borderColor: 'border-cyan-300',
+        glowColor: 'shadow-[0_0_30px_rgba(6,182,212,0.8)]',
+        starBonus: 1200,
+        image: platinumTrophy003,
+      },
+    },
+  },
+  {
+    id: 'pong_rally_legend',
+    title: 'Hyper Rally Dynamo',
+    category: 'pong',
+    categoryLabel: 'Bomb Pong',
+    description: 'Chain dizzying high-speed paddle volleys with the explosive bomb without letting it detonate.',
+    metricLabel: 'Longest Rally',
+    iconType: 'target',
+    images: {
+      bronze: bronzeTrophy004,
+      silver: silverTrophy004,
+      gold: goldTrophy004,
+      platinum: platinumTrophy004,
+    },
+    tiers: {
+      bronze: {
+        tier: 'bronze',
+        threshold: 6,
+        title: 'Reflex Adept',
+        badgeName: 'Bronze',
+        colorName: 'Amber Bronze',
+        textColor: 'text-amber-400',
+        gradient: 'from-[#613612] via-[#8c4f1c] to-[#b36b2d]',
+        borderColor: 'border-amber-700/60',
+        glowColor: 'shadow-[0_0_15px_rgba(180,83,9,0.4)]',
+        starBonus: 50,
+        image: bronzeTrophy004,
+      },
+      silver: {
+        tier: 'silver',
+        threshold: 14,
+        title: 'Supersonic Volley',
+        badgeName: 'Silver',
+        colorName: 'Sterling Silver',
+        textColor: 'text-slate-200',
+        gradient: 'from-[#334155] via-[#64748b] to-[#94a3b8]',
+        borderColor: 'border-slate-400/60',
+        glowColor: 'shadow-[0_0_20px_rgba(148,163,184,0.5)]',
+        starBonus: 150,
+        image: silverTrophy004,
+      },
+      gold: {
+        tier: 'gold',
+        threshold: 25,
+        title: 'Kinetic Dynamo',
+        badgeName: 'Gold',
+        colorName: 'Radiant Gold',
+        textColor: 'text-yellow-300',
+        gradient: 'from-[#854d0e] via-[#ca8a04] to-[#fde047]',
+        borderColor: 'border-yellow-400/80',
+        glowColor: 'shadow-[0_0_25px_rgba(234,179,8,0.6)]',
+        starBonus: 400,
+        image: goldTrophy004,
+      },
+      platinum: {
+        tier: 'platinum',
+        threshold: 45,
+        title: 'Perpetual Kinetic Legend',
+        badgeName: 'Platinum',
+        colorName: 'Cyber Platinum',
+        textColor: 'text-cyan-300',
+        gradient: 'from-[#083344] via-[#0891b2] to-[#67e8f9]',
+        borderColor: 'border-cyan-300',
+        glowColor: 'shadow-[0_0_30px_rgba(6,182,212,0.8)]',
+        starBonus: 1000,
+        image: platinumTrophy004,
+      },
+    },
+  },
 ];
 
 const TROPHY_CLAIM_STORAGE_KEY = 'picku_party_trophy_claims_v1';
@@ -868,6 +1006,9 @@ export function calculateTrophyProgress(
     totalRouletteRounds: number;
     totalBottleSpins: number;
     totalKaboomRounds: number;
+    totalPongRounds?: number;
+    pongVictories?: number;
+    pongHighestRally?: number;
     kaboomVictories: number;
     kaboomBonusCollected: number;
     unlockedItemCount: number;
@@ -893,11 +1034,18 @@ export function calculateTrophyProgress(
     case 'bonus_hunter':
       currentValue = stats.kaboomBonusCollected;
       break;
+    case 'pong_master':
+      currentValue = stats.pongVictories || 0;
+      break;
+    case 'pong_rally_legend':
+      currentValue = stats.pongHighestRally || 0;
+      break;
     case 'party_legend':
       currentValue =
         stats.totalRouletteRounds +
         stats.totalBottleSpins +
-        stats.totalKaboomRounds;
+        stats.totalKaboomRounds +
+        (stats.totalPongRounds || 0);
       break;
     case 'collector_wardrobe':
       currentValue = stats.unlockedItemCount;
@@ -994,6 +1142,14 @@ export function hasUnclaimedTrophies(
     totalRouletteRounds?: number;
     totalBottleSpins?: number;
     totalKaboomRounds?: number;
+    totalPongRounds?: number;
+    pongVictories?: number;
+    pongHighestRally?: number;
+    pong?: {
+      victories?: number;
+      highestRally?: number;
+      totalRounds?: number;
+    };
     kaboom?: {
       victories?: number;
       bonusCollected?: number;
@@ -1016,6 +1172,9 @@ export function hasUnclaimedTrophies(
       totalRouletteRounds: stats?.totalRouletteRounds || 0,
       totalBottleSpins: stats?.totalBottleSpins || 0,
       totalKaboomRounds: stats?.totalKaboomRounds || 0,
+      totalPongRounds: stats?.totalPongRounds || stats?.pong?.totalRounds || 0,
+      pongVictories: stats?.pongVictories || stats?.pong?.victories || 0,
+      pongHighestRally: stats?.pongHighestRally || stats?.pong?.highestRally || 0,
       kaboomVictories: stats?.kaboom?.victories || 0,
       kaboomBonusCollected: stats?.kaboom?.bonusCollected || 0,
       unlockedItemCount:
@@ -1058,6 +1217,14 @@ export function getUnclaimedTrophiesCount(
     totalRouletteRounds?: number;
     totalBottleSpins?: number;
     totalKaboomRounds?: number;
+    totalPongRounds?: number;
+    pongVictories?: number;
+    pongHighestRally?: number;
+    pong?: {
+      victories?: number;
+      highestRally?: number;
+      totalRounds?: number;
+    };
     kaboom?: {
       victories?: number;
       bonusCollected?: number;
@@ -1080,6 +1247,9 @@ export function getUnclaimedTrophiesCount(
       totalRouletteRounds: stats?.totalRouletteRounds || 0,
       totalBottleSpins: stats?.totalBottleSpins || 0,
       totalKaboomRounds: stats?.totalKaboomRounds || 0,
+      totalPongRounds: stats?.totalPongRounds || stats?.pong?.totalRounds || 0,
+      pongVictories: stats?.pongVictories || stats?.pong?.victories || 0,
+      pongHighestRally: stats?.pongHighestRally || stats?.pong?.highestRally || 0,
       kaboomVictories: stats?.kaboom?.victories || 0,
       kaboomBonusCollected: stats?.kaboom?.bonusCollected || 0,
       unlockedItemCount:

@@ -211,17 +211,31 @@ export const StoreModal: React.FC<StoreModalProps> = ({
               </div>
             </div>
 
-            {/* Floating primary sprite preview pill in bottom-left */}
-            {sprites[0] && (
-              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1 bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-white/20 shadow-sm">
+            {/* Floating 2 .webp independent particles preview pill in bottom-left */}
+            {sprites.length >= 2 ? (
+              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1.5 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/25 shadow-sm">
                 <img
                   src={sprites[0]}
-                  alt="FX preview"
-                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.9)] animate-pulse"
+                  alt="Particle 1"
+                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.95)] mix-blend-screen"
                 />
-                <span className="text-[7.5px] font-bold text-slate-200 uppercase font-header">FX</span>
+                <img
+                  src={sprites[1]}
+                  alt="Particle 2"
+                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.95)] mix-blend-screen"
+                />
+                <span className="text-[7.5px] font-bold text-slate-200 uppercase font-header tracking-wider">2× WEBP</span>
               </div>
-            )}
+            ) : sprites[0] ? (
+              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1 bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-white/25 shadow-sm">
+                <img
+                  src={sprites[0]}
+                  alt="GLOW FX preview"
+                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.95)] animate-pulse mix-blend-screen"
+                />
+                <span className="text-[7.5px] font-bold text-slate-200 uppercase font-header">GLOW FX</span>
+              </div>
+            ) : null}
           </div>
         );
       }

@@ -74,17 +74,34 @@ export const DEFAULT_KABOOM_STATS: KaboomStats = {
   winrate: 0,
 };
 
+export const DEFAULT_PONG_STATS: {
+  victories: number;
+  totalRounds: number;
+  highestRally: number;
+  totalBounces: number;
+  winrate: number;
+} = {
+  victories: 0,
+  totalRounds: 0,
+  highestRally: 0,
+  totalBounces: 0,
+  winrate: 0,
+};
+
 export const DEFAULT_STATS: AppStats = {
   totalRouletteRounds: 0,
   totalBottleSpins: 0,
   totalKaboomRounds: 0,
   totalPongRounds: 0,
+  pongVictories: 0,
+  pongHighestRally: 0,
   lastPlayedAt: Date.now(),
   kaboom: DEFAULT_KABOOM_STATS,
+  pong: DEFAULT_PONG_STATS,
 };
 
 function normalizeStats(raw: Partial<AppStats> | null | undefined): AppStats {
-  if (!raw) return { ...DEFAULT_STATS, kaboom: { ...DEFAULT_KABOOM_STATS } };
+  if (!raw) return { ...DEFAULT_STATS, kaboom: { ...DEFAULT_KABOOM_STATS }, pong: { ...DEFAULT_PONG_STATS } };
   
   const rawKaboom = raw.kaboom || ({} as Partial<KaboomStats>);
   const totalRounds = typeof rawKaboom.totalRounds === 'number'
@@ -103,13 +120,45 @@ function normalizeStats(raw: Partial<AppStats> | null | undefined): AppStats {
     winrate,
   };
 
+  const rawPong = (raw.pong || {}) as Partial<{
+    victories: number;
+    totalRounds: number;
+    highestRally: number;
+    totalBounces: number;
+    winrate: number;
+  }>;
+  const pongTotalRounds = typeof rawPong.totalRounds === 'number'
+    ? rawPong.totalRounds
+    : (raw.totalPongRounds || 0);
+  const pongVictories = typeof rawPong.victories === 'number'
+    ? rawPong.victories
+    : (raw.pongVictories || 0);
+  const pongHighestRally = typeof rawPong.highestRally === 'number'
+    ? rawPong.highestRally
+    : (raw.pongHighestRally || 0);
+  const pongTotalBounces = rawPong.totalBounces || 0;
+  const pongWinrate = pongTotalRounds > 0
+    ? Math.round((pongVictories / pongTotalRounds) * 1000) / 10
+    : 0;
+
+  const pong = {
+    victories: pongVictories,
+    totalRounds: pongTotalRounds,
+    highestRally: pongHighestRally,
+    totalBounces: pongTotalBounces,
+    winrate: pongWinrate,
+  };
+
   return {
     totalRouletteRounds: raw.totalRouletteRounds || 0,
     totalBottleSpins: raw.totalBottleSpins || 0,
     totalKaboomRounds: totalRounds,
-    totalPongRounds: raw.totalPongRounds || 0,
+    totalPongRounds: pongTotalRounds,
+    pongVictories,
+    pongHighestRally,
     lastPlayedAt: raw.lastPlayedAt || Date.now(),
     kaboom,
+    pong,
   };
 }
 
@@ -276,11 +325,39 @@ export async function recordGameEvent(type: 'roulette' | 'bottle'): Promise<AppS
 export async function recordPongEvent(event: {
   winner: 1 | 2;
   rallies?: number;
+  isVictory?: boolean;
 }): Promise<AppStats> {
   const current = await getStats();
-  current.totalPongRounds = (current.totalPongRounds || 0) + 1;
-  recordDailyQuestProgress('roulette_round', 1);
-  addEventExperience(35, 'pong');
+  if (!current.pong) {
+    current.pong = { ...DEFAULT_PONG_STATS };
+  }
+  const totalPongRounds = (current.totalPongRounds || 0) + 1;
+  current.totalPongRounds = totalPongRounds;
+  current.pong.totalRounds = totalPongRounds;
+
+  const isVictory = event.winner === 1 || Boolean(event.isVictory);
+  if (isVictory) {
+    current.pongVictories = (current.pongVictories || 0) + 1;
+    current.pong.victories = (current.pong.victories || 0) + 1;
+    recordDailyQuestProgress('roulette_round', 1);
+    addEventExperience(50, 'pong_victory');
+  } else {
+    recordDailyQuestProgress('roulette_round', 1);
+    addEventExperience(30, 'pong_match');
+  }
+
+  const rallies = event.rallies || 0;
+  if (rallies > (current.pongHighestRally || 0)) {
+    current.pongHighestRally = rallies;
+    current.pong.highestRally = rallies;
+  }
+  current.pong.totalBounces = (current.pong.totalBounces || 0) + rallies;
+
+  if (current.pong.totalRounds > 0) {
+    current.pong.winrate =
+      Math.round((current.pong.victories / current.pong.totalRounds) * 1000) / 10;
+  }
+
   current.lastPlayedAt = Date.now();
   await saveStats(current);
   return current;

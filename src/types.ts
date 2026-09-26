@@ -117,13 +117,24 @@ export interface KaboomStats {
   winrate: number; // Win percentage (0 to 100)
 }
 
+export interface PongStats {
+  victories: number; // Total Bomb Pong matches won
+  totalRounds: number; // Total Bomb Pong matches completed
+  highestRally: number; // Longest continuous rally record
+  totalBounces: number; // Total paddle hits recorded
+  winrate: number; // Win percentage (0 to 100)
+}
+
 export interface AppStats {
   totalRouletteRounds: number;
   totalBottleSpins: number;
   totalKaboomRounds: number;
   totalPongRounds?: number;
+  pongVictories?: number;
+  pongHighestRally?: number;
   lastPlayedAt: number;
   kaboom: KaboomStats;
+  pong?: PongStats;
 }
 
 // ============================================================================

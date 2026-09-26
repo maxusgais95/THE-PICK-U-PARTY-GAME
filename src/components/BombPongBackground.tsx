@@ -4,16 +4,13 @@
  */
 
 import React from 'react';
-import pongModeBg from '../assets/images/pong_mode_bg_1790404409295.jpg';
 import pongCourtBg from '../assets/images/pong_court_bg_1790404428944.jpg';
 import { getAssetUrl } from '../lib/assetPreloader';
 
 // Module-level asset preloading for instant zero-latency rendering
 if (typeof window !== 'undefined') {
-  [pongModeBg, pongCourtBg].forEach((src) => {
-    const img = new Image();
-    img.src = src;
-  });
+  const img = new Image();
+  img.src = pongCourtBg;
 }
 
 interface BombPongBackgroundProps {
@@ -31,7 +28,7 @@ export const BombPongBackground: React.FC<BombPongBackgroundProps> = ({
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none"
       aria-hidden="true"
     >
-      {/* Gameplay Court Background Artwork (Always displayed) */}
+      {/* Gameplay Court Background Artwork */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-100 scale-100"
         style={{
@@ -45,3 +42,4 @@ export const BombPongBackground: React.FC<BombPongBackgroundProps> = ({
     </div>
   );
 };
+

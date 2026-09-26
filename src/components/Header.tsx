@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb, ArrowLeft, RotateCcw } from 'lucide-react';
+import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb, ArrowLeft, RotateCcw, Sparkles } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
 import { CurrencyHud } from './CurrencyHud';
 import { AppSettings, ScreenView } from '../types';
@@ -29,6 +29,7 @@ interface HeaderProps {
   onToggleBottleSprite?: () => void;
   onToggleBallSkin?: () => void;
   onToggleBombSkin?: () => void;
+  onToggleParticleSkin?: () => void;
   onEconomyUpdated?: (state: EconomyState) => void;
   onRefillStars?: (amount: number) => void;
 }
@@ -50,6 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleBottleSprite,
   onToggleBallSkin,
   onToggleBombSkin,
+  onToggleParticleSkin,
   onEconomyUpdated,
   onRefillStars,
 }) => {
@@ -261,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Bomb Skin Quick Switcher in Kaboom & Bomb Pong Mode - Right Next to Guide */}
+        {/* Bomb Skin Quick Switcher in Kaboom & Bomb Pong Mode */}
         {(currentView === 'kaboom' || currentView === 'pong') && onToggleBombSkin && (
           <button
             onClick={() => {
@@ -274,6 +276,22 @@ export const Header: React.FC<HeaderProps> = ({
             className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.3)] flex items-center justify-center text-red-300 active:scale-95 transition-all cursor-pointer"
           >
             <Bomb className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+          </button>
+        )}
+
+        {/* Particle Trail Skin Quick Switcher in Pong Mode ONLY (Cycles purchased trail effects) */}
+        {currentView === 'pong' && onToggleParticleSkin && (
+          <button
+            onClick={() => {
+              SoundEngine.playButtonClick();
+              Haptics.buttonClick();
+              onToggleParticleSkin();
+            }}
+            aria-label="Switch Particle Trail Effect"
+            title="Switch Particle Trail Effect"
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-purple-950/70 backdrop-blur-md border border-purple-400/60 shadow-[0_0_12px_rgba(168,85,247,0.4)] flex items-center justify-center text-purple-200 active:scale-95 transition-all cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.9)]" />
           </button>
         )}
 
