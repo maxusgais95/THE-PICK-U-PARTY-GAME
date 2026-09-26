@@ -1354,7 +1354,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           </div>
 
           <div className="relative z-10 text-center text-xs text-slate-500 mb-4">
-            Equipped bomb skin syncs from your Store collection
+            Equipped bomb skin & particle trail sync from your Store collection
           </div>
         </div>
       )}

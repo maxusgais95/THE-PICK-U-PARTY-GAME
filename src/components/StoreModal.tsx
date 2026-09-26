@@ -4,8 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Star, Check, ShoppingBag, Sparkles, AlertCircle, Lock } from 'lucide-react';
+import { X, Star, Check, ShoppingBag, Sparkles, AlertCircle, Lock, Play } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
+import { TrailSimulationModal } from './TrailSimulationModal';
 import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
 import kaboomBallImg from '../assets/images/balls/Ball Sprite.webp';
 import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
@@ -50,6 +51,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
   const [activeCategory, setActiveCategory] = useState<StoreCategory>('bottles');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [catalogue, setCatalogue] = useState<Record<StoreCategory, StoreItem[]>>(() => getStoreCatalogue());
+  const [simulatingTrail, setSimulatingTrail] = useState<StoreItem | null>(null);
 
   useEffect(() => {
     const handleUpdate = (e: Event) => {
@@ -164,31 +166,62 @@ export const StoreModal: React.FC<StoreModalProps> = ({
           </div>
         );
       case 'particle': {
-        const sprites = item.spriteImages && item.spriteImages.length > 0 ? item.spriteImages : [item.image || ''];
+        const sprites = item.spriteImages && item.spriteImages.length > 0 ? item.spriteImages : [];
         return (
-          <div className="relative flex items-center justify-center w-full h-full p-2 overflow-hidden">
-            <div className={`absolute w-20 h-20 rounded-full bg-gradient-to-tr ${item.accentGradient} opacity-50 blur-lg animate-pulse`} />
-            <div className="relative flex items-center justify-center w-full h-full">
-              {sprites.slice(0, 3).map((spriteUrl, sIdx) => (
-                <img
-                  key={sIdx}
-                  src={spriteUrl}
-                  alt={`${item.name} sprite ${sIdx}`}
-                  className="absolute max-h-16 sm:max-h-20 w-auto object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
-                  style={{
-                    mixBlendMode: 'screen',
-                    transform:
-                      sIdx === 0
-                        ? 'scale(1) rotate(-6deg)'
-                        : sIdx === 1
-                        ? 'translate(14px, -12px) scale(0.75) rotate(18deg)'
-                        : 'translate(-14px, 12px) scale(0.7) rotate(-22deg)',
-                    opacity: sIdx === 0 ? 1 : 0.88,
-                    filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.75)) brightness(1.2)',
-                  }}
-                />
-              ))}
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              SoundEngine.playButtonClick();
+              Haptics.buttonClick();
+              setSimulatingTrail(item);
+            }}
+            className="group/trail relative w-full h-full rounded-xl overflow-hidden flex items-center justify-center cursor-pointer select-none"
+            title="Click to preview simulated trail effect"
+          >
+            {/* Background Ambient Gradient Glow */}
+            <div className={`absolute -inset-1 bg-gradient-to-tr ${item.accentGradient} opacity-40 blur-md pointer-events-none group-hover/trail:opacity-75 transition-opacity duration-300`} />
+
+            {/* Dedicated High-Res Display Image */}
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.name}
+                className="relative z-10 w-full h-full object-cover rounded-xl drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)] transform group-hover/trail:scale-105 transition-transform duration-500 pointer-events-none"
+              />
+            ) : (
+              <div className="relative z-10 flex items-center justify-center w-full h-full bg-slate-900/60 rounded-xl">
+                <Sparkles className="w-8 h-8 text-cyan-400" />
+              </div>
+            )}
+
+            {/* Subtle Vignette & Border Shading */}
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none rounded-xl" />
+
+            {/* Trail FX indicator pill */}
+            <div className="absolute top-1.5 right-1.5 z-30 flex items-center gap-1 bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-white/20 shadow-sm pointer-events-none">
+              <Sparkles className="w-2.5 h-2.5 text-amber-300 animate-pulse" />
+              <span className="text-[8px] font-header font-bold text-white tracking-widest uppercase">TRAIL</span>
             </div>
+
+            {/* Hover / Active Preview Effect Overlay Pill */}
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/45 backdrop-blur-[2px] opacity-0 group-hover/trail:opacity-100 transition-opacity rounded-xl pointer-events-none">
+              <div className="px-2.5 py-1 rounded-full bg-purple-600/90 border border-purple-300/80 text-white font-header font-bold text-[9px] tracking-wider flex items-center gap-1 shadow-[0_0_15px_rgba(168,85,247,0.85)]">
+                <Play className="w-2.5 h-2.5 fill-white text-white" />
+                <span>PREVIEW FX</span>
+              </div>
+            </div>
+
+            {/* Floating primary sprite preview pill in bottom-left */}
+            {sprites[0] && (
+              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1 bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-white/20 shadow-sm">
+                <img
+                  src={sprites[0]}
+                  alt="FX preview"
+                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.9)] animate-pulse"
+                />
+                <span className="text-[7.5px] font-bold text-slate-200 uppercase font-header">FX</span>
+              </div>
+            )}
           </div>
         );
       }
@@ -357,7 +390,18 @@ export const StoreModal: React.FC<StoreModalProps> = ({
               return (
                 <div
                   key={item.id}
+                  onClick={() => {
+                    if (item.category === 'particles') {
+                      SoundEngine.playButtonClick();
+                      Haptics.buttonClick();
+                      setSimulatingTrail(item);
+                    }
+                  }}
                   className={`group relative rounded-[22px] p-3 sm:p-3.5 bg-neutral-900/60 backdrop-blur-md border transition-all flex flex-col justify-between ${
+                    item.category === 'particles'
+                      ? 'cursor-pointer hover:border-purple-400/70 hover:shadow-[0_0_25px_rgba(168,85,247,0.35)]'
+                      : ''
+                  } ${
                     isBomb ? 'overflow-visible z-10 hover:z-30' : ''
                   } ${
                     isEquipped
@@ -411,7 +455,9 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                   <div
                     className={`relative w-full h-24 sm:h-28 rounded-xl bg-black/40 border border-white/10 ${
                       isBomb ? 'overflow-visible z-20' : 'overflow-hidden'
-                    } flex flex-col items-center justify-center p-2 mb-2 group-hover:border-white/25 transition-all`}
+                    } flex flex-col items-center justify-center ${
+                      item.category === 'particles' ? 'p-1' : 'p-2'
+                    } mb-2 group-hover:border-white/25 transition-all`}
                   >
                     {renderItemVisual(item)}
                   </div>
@@ -466,6 +512,23 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                     </div>
                   )}
 
+                  {/* Dedicated Preview Effect Button for Trail items */}
+                  {item.category === 'particles' && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        SoundEngine.playButtonClick();
+                        Haptics.buttonClick();
+                        setSimulatingTrail(item);
+                      }}
+                      className="w-full mb-2 py-1 px-2 rounded-full bg-purple-500/15 hover:bg-purple-500/30 border border-purple-400/40 hover:border-purple-300 text-purple-200 hover:text-white font-header font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                    >
+                      <Play className="w-2.5 h-2.5 fill-purple-300 text-purple-300" />
+                      <span>PREVIEW EFFECT</span>
+                    </button>
+                  )}
+
                   {/* Action Button */}
                   <div>
                     {isEquipped ? (
@@ -476,7 +539,10 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                     ) : (isUnlocked || (item.id === 'accessory_star_earrings' && economy.starEarrings?.unlocked)) ? (
                       <button
                         type="button"
-                        onClick={() => handleEquip(item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEquip(item);
+                        }}
                         className="w-full py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-purple-400/50 text-purple-200 font-header font-bold text-xs tracking-wider active:scale-95 transition-all"
                       >
                         EQUIP
@@ -504,7 +570,10 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                     ) : canAfford ? (
                       <button
                         type="button"
-                        onClick={() => handlePurchase(item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePurchase(item);
+                        }}
                         className="w-full py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 text-black font-header font-bold text-xs tracking-wider shadow-[0_0_12px_rgba(245,158,11,0.5)] border border-yellow-200 active:scale-95 transition-all flex items-center justify-center gap-1.5"
                       >
                         <img src={currencyStarImg} alt="Stars" className="w-3.5 h-3.5 object-contain" />
@@ -530,6 +599,21 @@ export const StoreModal: React.FC<StoreModalProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Interactive Live Trail Simulation Modal */}
+      {simulatingTrail && (
+        <TrailSimulationModal
+          isOpen={Boolean(simulatingTrail)}
+          item={simulatingTrail}
+          isUnlocked={economy.unlockedItems.includes(simulatingTrail.id)}
+          isEquipped={(economy.equippedSkins?.particles || 'particle_classic_blaze') === simulatingTrail.id}
+          canAfford={economy.stars >= simulatingTrail.price}
+          stars={economy.stars}
+          onClose={() => setSimulatingTrail(null)}
+          onEquip={(item) => handleEquip(item)}
+          onPurchase={(item) => handlePurchase(item)}
+        />
+      )}
     </div>
   );
 };
