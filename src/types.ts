@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type ScreenView = 'hub' | 'roulette' | 'bottle' | 'kaboom' | 'settings' | 'admin';
+export type ScreenView = 'hub' | 'roulette' | 'bottle' | 'kaboom' | 'pong' | 'settings' | 'admin';
 
 export type ThemeId =
   | 'cyber-neon'
@@ -121,6 +121,7 @@ export interface AppStats {
   totalRouletteRounds: number;
   totalBottleSpins: number;
   totalKaboomRounds: number;
+  totalPongRounds?: number;
   lastPlayedAt: number;
   kaboom: KaboomStats;
 }

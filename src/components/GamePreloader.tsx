@@ -7,6 +7,7 @@ import React from 'react';
 import chibiFingersImg from '../assets/images/Chibi Fingers Game.webp';
 import chibiBottleImg from '../assets/images/Chibi Spinning Bottle.webp';
 import chibiBombImg from '../assets/images/Chibi Bomb Game.webp';
+import chibiBombPongImg from '../assets/images/Chibi Bomb Pong Game.webp';
 import { GameModeId } from '../lib/assetPreloader';
 import { Loader2 } from 'lucide-react';
 
@@ -61,6 +62,17 @@ const GAME_CONFIGS: Record<GameModeId, GamePreloadConfig> = {
     glowColor: 'rgba(249, 115, 22, 0.65)',
     badgeColor: 'linear-gradient(90deg, #ef4444 0%, #f97316 50%, #ea580c 100%)',
     accentText: 'text-orange-300',
+  },
+  pong: {
+    title: 'BOMB PONG',
+    subtitle: 'Slide to deflect the bomb and survive',
+    badge: '2 PLAYERS',
+    thumbnail: chibiBombPongImg,
+    btnGradient: 'linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #06b6d4 100%)',
+    borderColor: 'border-fuchsia-500',
+    glowColor: 'rgba(217, 70, 239, 0.65)',
+    badgeColor: 'linear-gradient(90deg, #ec4899 0%, #d946ef 50%, #a855f7 100%)',
+    accentText: 'text-fuchsia-300',
   },
 };
 

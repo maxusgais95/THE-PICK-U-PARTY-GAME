@@ -78,6 +78,7 @@ export const DEFAULT_STATS: AppStats = {
   totalRouletteRounds: 0,
   totalBottleSpins: 0,
   totalKaboomRounds: 0,
+  totalPongRounds: 0,
   lastPlayedAt: Date.now(),
   kaboom: DEFAULT_KABOOM_STATS,
 };
@@ -106,6 +107,7 @@ function normalizeStats(raw: Partial<AppStats> | null | undefined): AppStats {
     totalRouletteRounds: raw.totalRouletteRounds || 0,
     totalBottleSpins: raw.totalBottleSpins || 0,
     totalKaboomRounds: totalRounds,
+    totalPongRounds: raw.totalPongRounds || 0,
     lastPlayedAt: raw.lastPlayedAt || Date.now(),
     kaboom,
   };
@@ -266,6 +268,19 @@ export async function recordGameEvent(type: 'roulette' | 'bottle'): Promise<AppS
     recordDailyQuestProgress('bottle_spin', 1);
     addEventExperience(25, 'bottle');
   }
+  current.lastPlayedAt = Date.now();
+  await saveStats(current);
+  return current;
+}
+
+export async function recordPongEvent(event: {
+  winner: 1 | 2;
+  rallies?: number;
+}): Promise<AppStats> {
+  const current = await getStats();
+  current.totalPongRounds = (current.totalPongRounds || 0) + 1;
+  recordDailyQuestProgress('roulette_round', 1);
+  addEventExperience(35, 'pong');
   current.lastPlayedAt = Date.now();
   await saveStats(current);
   return current;

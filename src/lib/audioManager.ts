@@ -845,6 +845,55 @@ export class AudioManager {
       noiseSource.stop(now + 0.9);
     } catch (e) {}
   }
+
+  // =========================================================================
+  // 13. Bomb Pong: Paddle bounce and laser wall reflections
+  // =========================================================================
+  public static playPaddleHit(multiplier: number = 1) {
+    if (!this.soundEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const baseFreq = Math.min(1400, 360 * Math.max(0.7, multiplier));
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.8, now + 0.035);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.12);
+
+      gain.gain.setValueAtTime(0.35 * this.masterVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.13);
+    } catch (e) {}
+  }
+
+  public static playWallPing() {
+    if (!this.soundEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(560, now);
+      osc.frequency.exponentialRampToValueAtTime(260, now + 0.07);
+
+      gain.gain.setValueAtTime(0.18 * this.masterVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch (e) {}
+  }
 }
 
 /**

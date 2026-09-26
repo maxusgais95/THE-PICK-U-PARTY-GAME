@@ -8,6 +8,7 @@ import pickuPartyLogo from '../assets/images/PICKU_PARTY_LOGO_E01.webp';
 import chibiFingersImg from '../assets/images/Chibi Fingers Game.webp';
 import chibiBottleImg from '../assets/images/Chibi Spinning Bottle.webp';
 import chibiBombImg from '../assets/images/Chibi Bomb Game.webp';
+import chibiBombPongImg from '../assets/images/Chibi Bomb Pong Game.webp';
 import { getAssetUrl } from '../lib/assetPreloader';
 import { AppSettings, AppStats } from '../types';
 import { SoundEngine, Haptics } from '../lib/audio';
@@ -23,6 +24,7 @@ interface LandingHubProps {
   onSelectRoulette: () => void;
   onSelectBottle: () => void;
   onSelectKaboom?: () => void;
+  onSelectPong?: () => void;
   onUpdateSettings: (newSettings: Partial<AppSettings>) => void;
   onOpenVersionNotes?: () => void;
   onOpenStore?: () => void;
@@ -54,6 +56,7 @@ export const LandingHub: React.FC<LandingHubProps> = ({
   onSelectRoulette,
   onSelectBottle,
   onSelectKaboom,
+  onSelectPong,
   onOpenVersionNotes,
   onOpenStore,
   onOpenDailyQuests,
@@ -146,6 +149,27 @@ export const LandingHub: React.FC<LandingHubProps> = ({
           onSelectKaboom();
         } else {
           handleKaboomClick(e);
+        }
+      },
+    },
+    {
+      id: 'pong',
+      title: 'BOMB PONG',
+      subtitle: '2-Player real-time bomb deflection duel',
+      buttonText: 'DUEL NOW',
+      image: chibiBombPongImg,
+      badge: '2 PLAYERS',
+      borderColor: 'border-fuchsia-500',
+      shadowColor: 'shadow-[0_0_24px_rgba(217,70,239,0.45)]',
+      btnGradient: 'linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #06b6d4 100%)',
+      titleGradient: 'from-pink-300 via-purple-200 to-cyan-300',
+      subGradient: 'from-pink-100 via-white to-cyan-100',
+      badgeGradient: 'linear-gradient(90deg, #ec4899 0%, #d946ef 50%, #a855f7 100%)',
+      onClick: () => {
+        SoundEngine.playButtonClick();
+        Haptics.buttonClick();
+        if (onSelectPong) {
+          onSelectPong();
         }
       },
     },

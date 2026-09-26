@@ -1,6 +1,6 @@
 {
   "name": "PICK'U PARTY",
-  "description": "The ultimate high-energy mobile party game hub! Test your luck with multi-touch Finger Roulette, dodge hidden penalties in Swipe-to-Spin Bottle, and clear the grid in KABOOM—where every tap could reveal a game-changing bonus or trigger an explosive bomb. The perfect way to level up game night with friends and family!",
+  "description": "The ultimate high-energy mobile party game hub! Duel in real-time 2-player Bomb Pong, test your luck with multi-touch Finger Roulette, dodge hidden penalties in Swipe-to-Spin Bottle, and clear the grid in KABOOM—where every tap could reveal a game-changing bonus or trigger an explosive bomb. The perfect way to level up game night with friends and family!",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

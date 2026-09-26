@@ -156,12 +156,14 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Locked Center Currency HUD - Mathematically locked to horizontal center on all pages */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-[max(2rem,calc(env(safe-area-inset-top)+1rem))] pointer-events-auto z-50 flex items-center justify-center">
-        <CurrencyHud
-          stars={stars}
-          onOpenStore={onOpenStore || (() => onOpenSettings('bottle'))}
-        />
-      </div>
+      {currentView !== 'pong' && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-[max(2rem,calc(env(safe-area-inset-top)+1rem))] pointer-events-auto z-50 flex items-center justify-center">
+          <CurrencyHud
+            stars={stars}
+            onOpenStore={onOpenStore || (() => onOpenSettings('bottle'))}
+          />
+        </div>
+      )}
 
       {/* Right Action Buttons (Compact, non-overlapping) */}
       <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto z-40">
@@ -177,22 +179,6 @@ export const Header: React.FC<HeaderProps> = ({
             className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-pink-400/50 shadow-[0_0_12px_rgba(236,72,153,0.3)] flex items-center justify-center text-pink-300 active:scale-95 transition-all"
           >
             <ChampagneBottleIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-pink-300 drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
-          </button>
-        )}
-
-        {/* Bomb Skin Quick Switcher in Kaboom Mode */}
-        {currentView === 'kaboom' && onToggleBombSkin && (
-          <button
-            onClick={() => {
-              SoundEngine.playButtonClick();
-              Haptics.buttonClick();
-              onToggleBombSkin();
-            }}
-            aria-label="Switch Bomb Skin"
-            title="Switch Bomb Skin"
-            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.3)] flex items-center justify-center text-red-300 active:scale-95 transition-all cursor-pointer"
-          >
-            <Bomb className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
           </button>
         )}
 
@@ -227,7 +213,23 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Game Guide Button - Top right next to Settings */}
+        {/* Bomb Skin Quick Switcher in Kaboom & Bomb Pong Mode - Right Next to Guide */}
+        {(currentView === 'kaboom' || currentView === 'pong') && onToggleBombSkin && (
+          <button
+            onClick={() => {
+              SoundEngine.playButtonClick();
+              Haptics.buttonClick();
+              onToggleBombSkin();
+            }}
+            aria-label="Switch Bomb Skin"
+            title="Switch Bomb Skin"
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.3)] flex items-center justify-center text-red-300 active:scale-95 transition-all cursor-pointer"
+          >
+            <Bomb className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+          </button>
+        )}
+
+        {/* Game Guide Button - Immediately next to Bomb Skin */}
         {(onOpenGuide || onOpenInfo) && (
           <button
             onClick={() => {

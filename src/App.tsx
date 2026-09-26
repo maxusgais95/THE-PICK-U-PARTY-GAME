@@ -25,6 +25,7 @@ import { LandscapeBlocker } from './components/LandscapeBlocker';
 import { SplashScreen } from './components/SplashScreen';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { KaboomGame } from './components/kaboom/KaboomGame';
+import { BombPongGame } from './components/pong/BombPongGame';
 import { getEconomyState, EconomyState, getStoreCatalogue, equipItem } from './lib/economy';
 import { StoreModal } from './components/StoreModal';
 import { DailyQuestsModal } from './components/DailyQuestsModal';
@@ -47,6 +48,7 @@ export default function App() {
   const [isVersionNotesOpen, setIsVersionNotesOpen] = useState<boolean>(false);
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false);
+  const [isPongInCourt, setIsPongInCourt] = useState<boolean>(false);
   const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState<boolean>(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
   const [isRewardsOpen, setIsRewardsOpen] = useState<boolean>(false);
@@ -235,6 +237,7 @@ export default function App() {
       roulette: 'finger',
       bottle: 'bottle',
       kaboom: 'bomb',
+      pong: 'bomb',
     };
     const targetTrack = trackMap[currentView] || 'hub';
     BgmManager.playTrack(targetTrack);
@@ -515,6 +518,7 @@ export default function App() {
             onSelectRoulette={() => handleNavigateToGame('roulette')}
             onSelectBottle={() => handleNavigateToGame('bottle')}
             onSelectKaboom={() => handleNavigateToGame('kaboom')}
+            onSelectPong={() => handleNavigateToGame('pong')}
             onUpdateSettings={handleUpdateSettings}
             onOpenVersionNotes={() => setIsVersionNotesOpen(true)}
             onOpenStore={() => setIsStoreOpen(true)}
@@ -554,6 +558,15 @@ export default function App() {
             economy={economy}
             onBackToMenu={() => setCurrentView('hub')}
             onStatsUpdated={(newStats) => setStats(newStats)}
+            onEconomyUpdated={setEconomy}
+          />
+        )}
+
+        {currentView === 'pong' && (
+          <BombPongGame
+            settings={settings}
+            economy={economy}
+            onNavigateHome={() => handleNavigateToGame('hub')}
             onEconomyUpdated={setEconomy}
           />
         )}

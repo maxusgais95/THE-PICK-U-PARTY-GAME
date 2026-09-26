@@ -35,7 +35,7 @@ export interface AboutGuideModalProps {
   initialTab?: TabKey;
   economy?: EconomyState;
   onEconomyUpdated?: (state: EconomyState) => void;
-  onNavigateToGame?: (game: 'roulette' | 'bottle' | 'kaboom') => void;
+  onNavigateToGame?: (game: 'roulette' | 'bottle' | 'kaboom' | 'pong') => void;
   onOpenStore?: () => void;
 }
 
@@ -350,6 +350,72 @@ export const AboutGuideModal: React.FC<AboutGuideModalProps> = ({
                   >
                     <span>Play KABOOM!</span>
                     <Bomb className="w-3.5 h-3.5 text-orange-300" />
+                  </button>
+                )}
+              </div>
+
+              {/* MODE 4: BOMB PONG */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-fuchsia-950/40 via-purple-950/30 to-cyan-950/40 border border-fuchsia-500/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-fuchsia-500/20 border border-fuchsia-400/40 flex items-center justify-center text-fuchsia-300">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-header font-bold text-white text-sm uppercase">
+                        Bomb Pong
+                      </h3>
+                      <p className="font-body text-[10px] text-fuchsia-300">
+                        2-Player Real-Time Ping Pong Duel & Solo AI
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-header font-bold bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40 uppercase">
+                    New Mode
+                  </span>
+                </div>
+
+                <p className="font-body text-xs text-slate-300 leading-relaxed">
+                  Slide your neon energy paddle to deflect the ticking bomb! Hit the outer edges of your bar for sharper angular slices. If a player misses the bomb behind their baseline, the bomb detonates and they lose a life.
+                </p>
+
+                <div className="pt-1 border-t border-white/5 space-y-1">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Game Rules & Highlights:
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                    <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
+                      <Users className="w-3.5 h-3.5 text-pink-400 shrink-0" />
+                      <span><strong>2P Duel:</strong> Head-to-head on 1 phone</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
+                      <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                      <span><strong>Solo Bot:</strong> Easy, Normal, Hard AI</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
+                      <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span><strong>Speed Up:</strong> +6% speed per bounce</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
+                      <Bomb className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      <span><strong>Skin Sync:</strong> Uses equipped bomb</span>
+                    </div>
+                  </div>
+                </div>
+
+                {onNavigateToGame && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      SoundEngine.playButtonClick();
+                      Haptics.buttonClick();
+                      onClose();
+                      onNavigateToGame('pong');
+                    }}
+                    className="mt-2.5 w-full py-1.5 rounded-xl bg-fuchsia-500/20 hover:bg-fuchsia-500/30 border border-fuchsia-400/40 text-fuchsia-200 font-header font-bold text-xs uppercase tracking-wider active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Play Bomb Pong!</span>
+                    <Sparkles className="w-3.5 h-3.5 text-fuchsia-300" />
                   </button>
                 )}
               </div>

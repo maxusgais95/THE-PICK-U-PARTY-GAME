@@ -103,6 +103,7 @@ import imgAsset_90 from './../assets/images/trophies/Silver Trophy 007.webp';
 import imgAsset_91 from './../assets/images/trophies/Silver Trophy 008.webp';
 import imgAsset_92 from './../assets/images/trophies/Silver Trophy 009.webp';
 import imgAsset_93 from './../assets/images/trophies/Silver Trophy 010.webp';
+import imgAsset_94 from './../assets/images/Chibi Bomb Pong Game.webp';
 
 import { preloadTransparentImages } from './bottleAlphaCache';
 import { AudioManager } from './audioManager';
@@ -198,6 +199,7 @@ const PRELOAD_QUEUE: PreloadItem[] = [
   { name: 'Chibi Bomb Game', url: imgAsset_7, type: 'image', description: 'Decoding Chibi Bomb Game (.webp)...' },
   { name: 'Chibi Fingers Game', url: imgAsset_8, type: 'image', description: 'Decoding Chibi Fingers Game (.webp)...' },
   { name: 'Chibi Spinning Bottle', url: imgAsset_9, type: 'image', description: 'Decoding Chibi Spinning Bottle (.webp)...' },
+  { name: 'Chibi Bomb Pong Game', url: imgAsset_94, type: 'image', description: 'Decoding Chibi Bomb Pong Game (.webp)...' },
   { name: 'Classic Mode Background', url: imgAsset_10, type: 'image', description: 'Decoding Classic Mode Background (.webp)...' },
   { name: 'Crystal Rose Sprite', url: imgAsset_11, type: 'image', description: 'Decoding Crystal Rose Sprite (.webp)...' },
   { name: 'Currency Star Sprite', url: imgAsset_12, type: 'image', description: 'Decoding Currency Star Sprite (.webp)...' },
@@ -372,7 +374,7 @@ export async function preloadAllAssets(
   onProgress?.(100, 'All media buffered! Initializing Party Suite...');
 }
 
-export type GameModeId = 'roulette' | 'bottle' | 'kaboom';
+export type GameModeId = 'roulette' | 'bottle' | 'kaboom' | 'pong';
 
 export interface GameAssetDefinition {
   name: string;
@@ -446,6 +448,26 @@ export const GAME_ASSET_REGISTRY: Record<GameModeId, GameAssetDefinition[]> = {
       url: imgAsset_38,
       type: 'image',
       description: 'Decoding Cyber Ball & Neon Horizontal Light Bands...',
+    },
+  ],
+  pong: [
+    {
+      name: 'Chibi Bomb Pong Game Banner',
+      url: imgAsset_94,
+      type: 'image',
+      description: 'Buffering Bomb Pong Chibi Artwork...',
+    },
+    {
+      name: 'Cyber Bomb Sprite',
+      url: imgAsset_50,
+      type: 'image',
+      description: 'Buffering Bomb Pong Ball & Fuse Sparks...',
+    },
+    {
+      name: 'Bomb Laser Court Background',
+      url: imgAsset_0,
+      type: 'image',
+      description: 'Decoding Neon Pong Laser Arena...',
     },
   ],
 };

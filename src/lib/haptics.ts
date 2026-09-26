@@ -174,4 +174,23 @@ export class Haptics {
   public static reward() {
     this.vibrate([20, 25, 40, 25, 70]);
   }
+
+  /**
+   * 14. Standard Haptic Intensity Helpers
+   */
+  public static light() {
+    this.vibrate(12);
+  }
+
+  public static medium() {
+    this.vibrate([25, 20, 35]);
+  }
+
+  public static heavy() {
+    this.vibrate([40, 20, 80, 30, 220]);
+  }
+
+  public static paddleHit() {
+    this.vibrate(18);
+  }
 }
