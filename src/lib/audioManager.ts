@@ -4,8 +4,10 @@
  */
 
 import { Haptics } from './haptics';
+import { BgmManager, BgmTrackKey } from './bgmManager';
 
-export { Haptics };
+export { Haptics, BgmManager };
+export type { BgmTrackKey };
 
 /**
  * Sound Asset Manifest:
@@ -143,7 +145,13 @@ export class AudioManager {
   /**
    * Update audio & haptics configuration from user settings
    */
-  public static updateConfig(soundEnabled: boolean, volume: number, hapticsEnabled: boolean) {
+  public static updateConfig(
+    soundEnabled: boolean,
+    volume: number,
+    hapticsEnabled: boolean,
+    musicEnabled?: boolean,
+    musicVolume?: number
+  ) {
     this.soundEnabled = soundEnabled;
     this.masterVolume = Math.max(0, Math.min(1, volume));
     this.hapticsEnabled = hapticsEnabled;
@@ -154,6 +162,14 @@ export class AudioManager {
         masterGainNode.gain.setValueAtTime(this.masterVolume, audioCtx.currentTime);
       } catch (e) {}
     }
+
+    if (musicEnabled !== undefined && musicVolume !== undefined) {
+      BgmManager.updateConfig(musicEnabled, musicVolume);
+    }
+  }
+
+  public static playBgm(track: BgmTrackKey, forceRestart: boolean = false) {
+    BgmManager.playTrack(track, forceRestart);
   }
 
   public static getSoundEnabled(): boolean {

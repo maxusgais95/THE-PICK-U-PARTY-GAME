@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { AppSettings, AppStats, CustomBottleSprite, ScreenView, TouchPlayer, BottleBuiltinStyle, ThemeId } from './types';
 import { THEMES } from './lib/themes';
 import { getSettings, saveSettings, getStats, getAllCustomSprites, saveCustomSprite } from './lib/db';
-import { SoundEngine, Haptics } from './lib/audio';
+import { SoundEngine, Haptics, BgmManager } from './lib/audio';
 import { processSpriteImage } from './lib/imageProcessing';
 import { BackgroundCanvas } from './components/BackgroundCanvas';
 import { Header } from './components/Header';
@@ -34,6 +34,7 @@ import { EventModal } from './components/EventModal';
 import { GamePreloader } from './components/GamePreloader';
 import { preloadGameAssets, GameModeId } from './lib/assetPreloader';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { AdminPinModal } from './components/admin/AdminPinModal';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState<boolean>(true);
@@ -42,6 +43,7 @@ export default function App() {
   const [preloadProgress, setPreloadProgress] = useState<number>(0);
   const [preloadStatus, setPreloadStatus] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isAdminPinOpen, setIsAdminPinOpen] = useState<boolean>(false);
   const [isVersionNotesOpen, setIsVersionNotesOpen] = useState<boolean>(false);
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false);
@@ -59,6 +61,10 @@ export default function App() {
     bottleBlendMode: 'screen',
     bottleFriction: 0.992,
     theme: 'cyber-neon',
+    sfxEnabled: true,
+    sfxVolume: 0.8,
+    musicEnabled: true,
+    musicVolume: 0.7,
     soundEnabled: true,
     soundVolume: 0.8,
     hapticsEnabled: true,
@@ -141,11 +147,14 @@ export default function App() {
       setCustomSprites(upgradedSprites);
 
       SoundEngine.updateConfig(
-        loadedSettings.soundEnabled,
-        loadedSettings.soundVolume,
-        loadedSettings.hapticsEnabled
+        loadedSettings.sfxEnabled ?? loadedSettings.soundEnabled,
+        loadedSettings.sfxVolume ?? loadedSettings.soundVolume,
+        loadedSettings.hapticsEnabled,
+        loadedSettings.musicEnabled ?? true,
+        loadedSettings.musicVolume ?? 0.7
       );
       SoundEngine.preloadSounds();
+      BgmManager.playTrack('hub');
     }
     loadDB();
   }, []);
@@ -198,19 +207,38 @@ export default function App() {
   const handleUpdateSettings = useCallback((newSettings: Partial<AppSettings>) => {
     setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
+      if (newSettings.sfxEnabled !== undefined) updated.soundEnabled = newSettings.sfxEnabled;
+      if (newSettings.soundEnabled !== undefined && newSettings.sfxEnabled === undefined) updated.sfxEnabled = newSettings.soundEnabled;
+      if (newSettings.sfxVolume !== undefined) updated.soundVolume = newSettings.sfxVolume;
+      if (newSettings.soundVolume !== undefined && newSettings.sfxVolume === undefined) updated.sfxVolume = newSettings.soundVolume;
+
       saveSettings(updated);
       SoundEngine.updateConfig(
-        updated.soundEnabled,
-        updated.soundVolume,
-        updated.hapticsEnabled
+        updated.sfxEnabled,
+        updated.sfxVolume,
+        updated.hapticsEnabled,
+        updated.musicEnabled,
+        updated.musicVolume
       );
       return updated;
     });
   }, []);
 
-  const handleToggleSound = useCallback(() => {
-    handleUpdateSettings({ soundEnabled: !settings.soundEnabled });
-  }, [settings.soundEnabled, handleUpdateSettings]);
+  // Seamless BGM Crossfade based on active game mode:
+  // - main hub: "src/bgm/Neon Party BGM.m4a"
+  // - Bottle mode: "src/bgm/Neon Party BGM_Bottle.m4a"
+  // - Finger mode: "src/bgm/Neon Party BGM_Roullete.m4a"
+  // - Bomb mode: "src/bgm/Neon Party_Bomb.m4a"
+  useEffect(() => {
+    const trackMap: Partial<Record<ScreenView, 'hub' | 'finger' | 'bottle' | 'bomb'>> = {
+      hub: 'hub',
+      roulette: 'finger',
+      bottle: 'bottle',
+      kaboom: 'bomb',
+    };
+    const targetTrack = trackMap[currentView] || 'hub';
+    BgmManager.playTrack(targetTrack);
+  }, [currentView]);
 
   const handleToggleHaptics = useCallback(() => {
     handleUpdateSettings({ hapticsEnabled: !settings.hapticsEnabled });
@@ -470,7 +498,6 @@ export default function App() {
         onOpenStore={() => setIsStoreOpen(true)}
         onOpenInfo={() => setIsGuideOpen(true)}
         onOpenGuide={() => setIsGuideOpen(true)}
-        onToggleSound={handleToggleSound}
         onToggleHaptics={handleToggleHaptics}
         onToggleBottleSprite={handleCycleBottleSprite}
         onToggleBallSkin={handleCycleBallSkin}
@@ -548,9 +575,19 @@ export default function App() {
         onOpenStore={() => setIsStoreOpen(true)}
         onOpenAdmin={() => {
           setIsSettingsOpen(false);
-          setCurrentView('admin');
+          setIsAdminPinOpen(true);
         }}
         onEconomyUpdated={setEconomy}
+      />
+
+      {/* Admin Security PIN Unlock Modal */}
+      <AdminPinModal
+        isOpen={isAdminPinOpen}
+        onClose={() => setIsAdminPinOpen(false)}
+        onSuccess={() => {
+          setIsAdminPinOpen(false);
+          setCurrentView('admin');
+        }}
       />
 
       {/* Version Notes Modal (Changelog History & v1.4.03 Updates) */}

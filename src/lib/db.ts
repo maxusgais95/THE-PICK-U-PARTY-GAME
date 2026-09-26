@@ -19,6 +19,10 @@ const DEFAULT_SETTINGS: AppSettings = {
   bottleBlendMode: 'color-dodge',
   bottleFriction: 0.992,
   theme: 'cyber-neon',
+  sfxEnabled: true,
+  sfxVolume: 0.8,
+  musicEnabled: true,
+  musicVolume: 0.7,
   soundEnabled: true,
   soundVolume: 0.8,
   hapticsEnabled: true,
@@ -26,6 +30,23 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 function normalizeSettings(data: Partial<AppSettings>): AppSettings {
   const merged: AppSettings = { ...DEFAULT_SETTINGS, ...data };
+  // Backwards compatibility migration
+  if (data.sfxEnabled === undefined && data.soundEnabled !== undefined) {
+    merged.sfxEnabled = data.soundEnabled;
+  }
+  if (data.sfxVolume === undefined && data.soundVolume !== undefined) {
+    merged.sfxVolume = data.soundVolume;
+  }
+  merged.soundEnabled = merged.sfxEnabled;
+  merged.soundVolume = merged.sfxVolume;
+
+  if (merged.musicEnabled === undefined) {
+    merged.musicEnabled = true;
+  }
+  if (typeof merged.musicVolume !== 'number' || isNaN(merged.musicVolume)) {
+    merged.musicVolume = 0.7;
+  }
+
   const validStyles = ['btl_e_001', 'btl_e_002', 'btl_e_003', 'btl_e_004', 'custom'];
   if (!validStyles.includes(merged.bottleStyle as string)) {
     merged.bottleStyle = 'btl_e_001';

@@ -10,6 +10,7 @@
 export {
   AudioManager,
   SoundEngine,
+  BgmManager,
   Haptics,
   getAudioContext,
   triggerHaptic,
@@ -19,6 +20,7 @@ export {
 export type {
   SoundFileName,
   SoundId,
+  BgmTrackKey,
   PlaySampleOptions,
   AudioCacheReport,
 } from './audioManager';

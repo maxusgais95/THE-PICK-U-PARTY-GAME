@@ -98,7 +98,12 @@ export interface AppSettings {
   // Theme & Appearance
   theme: ThemeId;
   
-  // Audio & Haptics
+  // Audio & Haptics (Dual SFX and Music controls)
+  sfxEnabled: boolean;
+  sfxVolume: number; // 0.0 to 1.0
+  musicEnabled: boolean;
+  musicVolume: number; // 0.0 to 1.0
+  // Compatibility aliases
   soundEnabled: boolean;
   soundVolume: number; // 0.0 to 1.0
   hapticsEnabled: boolean;

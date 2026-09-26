@@ -11,6 +11,7 @@ export default defineConfig(() => {
 
   return {
     base,
+    assetsInclude: ['**/*.m4a'],
     plugins: [
       react(),
       tailwindcss(),
@@ -70,7 +71,7 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpeg,jpg,webp,mp3,wav,mp4,woff,woff2}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpeg,jpg,webp,mp3,wav,mp4,m4a,woff,woff2}'],
           maximumFileSizeToCacheInBytes: 25 * 1024 * 1024,
           runtimeCaching: [
             {

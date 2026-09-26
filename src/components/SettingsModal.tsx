@@ -11,6 +11,8 @@ import {
   Sliders,
   BarChart2,
   Volume2,
+  VolumeX,
+  Music,
   Check,
   Smartphone,
   Zap,
@@ -293,29 +295,249 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Audio Volume */}
-              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+              {/* 1. SFX Audio Control */}
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-white">
-                    <Volume2 className="w-4 h-4" style={{ color: currentTheme.primary }} />
-                    <span>Sound Volume</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextSfx = !(settings.sfxEnabled ?? settings.soundEnabled);
+                      onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx });
+                      SoundEngine.updateConfig(
+                        nextSfx,
+                        settings.sfxVolume ?? settings.soundVolume,
+                        settings.hapticsEnabled,
+                        settings.musicEnabled ?? true,
+                        settings.musicVolume ?? 0.7
+                      );
+                      if (nextSfx) {
+                        SoundEngine.playButtonClick();
+                      }
+                    }}
+                    className="flex items-center gap-2.5 text-left group cursor-pointer focus:outline-none"
+                    aria-label="Toggle SFX Audio"
+                  >
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center border transition-all ${
+                        (settings.sfxEnabled ?? settings.soundEnabled)
+                          ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.4)]'
+                          : 'bg-white/5 border-white/10 text-gray-500'
+                      }`}
+                    >
+                      {(settings.sfxEnabled ?? settings.soundEnabled) ? (
+                        <Volume2 className="w-4 h-4 stroke-[2.2]" />
+                      ) : (
+                        <VolumeX className="w-4 h-4 stroke-[2]" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-xs font-extrabold uppercase tracking-wide text-white flex items-center gap-1.5">
+                        <span>SFX Audio</span>
+                        <span
+                          className={`text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-widest font-black ${
+                            (settings.sfxEnabled ?? settings.soundEnabled)
+                              ? 'bg-cyan-400/20 text-cyan-300 border border-cyan-400/30'
+                              : 'bg-white/10 text-gray-400'
+                          }`}
+                        >
+                          {(settings.sfxEnabled ?? settings.soundEnabled) ? 'ON' : 'OFF'}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-gray-400">Game sounds, taps & roulette ticks</div>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-cyan-300">
+                      {(settings.sfxEnabled ?? settings.soundEnabled)
+                        ? `${Math.round((settings.sfxVolume ?? settings.soundVolume) * 100)}%`
+                        : '0%'}
+                    </span>
+                    {/* Toggle Switch */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextSfx = !(settings.sfxEnabled ?? settings.soundEnabled);
+                        onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx });
+                        SoundEngine.updateConfig(
+                          nextSfx,
+                          settings.sfxVolume ?? settings.soundVolume,
+                          settings.hapticsEnabled,
+                          settings.musicEnabled ?? true,
+                          settings.musicVolume ?? 0.7
+                        );
+                        if (nextSfx) {
+                          SoundEngine.playButtonClick();
+                        }
+                      }}
+                      className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                      style={{
+                        backgroundColor: (settings.sfxEnabled ?? settings.soundEnabled)
+                          ? '#06b6d4'
+                          : 'rgba(255, 255, 255, 0.15)',
+                        boxShadow: (settings.sfxEnabled ?? settings.soundEnabled)
+                          ? '0 0 10px rgba(6, 182, 212, 0.6)'
+                          : 'none',
+                      }}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                          (settings.sfxEnabled ?? settings.soundEnabled)
+                            ? 'translate-x-5'
+                            : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
                   </div>
-                  <span className="text-xs font-black" style={{ color: currentTheme.primary }}>
-                    {Math.round(settings.soundVolume * 100)}%
-                  </span>
                 </div>
+
+                {/* SFX Volume Slider */}
                 <input
                   type="range"
                   min="0"
                   max="1"
                   step="0.05"
-                  value={settings.soundVolume}
+                  disabled={!(settings.sfxEnabled ?? settings.soundEnabled)}
+                  value={(settings.sfxEnabled ?? settings.soundEnabled) ? (settings.sfxVolume ?? settings.soundVolume) : 0}
                   onChange={(e) => {
                     const vol = parseFloat(e.target.value);
-                    onUpdateSettings({ soundVolume: vol });
-                    SoundEngine.updateConfig(settings.soundEnabled, vol, settings.hapticsEnabled);
+                    onUpdateSettings({ sfxVolume: vol, soundVolume: vol });
+                    SoundEngine.updateConfig(
+                      settings.sfxEnabled ?? settings.soundEnabled,
+                      vol,
+                      settings.hapticsEnabled,
+                      settings.musicEnabled ?? true,
+                      settings.musicVolume ?? 0.7
+                    );
                   }}
-                  className="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer transition-opacity ${
+                    (settings.sfxEnabled ?? settings.soundEnabled)
+                      ? 'bg-gray-800 accent-cyan-400 opacity-100'
+                      : 'bg-gray-800/50 accent-gray-500 opacity-40 cursor-not-allowed'
+                  }`}
+                />
+              </div>
+
+              {/* 2. Background Music (BGM) Control */}
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextMusic = !(settings.musicEnabled ?? true);
+                      onUpdateSettings({ musicEnabled: nextMusic });
+                      SoundEngine.updateConfig(
+                        settings.sfxEnabled ?? settings.soundEnabled,
+                        settings.sfxVolume ?? settings.soundVolume,
+                        settings.hapticsEnabled,
+                        nextMusic,
+                        settings.musicVolume ?? 0.7
+                      );
+                      if (settings.sfxEnabled ?? settings.soundEnabled) {
+                        SoundEngine.playButtonClick();
+                      }
+                    }}
+                    className="flex items-center gap-2.5 text-left group cursor-pointer focus:outline-none"
+                    aria-label="Toggle Background Music"
+                  >
+                    <div
+                      className={`w-7 h-7 rounded-xl flex items-center justify-center border transition-all ${
+                        (settings.musicEnabled ?? true)
+                          ? 'bg-pink-500/20 border-pink-400/50 text-pink-300 shadow-[0_0_10px_rgba(244,63,94,0.4)]'
+                          : 'bg-white/5 border-white/10 text-gray-500'
+                      }`}
+                    >
+                      {(settings.musicEnabled ?? true) ? (
+                        <Music className="w-4 h-4 stroke-[2.2] drop-shadow-[0_0_6px_#f43f5e]" />
+                      ) : (
+                        <VolumeX className="w-4 h-4 stroke-[2]" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-xs font-extrabold uppercase tracking-wide text-white flex items-center gap-1.5">
+                        <span>Background Music</span>
+                        <span
+                          className={`text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-widest font-black ${
+                            (settings.musicEnabled ?? true)
+                              ? 'bg-pink-400/20 text-pink-300 border border-pink-400/30'
+                              : 'bg-white/10 text-gray-400'
+                          }`}
+                        >
+                          {(settings.musicEnabled ?? true) ? 'ON' : 'OFF'}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-gray-400">Hub, Bottle, Finger & Bomb mode tracks</div>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-pink-300">
+                      {(settings.musicEnabled ?? true)
+                        ? `${Math.round((settings.musicVolume ?? 0.7) * 100)}%`
+                        : '0%'}
+                    </span>
+                    {/* Toggle Switch */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextMusic = !(settings.musicEnabled ?? true);
+                        onUpdateSettings({ musicEnabled: nextMusic });
+                        SoundEngine.updateConfig(
+                          settings.sfxEnabled ?? settings.soundEnabled,
+                          settings.sfxVolume ?? settings.soundVolume,
+                          settings.hapticsEnabled,
+                          nextMusic,
+                          settings.musicVolume ?? 0.7
+                        );
+                        if (settings.sfxEnabled ?? settings.soundEnabled) {
+                          SoundEngine.playButtonClick();
+                        }
+                      }}
+                      className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                      style={{
+                        backgroundColor: (settings.musicEnabled ?? true)
+                          ? '#f43f5e'
+                          : 'rgba(255, 255, 255, 0.15)',
+                        boxShadow: (settings.musicEnabled ?? true)
+                          ? '0 0 10px rgba(244, 63, 94, 0.6)'
+                          : 'none',
+                      }}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                          (settings.musicEnabled ?? true)
+                            ? 'translate-x-5'
+                            : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Music Volume Slider */}
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  disabled={!(settings.musicEnabled ?? true)}
+                  value={(settings.musicEnabled ?? true) ? (settings.musicVolume ?? 0.7) : 0}
+                  onChange={(e) => {
+                    const vol = parseFloat(e.target.value);
+                    onUpdateSettings({ musicVolume: vol });
+                    SoundEngine.updateConfig(
+                      settings.sfxEnabled ?? settings.soundEnabled,
+                      settings.sfxVolume ?? settings.soundVolume,
+                      settings.hapticsEnabled,
+                      settings.musicEnabled ?? true,
+                      vol
+                    );
+                  }}
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer transition-opacity ${
+                    (settings.musicEnabled ?? true)
+                      ? 'bg-gray-800 accent-pink-500 opacity-100'
+                      : 'bg-gray-800/50 accent-gray-500 opacity-40 cursor-not-allowed'
+                  }`}
                 />
               </div>
 
@@ -336,7 +558,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => {
                       const nextVal = !settings.hapticsEnabled;
                       onUpdateSettings({ hapticsEnabled: nextVal });
-                      SoundEngine.updateConfig(settings.soundEnabled, settings.soundVolume, nextVal);
+                      SoundEngine.updateConfig(
+                        settings.sfxEnabled ?? settings.soundEnabled,
+                        settings.sfxVolume ?? settings.soundVolume,
+                        nextVal,
+                        settings.musicEnabled ?? true,
+                        settings.musicVolume ?? 0.7
+                      );
                       if (nextVal) {
                         Haptics.buttonClick();
                       }

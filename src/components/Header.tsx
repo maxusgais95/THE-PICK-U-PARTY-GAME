@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Volume2, VolumeX, Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb } from 'lucide-react';
+import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
 import { CurrencyHud } from './CurrencyHud';
 import { AppSettings, ScreenView } from '../types';
@@ -21,7 +21,7 @@ interface HeaderProps {
   onOpenStore?: () => void;
   onOpenInfo?: () => void;
   onOpenGuide?: () => void;
-  onToggleSound: () => void;
+  onToggleSound?: () => void;
   onToggleHaptics: () => void;
   onToggleBottleSprite?: () => void;
   onToggleBallSkin?: () => void;
@@ -153,27 +153,6 @@ export const Header: React.FC<HeaderProps> = ({
             <Home className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
           </button>
         ) : null}
-
-        {/* Audio Toggle Button */}
-        <button
-          onClick={() => {
-            SoundEngine.playButtonClick();
-            Haptics.buttonClick();
-            onToggleSound();
-          }}
-          aria-label={settings.soundEnabled ? 'Mute Sound' : 'Enable Sound'}
-          className={`w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border transition-all flex items-center justify-center active:scale-95 ${
-            settings.soundEnabled
-              ? 'border-purple-400/60 shadow-[0_0_12px_rgba(192,38,211,0.3)] text-pink-300'
-              : 'border-purple-900/40 text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.5)]'
-          }`}
-        >
-          {settings.soundEnabled ? (
-            <Volume2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
-          ) : (
-            <VolumeX className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2] opacity-80" />
-          )}
-        </button>
       </div>
 
       {/* Locked Center Currency HUD - Mathematically locked to horizontal center on all pages */}
