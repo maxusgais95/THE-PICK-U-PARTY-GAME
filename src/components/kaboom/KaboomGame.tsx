@@ -54,6 +54,7 @@ interface KaboomGameProps {
   onBackToMenu?: () => void;
   onStatsUpdated?: (stats: AppStats) => void;
   onEconomyUpdated?: (economy: EconomyState) => void;
+  onScreenChange?: (screen: 'selection' | 'gameplay') => void;
 }
 
 interface KaboomToast {
@@ -116,6 +117,7 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
   onBackToMenu,
   onStatsUpdated,
   onEconomyUpdated,
+  onScreenChange,
 }) => {
   const [catalogue, setCatalogue] = useState<Record<StoreCategory, StoreItem[]>>(() => getStoreCatalogue());
 
@@ -720,7 +722,7 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
   );
 
   // Start a new round directly
-  const handleNextRound = () => {
+  const handleNextRound = useCallback(() => {
     // Flush any pending flying stars to economy so nothing is lost on quick restarts
     if (flyingStarBatches.length > 0) {
       const pendingStars = flyingStarBatches.reduce((acc, b) => acc + b.amount, 0);
@@ -733,7 +735,48 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
     SoundEngine.playButtonClick();
     Haptics.buttonClick();
     initializeBoard(selectedDimension);
-  };
+  }, [flyingStarBatches, initializeBoard, onEconomyUpdated, selectedDimension]);
+
+  // Sync screen state with parent header and listen to top header Back and Restart buttons
+  useEffect(() => {
+    if (onScreenChange) {
+      onScreenChange(currentScreen);
+    }
+  }, [currentScreen, onScreenChange]);
+
+  useEffect(() => {
+    const handleBackEvent = () => {
+      if (currentScreen === 'gameplay') {
+        if (flyingStarBatches.length > 0) {
+          const pendingStars = flyingStarBatches.reduce((acc, b) => acc + b.amount, 0);
+          if (pendingStars > 0) {
+            const nextEco = addStars(pendingStars);
+            if (onEconomyUpdated) onEconomyUpdated(nextEco);
+          }
+          setFlyingStarBatches([]);
+        }
+        SoundEngine.playButtonClick();
+        Haptics.buttonClick();
+        setCurrentScreen('selection');
+      } else if (onBackToMenu) {
+        onBackToMenu();
+      }
+    };
+
+    const handleRestartEvent = () => {
+      if (currentScreen === 'gameplay') {
+        handleNextRound();
+      }
+    };
+
+    window.addEventListener('picku_game_back', handleBackEvent);
+    window.addEventListener('picku_game_restart', handleRestartEvent);
+
+    return () => {
+      window.removeEventListener('picku_game_back', handleBackEvent);
+      window.removeEventListener('picku_game_restart', handleRestartEvent);
+    };
+  }, [currentScreen, flyingStarBatches, handleNextRound, onBackToMenu, onEconomyUpdated]);
 
   // Board container size & proportion based on dimension:
   // "The board size proportion: 2x2 is slightly smaller than 3x3, 3x3 slightly smaller than 4x4, and so on."
@@ -815,98 +858,49 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
           onComplete={() => setExplosionActive(false)}
         />
 
-      {/* Top Header / Navigation Bar - Fixed height container */}
-      <div className="w-full max-w-md mx-auto shrink-0 mb-2 relative z-30">
-        <div className="flex items-center justify-between gap-2 h-10">
-          {/* Back to Board Selection */}
-          <button
-            id="kaboom-back-to-selection-button"
-            type="button"
-            onClick={() => {
-              if (flyingStarBatches.length > 0) {
-                const pendingStars = flyingStarBatches.reduce((acc, b) => acc + b.amount, 0);
-                if (pendingStars > 0) {
-                  const nextEco = addStars(pendingStars);
-                  if (onEconomyUpdated) onEconomyUpdated(nextEco);
-                }
-                setFlyingStarBatches([]);
-              }
-              SoundEngine.playButtonClick();
-              Haptics.buttonClick();
-              setCurrentScreen('selection');
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md border border-zinc-700/60 text-zinc-300 text-xs font-bold hover:border-zinc-500 active:scale-95 transition-all cursor-pointer shadow-[0_0_12px_rgba(0,0,0,0.6)]"
-          >
-            <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
-            <span>Select Board</span>
-          </button>
-
-          {/* Quick Reshuffle Button */}
-          <button
-            id="kaboom-restart-round-button"
-            type="button"
-            onClick={handleNextRound}
-            title="Restart round"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md border text-xs font-bold active:scale-95 transition-all cursor-pointer shadow-[0_0_12px_rgba(0,0,0,0.6)] ${
-              isGameOver
-                ? isVictory
-                  ? 'border-emerald-400 text-emerald-300 animate-glow-pulse-victory'
-                  : 'border-orange-500 text-orange-300 animate-glow-pulse-restart'
-                : 'border-zinc-700/60 text-zinc-300 hover:border-zinc-500'
-            }`}
-          >
-            <RotateCcw className="w-3.5 h-3.5 stroke-[2.2]" />
-            <span>Restart</span>
-          </button>
-        </div>
-
-        {/* Toast Notification: Floating absolutely directly below buttons row
-            - absolute top-11: floats below the buttons without overlapping "Select Board" or "Restart"
-            - 0px layout footprint: the board below NEVER shifts when toast appears or disappears!
-        */}
-        <div className="absolute top-11 left-0 right-0 pointer-events-none flex justify-center z-40">
-          {toast && (
-            <div className="w-full pointer-events-auto animate-bounce-in">
-              <div
-                onClick={() => setToast(null)}
-                className={`w-full cursor-pointer rounded-xl p-2.5 border shadow-2xl backdrop-blur-xl flex items-start justify-between gap-2.5 ${
-                  toast.type === 'bomb'
-                    ? 'bg-gradient-to-r from-red-950/95 via-orange-950/95 to-slate-950/95 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.6)]'
-                    : toast.type === 'bonus'
-                    ? 'bg-gradient-to-r from-amber-950/95 via-purple-950/95 to-slate-950/95 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]'
-                    : 'bg-black/90 border-cyan-500/60 shadow-[0_0_18px_rgba(6,182,212,0.4)]'
-                }`}
-              >
-                <div className="flex-1 min-w-0">
-                  <div
-                    className={`text-[11px] font-black uppercase tracking-wider ${
-                      toast.type === 'bomb'
-                        ? 'text-red-300'
-                        : toast.type === 'bonus'
-                        ? 'text-amber-300'
-                        : 'text-cyan-300'
-                    }`}
-                  >
-                    {toast.title}
-                  </div>
-                  <div className="text-xs text-white/90 font-medium mt-0.5 leading-snug">
-                    {toast.message}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setToast(null);
-                  }}
-                  className="text-gray-400 hover:text-white p-1 cursor-pointer shrink-0"
+      {/* Toast Notification Container - Fixed footprint so grid board never shifts */}
+      <div className="w-full max-w-md mx-auto shrink-0 mb-1.5 min-h-[32px] relative z-30 flex items-center justify-center">
+        {toast && (
+          <div className="w-full pointer-events-auto animate-bounce-in">
+            <div
+              onClick={() => setToast(null)}
+              className={`w-full cursor-pointer rounded-xl p-2.5 border shadow-2xl backdrop-blur-xl flex items-start justify-between gap-2.5 ${
+                toast.type === 'bomb'
+                  ? 'bg-gradient-to-r from-red-950/95 via-orange-950/95 to-slate-950/95 border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.6)]'
+                  : toast.type === 'bonus'
+                  ? 'bg-gradient-to-r from-amber-950/95 via-purple-950/95 to-slate-950/95 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]'
+                  : 'bg-black/90 border-cyan-500/60 shadow-[0_0_18px_rgba(6,182,212,0.4)]'
+              }`}
+            >
+              <div className="flex-1 min-w-0">
+                <div
+                  className={`text-[11px] font-black uppercase tracking-wider ${
+                    toast.type === 'bomb'
+                      ? 'text-red-300'
+                      : toast.type === 'bonus'
+                      ? 'text-amber-300'
+                      : 'text-cyan-300'
+                  }`}
                 >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                  {toast.title}
+                </div>
+                <div className="text-xs text-white/90 font-medium mt-0.5 leading-snug">
+                  {toast.message}
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setToast(null);
+                }}
+                className="text-gray-400 hover:text-white p-1 cursor-pointer shrink-0"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Center: Tactile Cyber Gray Grid Board - LOCKED IN PLACE */}

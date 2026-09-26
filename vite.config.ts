@@ -116,8 +116,9 @@ export default defineConfig(() => {
       },
     },
     server: {
-      hmr: process.env.DISABLE_HMR !== 'true',
-      watch: process.env.DISABLE_HMR === 'true' ? null : undefined,
+      host: true,
+      port: 3000,
+      hmr: false,
     },
   };
 });

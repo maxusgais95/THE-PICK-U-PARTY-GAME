@@ -54,6 +54,9 @@ export class BgmManager {
     this.channelB.preload = 'auto';
     this.channelB.volume = 0;
 
+    // Suppress system notification media player popup on mobile OS
+    this.suppressMediaSession();
+
     // Visibility change listener to pause/resume cleanly on tab backgrounding
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
@@ -179,6 +182,7 @@ export class BgmManager {
     this.currentTrack = newTrack;
     this.activeChannelIndex = nextChannelIdx;
     this.isTransitioning = true;
+    this.suppressMediaSession();
 
     const startTime = performance.now();
     const initialCurrentVol = currentChannel.volume;
@@ -366,4 +370,31 @@ export class BgmManager {
     const active = this.activeChannelIndex === 0 ? this.channelA : this.channelB;
     return !!active && !active.paused && active.volume > 0;
   }
+
+  /**
+   * Suppress system notification media player on mobile devices
+   */
+  public static suppressMediaSession() {
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      try {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.playbackState = 'none';
+        const actions: MediaSessionAction[] = [
+          'play',
+          'pause',
+          'seekbackward',
+          'seekforward',
+          'previoustrack',
+          'nexttrack',
+          'stop',
+        ];
+        actions.forEach((action) => {
+          try {
+            navigator.mediaSession.setActionHandler(action, null);
+          } catch (e) {}
+        });
+      } catch (e) {}
+    }
+  }
 }
+

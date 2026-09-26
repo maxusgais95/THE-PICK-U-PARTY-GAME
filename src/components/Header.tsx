@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb } from 'lucide-react';
+import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb, ArrowLeft, RotateCcw } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
 import { CurrencyHud } from './CurrencyHud';
 import { AppSettings, ScreenView } from '../types';
@@ -17,6 +17,9 @@ interface HeaderProps {
   settings: AppSettings;
   stars?: number;
   onNavigate: (view: ScreenView) => void;
+  onBack?: () => void;
+  onRestart?: () => void;
+  showGameActionButtons?: boolean;
   onOpenSettings: (tab?: 'game' | 'bottle' | 'stats') => void;
   onOpenStore?: () => void;
   onOpenInfo?: () => void;
@@ -35,6 +38,9 @@ export const Header: React.FC<HeaderProps> = ({
   settings,
   stars = 1250,
   onNavigate,
+  onBack,
+  onRestart,
+  showGameActionButtons = false,
   onOpenSettings,
   onOpenStore,
   onOpenInfo,
@@ -141,17 +147,59 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Left Action Buttons (Compact, non-overlapping) */}
       <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto z-40">
         {currentView !== 'hub' ? (
-          <button
-            onClick={() => {
-              SoundEngine.playButtonClick();
-              Haptics.buttonClick();
-              onNavigate('hub');
-            }}
-            aria-label="Return to Hub"
-            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-purple-400/40 shadow-[0_0_12px_rgba(168,85,247,0.25)] flex items-center justify-center text-purple-300 hover:border-purple-300 active:scale-95 transition-all"
-          >
-            <Home className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-          </button>
+          <>
+            <button
+              onClick={() => {
+                SoundEngine.playButtonClick();
+                Haptics.buttonClick();
+                onNavigate('hub');
+              }}
+              aria-label="Return to Hub"
+              title="Return to Hub"
+              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-purple-400/40 shadow-[0_0_12px_rgba(168,85,247,0.25)] flex items-center justify-center text-purple-300 hover:border-purple-300 active:scale-95 transition-all cursor-pointer"
+            >
+              <Home className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
+            </button>
+
+            {/* Back & Restart buttons exclusively in gameplay for bomb game and bomb pong */}
+            {showGameActionButtons && (
+              <>
+                <button
+                  onClick={() => {
+                    SoundEngine.playButtonClick();
+                    Haptics.buttonClick();
+                    if (onBack) {
+                      onBack();
+                    } else {
+                      window.dispatchEvent(new CustomEvent('picku_game_back'));
+                    }
+                  }}
+                  aria-label="Back"
+                  title="Back"
+                  className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-purple-400/40 shadow-[0_0_12px_rgba(168,85,247,0.25)] flex items-center justify-center text-purple-300 hover:border-purple-300 active:scale-95 transition-all cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-pink-300 drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    SoundEngine.playButtonClick();
+                    Haptics.buttonClick();
+                    if (onRestart) {
+                      onRestart();
+                    } else {
+                      window.dispatchEvent(new CustomEvent('picku_game_restart'));
+                    }
+                  }}
+                  aria-label="Restart"
+                  title="Restart"
+                  className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-purple-400/40 shadow-[0_0_12px_rgba(168,85,247,0.25)] flex items-center justify-center text-purple-300 hover:border-purple-300 active:scale-95 transition-all cursor-pointer"
+                >
+                  <RotateCcw className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                </button>
+              </>
+            )}
+          </>
         ) : null}
       </div>
 

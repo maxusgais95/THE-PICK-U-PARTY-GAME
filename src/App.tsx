@@ -49,6 +49,7 @@ export default function App() {
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false);
   const [isPongInCourt, setIsPongInCourt] = useState<boolean>(false);
+  const [isKaboomInGame, setIsKaboomInGame] = useState<boolean>(false);
   const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState<boolean>(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState<boolean>(false);
   const [isRewardsOpen, setIsRewardsOpen] = useState<boolean>(false);
@@ -376,6 +377,8 @@ export default function App() {
     setIsBottleSpinning(false);
     setBottleSpinSpeed(0);
     setRouletteGameState('waiting');
+    setIsPongInCourt(false);
+    setIsKaboomInGame(false);
 
     if (targetView === 'hub') {
       setCurrentView('hub');
@@ -497,6 +500,16 @@ export default function App() {
         settings={settings}
         stars={economy.stars}
         onNavigate={handleNavigateToGame}
+        showGameActionButtons={
+          (currentView === 'pong' && isPongInCourt) ||
+          (currentView === 'kaboom' && isKaboomInGame)
+        }
+        onBack={() => {
+          window.dispatchEvent(new CustomEvent('picku_game_back'));
+        }}
+        onRestart={() => {
+          window.dispatchEvent(new CustomEvent('picku_game_restart'));
+        }}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenStore={() => setIsStoreOpen(true)}
         onOpenInfo={() => setIsGuideOpen(true)}
@@ -559,6 +572,7 @@ export default function App() {
             onBackToMenu={() => setCurrentView('hub')}
             onStatsUpdated={(newStats) => setStats(newStats)}
             onEconomyUpdated={setEconomy}
+            onScreenChange={(screen) => setIsKaboomInGame(screen === 'gameplay')}
           />
         )}
 
@@ -568,6 +582,7 @@ export default function App() {
             economy={economy}
             onNavigateHome={() => handleNavigateToGame('hub')}
             onEconomyUpdated={setEconomy}
+            onInCourtChange={setIsPongInCourt}
           />
         )}
       </div>
