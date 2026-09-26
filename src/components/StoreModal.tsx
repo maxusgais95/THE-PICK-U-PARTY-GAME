@@ -35,6 +35,7 @@ const CATEGORIES: { id: StoreCategory; label: string;}[] = [
   { id: 'bottles', label: 'BOTTLES'},
   { id: 'bombs', label: 'BOMBS'},
   { id: 'balls', label: 'BALLS'},
+  { id: 'particles', label: 'TRAILS'},
   { id: 'accessories', label: 'SPECIAL'},
 ];
 
@@ -162,6 +163,35 @@ export const StoreModal: React.FC<StoreModalProps> = ({
             />
           </div>
         );
+      case 'particle': {
+        const sprites = item.spriteImages && item.spriteImages.length > 0 ? item.spriteImages : [item.image || ''];
+        return (
+          <div className="relative flex items-center justify-center w-full h-full p-2 overflow-hidden">
+            <div className={`absolute w-20 h-20 rounded-full bg-gradient-to-tr ${item.accentGradient} opacity-50 blur-lg animate-pulse`} />
+            <div className="relative flex items-center justify-center w-full h-full">
+              {sprites.slice(0, 3).map((spriteUrl, sIdx) => (
+                <img
+                  key={sIdx}
+                  src={spriteUrl}
+                  alt={`${item.name} sprite ${sIdx}`}
+                  className="absolute max-h-16 sm:max-h-20 w-auto object-contain pointer-events-none transition-transform duration-500 group-hover:scale-110"
+                  style={{
+                    mixBlendMode: 'screen',
+                    transform:
+                      sIdx === 0
+                        ? 'scale(1) rotate(-6deg)'
+                        : sIdx === 1
+                        ? 'translate(14px, -12px) scale(0.75) rotate(18deg)'
+                        : 'translate(-14px, 12px) scale(0.7) rotate(-22deg)',
+                    opacity: sIdx === 0 ? 1 : 0.88,
+                    filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.75)) brightness(1.2)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      }
       case "accessory":
         if (item.image) {
           return (
@@ -307,6 +337,9 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                 }
                 if (item.category === 'balls') {
                   return (economy.equippedSkins?.balls || 'ball_cyan_orbs') === item.id;
+                }
+                if (item.category === 'particles') {
+                  return (economy.equippedSkins?.particles || 'particle_classic_blaze') === item.id;
                 }
                 if (item.category === 'accessories') {
                   return (economy.equippedSkins?.accessories || '') === item.id;

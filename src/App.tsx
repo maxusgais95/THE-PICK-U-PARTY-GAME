@@ -19,6 +19,7 @@ import { PartyBackground } from './components/PartyBackground';
 import { FingerGameBackground } from './components/FingerGameBackground';
 import { SpinBottleBackground } from './components/SpinBottleBackground';
 import { BombGameBackground } from './components/BombGameBackground';
+import { BombPongBackground } from './components/BombPongBackground';
 import { VersionNotesModal } from './components/VersionNotesModal';
 import { AboutGuideModal } from './components/AboutGuideModal';
 import { LandscapeBlocker } from './components/LandscapeBlocker';
@@ -483,6 +484,11 @@ export default function App() {
       {/* 4. Bomb Game Background (Preloaded & Persistent) */}
       <div className={currentView === 'kaboom' ? 'contents' : 'hidden'}>
         <BombGameBackground active={currentView === 'kaboom'} />
+      </div>
+
+      {/* 5. Bomb Pong Game Background (Mode Select & Court Gameplay) */}
+      <div className={currentView === 'pong' ? 'contents' : 'hidden'}>
+        <BombPongBackground active={currentView === 'pong'} gamePhase={isPongInCourt ? 'playing' : 'mode_select'} />
       </div>
 
       {/* 3. 60FPS Background Particle & Shockwave Canvas */}

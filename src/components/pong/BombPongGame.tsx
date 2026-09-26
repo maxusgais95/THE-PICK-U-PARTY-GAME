@@ -9,6 +9,7 @@ import {
   Bot,
   ChevronRight,
   Heart,
+  Sparkles,
 } from 'lucide-react';
 import { AppSettings } from '../../types';
 import { SoundEngine, Haptics } from '../../lib/audio';
@@ -20,7 +21,9 @@ import {
   EconomyState,
 } from '../../lib/economy';
 import { BombPongGameOverModal } from './BombPongGameOverModal';
+import { BombPongBackground } from '../BombPongBackground';
 import defaultBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
+import fireParticleImgSrc from '../../assets/images/fire_particle_blaze_1790403813873.jpg';
 
 export interface BombPongGameProps {
   settings: AppSettings;
@@ -40,6 +43,10 @@ interface Particle {
   alpha: number;
   life: number;
   maxLife: number;
+  rotation: number;
+  rotSpeed: number;
+  type: 'flame' | 'spark' | 'ember';
+  spriteIndex?: number;
 }
 
 interface ExplosionEffect {
@@ -50,6 +57,30 @@ interface ExplosionEffect {
   maxRadius: number;
   alpha: number;
 }
+
+const PARTICLE_COLOR_PALETTES: Record<string, string[]> = {
+  particle_classic_blaze: ['#ff9900', '#ff5500', '#ffcc00', '#ff2200', '#fff3a1'],
+  particle_neon_trail: ['#00f3ff', '#ec4899', '#a855f7', '#06b6d4', '#ffffff'],
+  particle_music_notes: ['#ec4899', '#06b6d4', '#eab308', '#a855f7', '#38bdf8'],
+  particle_star_spark: ['#ffd700', '#ffffff', '#f59e0b', '#fef08a', '#38bdf8'],
+  particle_galaxy_trail: ['#c084fc', '#818cf8', '#06b6d4', '#f472b6', '#e0e7ff'],
+  particle_sakura: ['#f472b6', '#fb7185', '#fbcfe8', '#fef08a', '#ffffff'],
+  particle_electric_shock: ['#00f3ff', '#60a5fa', '#ffffff', '#3b82f6', '#93c5fd'],
+  particle_blizzard_ice: ['#e0f2fe', '#38bdf8', '#ffffff', '#93c5fd', '#67e8f9'],
+  particle_nature_leaves: ['#22c55e', '#4ade80', '#facc15', '#10b981', '#a7f3d0'],
+};
+
+const PARTICLE_CORE_COLORS: Record<string, [string, string, string]> = {
+  particle_classic_blaze: ['rgba(255, 255, 220, 0.95)', 'rgba(255, 180, 0, 0.75)', 'rgba(255, 60, 0, 0.35)'],
+  particle_neon_trail: ['rgba(255, 255, 255, 0.95)', 'rgba(6, 182, 212, 0.85)', 'rgba(236, 72, 153, 0.45)'],
+  particle_music_notes: ['rgba(255, 255, 255, 0.95)', 'rgba(168, 85, 247, 0.85)', 'rgba(236, 72, 153, 0.45)'],
+  particle_star_spark: ['rgba(255, 255, 255, 0.98)', 'rgba(251, 191, 36, 0.85)', 'rgba(245, 158, 11, 0.4)'],
+  particle_galaxy_trail: ['rgba(255, 255, 255, 0.95)', 'rgba(129, 140, 248, 0.85)', 'rgba(192, 132, 252, 0.4)'],
+  particle_sakura: ['rgba(255, 255, 255, 0.95)', 'rgba(244, 114, 182, 0.85)', 'rgba(251, 113, 133, 0.4)'],
+  particle_electric_shock: ['rgba(255, 255, 255, 0.98)', 'rgba(34, 211, 238, 0.9)', 'rgba(59, 130, 246, 0.45)'],
+  particle_blizzard_ice: ['rgba(255, 255, 255, 0.98)', 'rgba(56, 189, 248, 0.85)', 'rgba(147, 197, 253, 0.4)'],
+  particle_nature_leaves: ['rgba(255, 255, 240, 0.95)', 'rgba(52, 211, 153, 0.85)', 'rgba(34, 197, 94, 0.4)'],
+};
 
 type BotDifficulty = 'easy' | 'normal' | 'hard';
 type PongGamePhase = 'mode_select' | 'ready' | 'countdown' | 'playing' | 'detonated' | 'gameover';
@@ -96,10 +127,18 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     STORE_CATALOGUE.bombs.find((b) => b.id === equippedBombId);
   const bombImageUrl = equippedBombItem?.image || defaultBombImg;
 
+  // Determine equipped particle effect skin
+  const equippedParticleId = currentEconomy?.equippedSkins?.particles || 'particle_classic_blaze';
+  const equippedParticleItem =
+    catalogue.particles?.find((p) => p.id === equippedParticleId) ||
+    STORE_CATALOGUE.particles?.find((p) => p.id === equippedParticleId);
+  const particleImageUrl = equippedParticleItem?.image || fireParticleImgSrc;
+
   // Game Setup & Modes
   const [gamePhase, setGamePhase] = useState<PongGamePhase>('mode_select');
   const [isBotMode, setIsBotMode] = useState<boolean>(false);
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('normal');
+  const [trailsEnabled, setTrailsEnabled] = useState<boolean>(true);
 
   // Game States
   const [player1Score, setPlayer1Score] = useState<number>(0);
@@ -134,6 +173,27 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       bombImageRef.current = img;
     };
   }, [bombImageUrl]);
+
+  // Multi-sprite image collection for particle effects with screen blending
+  const spriteImageUrls = equippedParticleItem?.spriteImages || [particleImageUrl];
+  const particleImagesRef = useRef<HTMLImageElement[]>([]);
+  useEffect(() => {
+    const loaded: HTMLImageElement[] = [];
+    spriteImageUrls.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => {
+        loaded.push(img);
+      };
+    });
+    particleImagesRef.current = loaded;
+  }, [spriteImageUrls]);
+
+  const fireImageRef = {
+    get current() {
+      return particleImagesRef.current[0] || null;
+    }
+  };
 
   // Arena Dimensions & Logical Resolution
   const arenaRef = useRef({
@@ -197,11 +257,11 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       canvas.style.height = `${height}px`;
     }
 
-    // Responsive, non-distorting paddle dimensions
+    // Responsive, non-distorting paddle dimensions (Moved a bit towards the center)
     const paddleW = Math.max(90, Math.min(160, width * 0.28));
     const paddleH = 15;
-    const topPaddleY = Math.max(75, Math.min(115, height * 0.12));
-    const bottomPaddleY = Math.max(height - 115, Math.min(height - 75, height * 0.88));
+    const topPaddleY = Math.max(115, Math.min(170, height * 0.175));
+    const bottomPaddleY = Math.max(height - 170, Math.min(height - 115, height * 0.825));
 
     p1PaddleRef.current.width = paddleW;
     p1PaddleRef.current.height = paddleH;
@@ -312,6 +372,8 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     bomb.speed = speed;
     bomb.vx = Math.sin(angle) * speed;
     bomb.vy = Math.cos(angle) * speed * dirY;
+    // When opponent (P2) launches, flip the bomb 180 degrees (Math.PI) to face P2
+    bomb.rotation = servingPlayer === 'p2' ? Math.PI : 0;
     bomb.active = true;
 
     setRallyCount(0);
@@ -352,21 +414,25 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     });
 
     const colors = ['#ff0055', '#ff5500', '#ffaa00', '#ffff00', '#ff00aa', '#ffffff', '#00f3ff'];
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 65; i++) {
       const angle = side === 'top'
         ? Math.PI * 0.15 + Math.random() * Math.PI * 0.7
         : -Math.PI * 0.85 + Math.random() * Math.PI * 0.7;
-      const vel = 3 + Math.random() * 15;
+      const vel = 3 + Math.random() * 16;
+      const isFlame = Math.random() < 0.45;
       particlesRef.current.push({
         x: x + (Math.random() * 60 - 30),
         y: y,
         vx: Math.cos(angle) * vel,
         vy: Math.sin(angle) * vel,
         color: colors[Math.floor(Math.random() * colors.length)],
-        size: 3 + Math.random() * 6,
+        size: isFlame ? 18 + Math.random() * 26 : 3 + Math.random() * 6,
         alpha: 1,
         life: 0,
-        maxLife: 30 + Math.random() * 35,
+        maxLife: 25 + Math.random() * 35,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.25,
+        type: isFlame ? 'flame' : 'spark',
       });
     }
   }, []);
@@ -375,7 +441,6 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
   const handleMissedBomb = useCallback(
     (side: 'top' | 'bottom') => {
       bombRef.current.active = false;
-      setGamePhase('detonated');
 
       const bombX = bombRef.current.x;
       const bombY = side === 'top' ? p2PaddleRef.current.y - 15 : p1PaddleRef.current.y + 15;
@@ -390,13 +455,13 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
             setTimeout(() => {
               setMatchWinner('player2');
               finishMatch('player2');
-            }, 1200);
+            }, 1000);
           } else {
             setTimeout(() => {
               setDetonatedSide(null);
               setOpponentReady(false);
               setGamePhase('ready');
-            }, 1400);
+            }, 600);
           }
           return next;
         });
@@ -409,13 +474,13 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
             setTimeout(() => {
               setMatchWinner('player1');
               finishMatch('player1');
-            }, 1200);
+            }, 1000);
           } else {
             setTimeout(() => {
               setDetonatedSide(null);
               setOpponentReady(false);
               setGamePhase('ready');
-            }, 1400);
+            }, 600);
           }
           return next;
         });
@@ -691,33 +756,56 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       // Anchor bomb to serving bar during ready / countdown
       if (gamePhase === 'ready' || gamePhase === 'countdown') {
         syncBombToPaddle();
-        bombRef.current.rotation = Math.sin(time * 0.005) * 0.15;
+        // Flip bomb 180 degrees (Math.PI) when Player 2 (top opponent) holds the bomb
+        const baseAngle = servingPlayer === 'p2' ? Math.PI : 0;
+        bombRef.current.rotation = baseAngle + Math.sin(time * 0.005) * 0.15;
         bombRef.current.pulse = 1 + Math.sin(time * 0.012) * 0.08;
       }
 
       // Bomb Physics Update while playing
       const bomb = bombRef.current;
+
+      // Calculate dynamic Fuse Tip position in arena world coordinates
+      const cosR = Math.cos(bomb.rotation);
+      const sinR = Math.sin(bomb.rotation);
+      const fuseLocalX = bomb.radius * 0.42;
+      const fuseLocalY = -bomb.radius * 0.95;
+      const fuseWorldX = bomb.x + (fuseLocalX * cosR - fuseLocalY * sinR) * bomb.pulse;
+      const fuseWorldY = bomb.y + (fuseLocalX * sinR + fuseLocalY * cosR) * bomb.pulse;
+
       if (bomb.active && gamePhase === 'playing') {
         bomb.x += bomb.vx;
         bomb.y += bomb.vy;
         bomb.rotation += bomb.speed * 0.04;
         bomb.pulse = 1 + Math.sin(time * 0.015) * 0.1;
 
-        // Fuse Spark Generator
-        if (Math.random() < 0.6) {
-          const sparkAngle = Math.random() * Math.PI * 2;
-          const sparkSpeed = 1.5 + Math.random() * 3.5;
-          particlesRef.current.push({
-            x: bomb.x + Math.sin(bomb.rotation) * (bomb.radius * 0.9),
-            y: bomb.y - Math.cos(bomb.rotation) * (bomb.radius * 0.9),
-            vx: Math.cos(sparkAngle) * sparkSpeed,
-            vy: Math.sin(sparkAngle) * sparkSpeed,
-            color: Math.random() > 0.3 ? '#ffaa00' : '#ffff55',
-            size: 2 + Math.random() * 3,
-            alpha: 1,
-            life: 0,
-            maxLife: 15 + Math.random() * 15,
-          });
+        // Dynamic Fuse Blaze & Sparks Generator
+        const activePalette = PARTICLE_COLOR_PALETTES[equippedParticleId] || PARTICLE_COLOR_PALETTES.particle_classic_blaze;
+        const spawnCount = bomb.speed > bomb.baseSpeed * 1.3 ? 3 : 2;
+        if (trailsEnabled) {
+          for (let s = 0; s < spawnCount; s++) {
+            const sparkAngle = bomb.rotation - Math.PI / 4 + (Math.random() - 0.5) * 1.2;
+            const sparkSpeed = 1.0 + Math.random() * 3.5;
+            const trailVx = -bomb.vx * 0.2;
+            const trailVy = -bomb.vy * 0.2 - 0.4;
+            const isFlame = Math.random() < 0.55;
+
+            particlesRef.current.push({
+              x: fuseWorldX + (Math.random() - 0.5) * 4,
+              y: fuseWorldY + (Math.random() - 0.5) * 4,
+              vx: Math.cos(sparkAngle) * sparkSpeed + trailVx,
+              vy: Math.sin(sparkAngle) * sparkSpeed + trailVy,
+              color: activePalette[Math.floor(Math.random() * activePalette.length)],
+              size: isFlame ? 12 + Math.random() * 18 : 2 + Math.random() * 4,
+              alpha: 1,
+              life: 0,
+              maxLife: isFlame ? 18 + Math.random() * 16 : 12 + Math.random() * 14,
+              rotation: Math.random() * Math.PI * 2,
+              rotSpeed: (Math.random() - 0.5) * 0.25,
+              type: isFlame ? 'flame' : 'spark',
+              spriteIndex: particleImagesRef.current.length > 0 ? Math.floor(Math.random() * particleImagesRef.current.length) : 0,
+            });
+          }
         }
 
         // Left / Right Laser Wall Collisions
@@ -757,6 +845,27 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           bomb.vy = -Math.cos(bounceAngle) * bomb.speed;
           bomb.y = p1Top - bomb.radius - 1;
 
+          // Spawn blazing impact sparks with equipped particle theme
+          for (let k = 0; k < 12; k++) {
+            const angle = Math.random() * Math.PI * 2;
+            const spd = 2 + Math.random() * 7;
+            particlesRef.current.push({
+              x: bomb.x,
+              y: bomb.y,
+              vx: Math.cos(angle) * spd,
+              vy: Math.sin(angle) * spd,
+              color: activePalette[Math.floor(Math.random() * activePalette.length)],
+              size: 14 + Math.random() * 18,
+              alpha: 1,
+              life: 0,
+              maxLife: 18 + Math.random() * 14,
+              rotation: Math.random() * Math.PI * 2,
+              rotSpeed: (Math.random() - 0.5) * 0.3,
+              type: 'flame',
+              spriteIndex: particleImagesRef.current.length > 0 ? Math.floor(Math.random() * particleImagesRef.current.length) : 0,
+            });
+          }
+
           SoundEngine.playPaddleHit(bomb.speed / bomb.baseSpeed);
           Haptics.medium();
 
@@ -788,6 +897,27 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           bomb.vx = Math.sin(bounceAngle) * bomb.speed;
           bomb.vy = Math.cos(bounceAngle) * bomb.speed;
           bomb.y = p2Bottom + bomb.radius + 1;
+
+          // Spawn blazing impact sparks with equipped particle theme
+          for (let k = 0; k < 12; k++) {
+            const angle = Math.random() * Math.PI * 2;
+            const spd = 2 + Math.random() * 7;
+            particlesRef.current.push({
+              x: bomb.x,
+              y: bomb.y,
+              vx: Math.cos(angle) * spd,
+              vy: Math.sin(angle) * spd,
+              color: activePalette[Math.floor(Math.random() * activePalette.length)],
+              size: 14 + Math.random() * 18,
+              alpha: 1,
+              life: 0,
+              maxLife: 18 + Math.random() * 14,
+              rotation: Math.random() * Math.PI * 2,
+              rotSpeed: (Math.random() - 0.5) * 0.3,
+              type: 'flame',
+              spriteIndex: particleImagesRef.current.length > 0 ? Math.floor(Math.random() * particleImagesRef.current.length) : 0,
+            });
+          }
 
           SoundEngine.playPaddleHit(bomb.speed / bomb.baseSpeed);
           Haptics.medium();
@@ -866,7 +996,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       ctx.fill();
       ctx.restore();
 
-      // 5. Explosions FX
+      // 5. Explosions Shockwaves
       for (let i = explosionsRef.current.length - 1; i >= 0; i--) {
         const exp = explosionsRef.current[i];
         exp.radius += 14;
@@ -885,32 +1015,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         }
       }
 
-      // 6. Particles FX
-      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
-        const p = particlesRef.current[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.96;
-        p.vy *= 0.96;
-        p.life += 1;
-        p.alpha = Math.max(0, 1 - p.life / p.maxLife);
-
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 6;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        if (p.life >= p.maxLife) {
-          particlesRef.current.splice(i, 1);
-        }
-      }
-
-      // 7. Perfect 1:1 Aspect Ratio Bomb Sprite (No stretching)
+      // 6. Perfect 1:1 Aspect Ratio Bomb Sprite (No stretching)
       if (bomb.active || gamePhase === 'ready' || gamePhase === 'countdown') {
         ctx.save();
         ctx.translate(bomb.x, bomb.y);
@@ -935,6 +1040,93 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
 
         ctx.restore();
       }
+
+      // 7. Realistic Fire Blaze & Flame Particles FX with Additive Blending ('lighter')
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+
+      // 7a. Core Fire Blaze at the tip of the bomb
+      if (bomb.active || gamePhase === 'ready' || gamePhase === 'countdown') {
+        if (fireImageRef.current && fireImageRef.current.complete && fireImageRef.current.naturalWidth > 0) {
+          const blazeSize = bomb.radius * (1.15 + Math.sin(time * 0.04) * 0.25 + (Math.random() - 0.5) * 0.15);
+          ctx.save();
+          ctx.translate(fuseWorldX, fuseWorldY);
+          ctx.rotate(bomb.rotation + Math.PI / 4 + Math.sin(time * 0.03) * 0.3);
+          ctx.globalAlpha = 0.95;
+          ctx.drawImage(
+            fireImageRef.current,
+            -blazeSize / 2,
+            -blazeSize / 2,
+            blazeSize,
+            blazeSize
+          );
+          ctx.restore();
+        }
+
+        // Inner incandescent core gradient
+        const coreRadius = bomb.radius * 0.55 * (0.85 + Math.random() * 0.25);
+        const coreGrad = ctx.createRadialGradient(fuseWorldX, fuseWorldY, 0, fuseWorldX, fuseWorldY, coreRadius);
+        const activeCore = PARTICLE_CORE_COLORS[equippedParticleId] || PARTICLE_CORE_COLORS.particle_classic_blaze;
+        coreGrad.addColorStop(0, activeCore[0]);
+        coreGrad.addColorStop(0.35, activeCore[1]);
+        coreGrad.addColorStop(0.7, activeCore[2]);
+        coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(fuseWorldX, fuseWorldY, coreRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 7b. Floating / Trailing Flame Particles and Glowing Embers
+      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
+        const p = particlesRef.current[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+        p.rotation += p.rotSpeed;
+        p.life += 1;
+        const progress = p.life / p.maxLife;
+        // Smooth ease-out alpha decay animation over lifespan for elegant fading out
+        p.alpha = Math.max(0, Math.pow(1 - progress, 1.6));
+
+        const imgs = particleImagesRef.current;
+        const targetImg = imgs.length > 0 && imgs[p.spriteIndex || 0] && imgs[p.spriteIndex || 0].complete ? imgs[p.spriteIndex || 0] : fireImageRef.current;
+
+        if (p.type === 'flame' && targetImg && targetImg.complete) {
+          const curSize = p.size * (1 - (p.life / p.maxLife) * 0.35);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.globalAlpha = p.alpha * 0.92;
+          ctx.globalCompositeOperation = 'screen';
+          ctx.drawImage(
+            targetImg,
+            -curSize / 2,
+            -curSize / 2,
+            curSize,
+            curSize
+          );
+          ctx.restore();
+        } else {
+          // Glowing Sparks & Embers
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, Math.max(0.6, p.size * (1 - p.life / p.maxLife)), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        if (p.life >= p.maxLife) {
+          particlesRef.current.splice(i, 1);
+        }
+      }
+
+      ctx.restore();
 
       ctx.restore();
       animFrameIdRef.current = requestAnimationFrame(loop);
@@ -967,6 +1159,9 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       }}
       className="relative w-full h-full min-h-[100vh] sm:min-h-0 select-none overflow-hidden touch-none flex flex-col justify-between bg-slate-950"
     >
+      {/* 0. High-Fidelity Preloaded Pong Bomb Background (Mode Select & Court Gameplay) */}
+      <BombPongBackground active={true} gamePhase={gamePhase} />
+
       {/* Detonation Screen Flash Overlays */}
       {detonatedSide === 'bottom' && (
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-red-600/60 via-orange-500/25 to-transparent pointer-events-none z-20 animate-pulse" />
@@ -993,7 +1188,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           {/* Player 2 Lives (Top - Centered slightly under/behind Top Bar) */}
           <div
             style={{ top: Math.max(14, p2.y - 42) }}
-            className="absolute inset-x-0 z-25 flex items-center justify-center pointer-events-none"
+            className="absolute inset-x-0 z-25 flex items-center justify-center pointer-events-none rotate-180"
           >
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-pink-500/20 shadow-[0_0_10px_rgba(236,72,153,0.2)]">
               {[1, 2, 3].map((h) => (
@@ -1030,9 +1225,32 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         </>
       )}
 
+      {/* Gameplay Trail Effects Toggle Button */}
+      {gamePhase !== 'mode_select' && (
+        <div className="absolute top-3 right-3 z-30 pointer-events-auto">
+          <button
+            type="button"
+            onClick={() => {
+              SoundEngine.playButtonClick();
+              Haptics.buttonClick();
+              setTrailsEnabled((prev) => !prev);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-header font-bold uppercase backdrop-blur-md border transition-all shadow-lg cursor-pointer ${
+              trailsEnabled
+                ? 'bg-purple-950/80 text-purple-200 border-purple-400/60 shadow-[0_0_12px_rgba(168,85,247,0.4)]'
+                : 'bg-neutral-900/80 text-gray-400 border-white/20'
+            }`}
+            title="Toggle Particle Trails"
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${trailsEnabled ? 'text-purple-300 animate-spin' : 'text-gray-500'}`} style={{ animationDuration: '6s' }} />
+            <span>TRAILS: {trailsEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+        </div>
+      )}
+
       {/* VIEW: MODE SELECTION OVERLAY */}
       {gamePhase === 'mode_select' && (
-        <div className="absolute inset-0 z-30 flex flex-col justify-between p-6 sm:p-10 bg-slate-950/90 backdrop-blur-sm pointer-events-auto">
+        <div className="absolute inset-0 z-30 flex flex-col justify-between p-6 sm:p-10 bg-black/40 backdrop-blur-md pointer-events-auto">
           {/* Top Glow Ambiance */}
           <div className="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-pink-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -1144,14 +1362,18 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       {/* READY / SERVE PHASE OVERLAY */}
       {gamePhase === 'ready' && (
         <div className="absolute inset-0 z-30 pointer-events-none">
-          {/* 1. VS BOT MODE: No ready button, click anywhere to start */}
+          {/* 1. VS BOT MODE: START button */}
           {isBotMode && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-slate-900/90 border border-cyan-500/40 backdrop-blur-md px-6 py-3.5 rounded-3xl shadow-[0_0_20px_rgba(6,182,212,0.3)] animate-pulse flex flex-col items-center">
-                <span className="text-xs font-black text-cyan-300 tracking-widest uppercase">
-                  TAP ANYWHERE TO SERVE
-                </span>
-              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerCountdown();
+                }}
+                className="pointer-events-auto px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-cyan-950/90 text-cyan-300 border border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:bg-cyan-900 active:scale-95 transition-all cursor-pointer animate-pulse"
+              >
+                START
+              </button>
             </div>
           )}
 
@@ -1175,16 +1397,20 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
                       </button>
                     </div>
                   ) : (
-                    /* After opponent is ready, serving player (P1) taps anywhere to start */
+                    /* After opponent is ready, serving player (P1) START button */
                     <div
                       style={{ top: p1.y - 56 }}
                       className="absolute inset-x-0 flex items-center justify-center pointer-events-none"
                     >
-                      <div className="bg-slate-900/90 border border-cyan-500/50 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-[0_0_15px_rgba(6,182,212,0.35)] animate-pulse">
-                        <span className="text-xs font-black text-cyan-300 tracking-wider uppercase">
-                          TAP ANYWHERE TO SERVE
-                        </span>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          triggerCountdown();
+                        }}
+                        className="pointer-events-auto px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-cyan-950/90 text-cyan-300 border border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:bg-cyan-900 active:scale-95 transition-all cursor-pointer animate-pulse"
+                      >
+                        START
+                      </button>
                     </div>
                   )}
                 </>
@@ -1207,16 +1433,20 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
                       </button>
                     </div>
                   ) : (
-                    /* After opponent is ready, serving player (P2) taps anywhere to start */
+                    /* After opponent is ready, serving player (P2) START button */
                     <div
                       style={{ top: p2.y + 36 }}
                       className="absolute inset-x-0 flex items-center justify-center pointer-events-none rotate-180"
                     >
-                      <div className="bg-slate-900/90 border border-pink-500/50 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-[0_0_15px_rgba(236,72,153,0.35)] animate-pulse">
-                        <span className="text-xs font-black text-pink-300 tracking-wider uppercase">
-                          TAP ANYWHERE TO SERVE
-                        </span>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          triggerCountdown();
+                        }}
+                        className="pointer-events-auto px-6 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-pink-950/90 text-pink-300 border border-pink-500/60 shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:bg-pink-900 active:scale-95 transition-all cursor-pointer animate-pulse"
+                      >
+                        START
+                      </button>
                     </div>
                   )}
                 </>
@@ -1230,19 +1460,8 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       {gamePhase === 'countdown' && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center animate-in zoom-in-75 duration-200">
-            <div className="text-7xl font-black text-amber-400 drop-shadow-[0_0_25px_rgba(245,158,11,0.9)]">
+            <div className="text-7xl font-black text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.9)] animate-pulse">
               {serveCountdown > 0 ? serveCountdown : 'BOUNCE!'}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Detonated Alert */}
-      {gamePhase === 'detonated' && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col items-center animate-bounce">
-            <div className="text-4xl font-black text-red-500 drop-shadow-[0_0_25px_rgba(239,68,68,0.9)]">
-              💥 DETONATED!
             </div>
           </div>
         </div>

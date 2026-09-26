@@ -27,6 +27,7 @@ const CATEGORY_OPTIONS: { id: StoreCategory; label: string }[] = [
   { id: 'bottles', label: 'Bottles' },
   { id: 'bombs', label: 'Bombs' },
   { id: 'balls', label: 'Balls' },
+  { id: 'particles', label: 'Trails / Particles' },
   { id: 'accessories', label: 'Accessories' },
 ];
 
@@ -223,10 +224,11 @@ export const StoreItemModal: React.FC<StoreItemModalProps> = ({
       borderGlow = 'border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]';
     }
 
-    const iconTypeMap: Record<StoreCategory, 'bottle' | 'bomb' | 'ball' | 'accessory'> = {
+    const iconTypeMap: Record<StoreCategory, 'bottle' | 'bomb' | 'ball' | 'particle' | 'accessory'> = {
       bottles: 'bottle',
       bombs: 'bomb',
       balls: 'ball',
+      particles: 'particle',
       accessories: 'accessory',
     };
 

@@ -19,8 +19,8 @@ export const BGM_TRACKS: Record<BgmTrackKey, string> = {
 
 /**
  * BgmManager
- * Dual-channel background music system with smooth crossfade, blending,
- * separate volume control, on/off toggling, and autoplay unlock handling.
+ * Dual-channel background music system with instant streaming playback,
+ * smooth crossfading, user-gesture autoplay recovery, and notification media player suppression.
  */
 export class BgmManager {
   private static musicEnabled: boolean = true;
@@ -44,15 +44,19 @@ export class BgmManager {
     if (typeof window === 'undefined' || this.isInitialized) return;
     this.isInitialized = true;
 
-    this.channelA = new Audio();
-    this.channelA.loop = true;
-    this.channelA.preload = 'auto';
-    this.channelA.volume = 0;
+    try {
+      this.channelA = new Audio();
+      this.channelA.loop = true;
+      this.channelA.preload = 'auto';
+      this.channelA.volume = 0;
 
-    this.channelB = new Audio();
-    this.channelB.loop = true;
-    this.channelB.preload = 'auto';
-    this.channelB.volume = 0;
+      this.channelB = new Audio();
+      this.channelB.loop = true;
+      this.channelB.preload = 'auto';
+      this.channelB.volume = 0;
+    } catch (e) {
+      console.warn('[BgmManager] Audio channel init error:', e);
+    }
 
     // Suppress system notification media player popup on mobile OS
     this.suppressMediaSession();
@@ -62,26 +66,32 @@ export class BgmManager {
       if (document.hidden) {
         this.pauseActive();
       } else {
-        if (this.musicEnabled) {
+        if (this.musicEnabled && this.hasUserInteracted) {
           this.resumeActive();
         }
       }
     });
 
-    // Global unlocker for iOS Safari and mobile browser autoplay constraints
+    // Global unlocker for mobile browser autoplay constraints
     const unlockMusic = () => {
       this.hasUserInteracted = true;
+      this.suppressMediaSession();
+
       if (this.musicEnabled) {
-        this.resumeActive();
+        const active = this.activeChannelIndex === 0 ? this.channelA : this.channelB;
+        if (active && (active.paused || active.currentTime === 0)) {
+          this.resumeActive();
+        }
       }
+
       window.removeEventListener('pointerdown', unlockMusic);
       window.removeEventListener('touchstart', unlockMusic);
       window.removeEventListener('click', unlockMusic);
     };
 
-    window.addEventListener('pointerdown', unlockMusic, { passive: true });
-    window.addEventListener('touchstart', unlockMusic, { passive: true });
-    window.addEventListener('click', unlockMusic, { passive: true });
+    window.addEventListener('pointerdown', unlockMusic, { passive: true, capture: true });
+    window.addEventListener('touchstart', unlockMusic, { passive: true, capture: true });
+    window.addEventListener('click', unlockMusic, { passive: true, capture: true });
   }
 
   /**
@@ -130,22 +140,18 @@ export class BgmManager {
       return;
     }
 
-    if (!this.musicEnabled) {
-      this.currentTrack = track;
-      return;
-    }
+    this.currentTrack = track;
+    if (!this.musicEnabled) return;
 
     this.crossfadeTo(track);
   }
 
   /**
-   * Smoothly crossfade from current track to destination track over 1.2 seconds.
-   * Blends outgoing and incoming audio smoothly.
+   * Smoothly crossfade from current track to destination track over 800ms.
    */
-  private static crossfadeTo(newTrack: BgmTrackKey, durationMs: number = 1200) {
+  private static crossfadeTo(newTrack: BgmTrackKey, durationMs: number = 800) {
     if (!this.channelA || !this.channelB) return;
 
-    // Cancel any running fade animation
     if (this.fadeAnimationId !== null) {
       cancelAnimationFrame(this.fadeAnimationId);
       this.fadeAnimationId = null;
@@ -158,9 +164,7 @@ export class BgmManager {
     const newUrl = BGM_TRACKS[newTrack];
     if (!newUrl) return;
 
-    // Prepare next channel
     try {
-      // If next channel source is different, update src
       if (nextChannel.src !== newUrl && !nextChannel.src.endsWith(newUrl)) {
         nextChannel.src = newUrl;
       }
@@ -173,10 +177,7 @@ export class BgmManager {
 
     const playPromise = nextChannel.play();
     if (playPromise) {
-      playPromise.catch((err) => {
-        // Expected if user hasn't tapped yet due to browser autoplay policy
-        console.log('[BgmManager] Autoplay waiting for user gesture:', err.message);
-      });
+      playPromise.catch(() => {});
     }
 
     this.currentTrack = newTrack;
@@ -192,21 +193,17 @@ export class BgmManager {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / durationMs);
 
-      // Equal-power crossfade or smooth sine curve for optimal blend mix without dip in perceived energy
-      const fadeOutFactor = Math.cos((progress * Math.PI) / 2); // 1 -> 0
-      const fadeInFactor = Math.sin((progress * Math.PI) / 2);  // 0 -> 1
+      const fadeOutFactor = Math.cos((progress * Math.PI) / 2);
+      const fadeInFactor = Math.sin((progress * Math.PI) / 2);
 
       try {
         currentChannel.volume = Math.max(0, Math.min(1, initialCurrentVol * fadeOutFactor));
         nextChannel.volume = Math.max(0, Math.min(1, targetVol * fadeInFactor));
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
 
       if (progress < 1) {
         this.fadeAnimationId = requestAnimationFrame(step);
       } else {
-        // Complete transition
         this.fadeAnimationId = null;
         this.isTransitioning = false;
         try {
@@ -214,9 +211,7 @@ export class BgmManager {
           currentChannel.volume = 0;
           currentChannel.currentTime = 0;
           nextChannel.volume = this.musicVolume;
-        } catch (e) {
-          // ignore
-        }
+        } catch (e) {}
       }
     };
 
@@ -326,7 +321,7 @@ export class BgmManager {
    */
   private static adjustCurrentVolume() {
     if (!this.channelA || !this.channelB) return;
-    if (this.isTransitioning) return; // let transition complete to new targetVol
+    if (this.isTransitioning) return;
 
     const active = this.activeChannelIndex === 0 ? this.channelA : this.channelB;
     try {
@@ -364,6 +359,8 @@ export class BgmManager {
         playPromise.catch(() => {});
       }
     } catch (e) {}
+
+    this.suppressMediaSession();
   }
 
   private static isPlaying(): boolean {
@@ -372,7 +369,7 @@ export class BgmManager {
   }
 
   /**
-   * Suppress system notification media player on mobile devices
+   * Suppress system notification media player popup on mobile OS
    */
   public static suppressMediaSession() {
     if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
@@ -397,4 +394,3 @@ export class BgmManager {
     }
   }
 }
-

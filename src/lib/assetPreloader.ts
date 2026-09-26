@@ -104,6 +104,8 @@ import imgAsset_91 from './../assets/images/trophies/Silver Trophy 008.webp';
 import imgAsset_92 from './../assets/images/trophies/Silver Trophy 009.webp';
 import imgAsset_93 from './../assets/images/trophies/Silver Trophy 010.webp';
 import imgAsset_94 from './../assets/images/Chibi Bomb Pong Game.webp';
+import pongModeBg from './../assets/images/pong_mode_bg_1790404409295.jpg';
+import pongCourtBg from './../assets/images/pong_court_bg_1790404428944.jpg';
 
 import { preloadTransparentImages } from './bottleAlphaCache';
 import { AudioManager } from './audioManager';
@@ -464,10 +466,16 @@ export const GAME_ASSET_REGISTRY: Record<GameModeId, GameAssetDefinition[]> = {
       description: 'Buffering Bomb Pong Ball & Fuse Sparks...',
     },
     {
-      name: 'Bomb Laser Court Background',
-      url: imgAsset_0,
+      name: 'Pong Bomb Mode Selection Background',
+      url: pongModeBg,
       type: 'image',
-      description: 'Decoding Neon Pong Laser Arena...',
+      description: 'Decoding Cyber Pong Mode Arena...',
+    },
+    {
+      name: 'Pong Bomb Gameplay Court Background',
+      url: pongCourtBg,
+      type: 'image',
+      description: 'Decoding Cyber Pong Court Floor...',
     },
   ],
 };

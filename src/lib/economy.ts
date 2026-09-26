@@ -34,11 +34,36 @@ import bombPrismImg from '../assets/images/bombs/Bomb Prism.webp';
 import bombSamuraiImg from '../assets/images/bombs/Bomb Samurai.webp';
 import bombSonicImg from '../assets/images/bombs/Bomb Sonic.webp';
 import bombSpriteImg from '../assets/images/bombs/Bomb Sprite.webp';
+// Particle effect assets
+import particleFlameClassicImg from '../assets/images/fire_particle_blaze_1790403813873.jpg';
+import particleNeonTrailImg from '../assets/images/particle_neon_trail_1790404771555.jpg';
+import particleMusicNotesImg from '../assets/images/particle_music_notes_1790404785022.jpg';
+import particleStarSparkImg from '../assets/images/particle_star_spark_1790404799837.jpg';
+import particleGalaxyTrailImg from '../assets/images/particle_galaxy_trail_1790404812457.jpg';
+import particleSakuraImg from '../assets/images/particle_sakura_1790404826117.jpg';
+import particleElectricShockImg from '../assets/images/particle_electric_shock_1790404840369.jpg';
+import particleBlizzardIceImg from '../assets/images/particle_blizzard_ice_1790404856638.jpg';
+import particleNatureLeavesImg from '../assets/images/particle_nature_leaves_1790404868691.jpg';
+import diamondStarSparkleImg from '../assets/images/diamond_star_sparkle.webp';
+import diamondStarSpriteImg from '../assets/images/diamond_star_sprite.webp';
+import musicNoteSpriteImg from '../assets/images/Music Note Sprite.webp';
+import starSpriteImg from '../assets/images/Star Sprite.webp';
+
+// WebP sprite assets for all trail themes
+import btlE1Img from '../assets/images/Btl_E_001.webp';
+import btlE2Img from '../assets/images/Btl_E_002.webp';
+import btlE3Img from '../assets/images/Btl_E_003.webp';
+import btlE4Img from '../assets/images/Btl_E_004.webp';
+import crystalRoseImg from '../assets/images/Crystal Rose Sprite.webp';
+import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
+import headsetsImg from '../assets/images/Headsets Sprite.webp';
+import keyImg from '../assets/images/Key Sprite.webp';
+import chestImg from '../assets/images/Chest Sprite.webp';
 
 export const DAY7_BUNDLE_BOMB_ID = 'bomb_dynamo';
 export const DAY7_BUNDLE_BALL_ID = 'ball_celestial';
 
-export type StoreCategory = 'bottles' | 'bombs' | 'balls' | 'accessories';
+export type StoreCategory = 'bottles' | 'bombs' | 'balls' | 'particles' | 'accessories';
 
 export interface StoreItem {
   id: string;
@@ -51,9 +76,10 @@ export interface StoreItem {
   badge?: string;
   accentGradient: string;
   borderGlow: string;
-  iconType: 'bottle' | 'bomb' | 'ball' | 'accessory';
+  iconType: 'bottle' | 'bomb' | 'ball' | 'particle' | 'accessory';
   builtInBottleStyle?: BottleBuiltinStyle;
   image?: string;
+  spriteImages?: string[];
   cssFilter?: string;
 }
 
@@ -88,6 +114,7 @@ export interface EconomyState {
     bottles: string;
     bombs: string;
     balls: string;
+    particles?: string;
     accessories?: string;
   };
   starEarrings: StarEarringsProgress;
@@ -494,6 +521,143 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       image: ballGrassImg,
     },
   ],
+  particles: [
+    {
+      id: 'particle_classic_blaze',
+      category: 'particles',
+      name: 'Inferno Phoenix Blaze',
+      subtitle: 'Classic Ignited Ember',
+      description: 'The iconic roaring incendiary fire blaze with sputtering orange and crimson ember sparks.',
+      price: 0,
+      rarity: 'Common',
+      badge: 'DEFAULT',
+      accentGradient: 'from-orange-500 via-amber-500 to-red-600',
+      borderGlow: 'border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.4)]',
+      iconType: 'particle',
+      image: btlE1Img,
+      spriteImages: [btlE1Img, starSpriteImg, diamondStarSparkleImg],
+    },
+    {
+      id: 'particle_neon_trail',
+      category: 'particles',
+      name: 'Cyber Neon Trail',
+      subtitle: 'Electro Rave Stream',
+      description: 'High-energy futuristic neon cyan and hot magenta laser ribbons with glowing cyber sparks.',
+      price: 350,
+      rarity: 'Rare',
+      badge: 'VIBRANT',
+      accentGradient: 'from-cyan-400 via-fuchsia-500 to-pink-500',
+      borderGlow: 'border-cyan-400/60 shadow-[0_0_18px_rgba(6,182,212,0.5)]',
+      iconType: 'particle',
+      image: btlE2Img,
+      spriteImages: [btlE2Img, headsetsImg, diamondStarSpriteImg],
+    },
+    {
+      id: 'particle_music_notes',
+      category: 'particles',
+      name: 'Rhythm Beats & Notes',
+      subtitle: 'Euphoric Acoustic Sparks',
+      description: 'Luminous dancing neon musical notes, clefs, and equalizer sound sparks pulsing to party beats.',
+      price: 500,
+      rarity: 'Rare',
+      badge: 'BEATS',
+      accentGradient: 'from-purple-400 via-pink-500 to-cyan-400',
+      borderGlow: 'border-purple-400/60 shadow-[0_0_18px_rgba(168,85,247,0.5)]',
+      iconType: 'particle',
+      image: musicNoteSpriteImg,
+      spriteImages: [musicNoteSpriteImg, headsetsImg, currencyStarImg],
+    },
+    {
+      id: 'particle_star_spark',
+      category: 'particles',
+      name: 'Supernova Stardust',
+      subtitle: 'Diamond Sparkle Glitter',
+      description: 'Dazzling 4-point glittering golden stars, diamond prisms, and radiant celestial sparkle dust.',
+      price: 650,
+      rarity: 'Epic',
+      badge: 'SPARKLE',
+      accentGradient: 'from-amber-300 via-yellow-400 to-amber-500',
+      borderGlow: 'border-amber-300/70 shadow-[0_0_20px_rgba(251,191,36,0.6)]',
+      iconType: 'particle',
+      image: starSpriteImg,
+      spriteImages: [starSpriteImg, diamondStarSparkleImg, crystalRoseImg],
+    },
+    {
+      id: 'particle_galaxy_trail',
+      category: 'particles',
+      name: 'Cosmic Nebula Vortex',
+      subtitle: 'Astral Star Clusters',
+      description: 'Deep cosmic nebula vortex swirling with interstellar violet star clusters and celestial dust.',
+      price: 800,
+      rarity: 'Epic',
+      badge: 'COSMIC',
+      accentGradient: 'from-indigo-500 via-purple-500 to-pink-500',
+      borderGlow: 'border-indigo-400/70 shadow-[0_0_20px_rgba(99,102,241,0.6)]',
+      iconType: 'particle',
+      image: btlE3Img,
+      spriteImages: [btlE3Img, diamondStarSpriteImg, starSpriteImg],
+    },
+    {
+      id: 'particle_sakura',
+      category: 'particles',
+      name: 'Sakura Blossom Bloom',
+      subtitle: 'Spring Petal Breeze',
+      description: 'Gracefully drifting luminous pink cherry blossom petals leaving soft glowing pollen trails.',
+      price: 700,
+      rarity: 'Epic',
+      badge: 'SERENE',
+      accentGradient: 'from-pink-300 via-rose-400 to-pink-500',
+      borderGlow: 'border-pink-300/70 shadow-[0_0_18px_rgba(244,114,182,0.6)]',
+      iconType: 'particle',
+      image: crystalRoseImg,
+      spriteImages: [crystalRoseImg, currencyStarImg, btlE1Img],
+    },
+    {
+      id: 'particle_electric_shock',
+      category: 'particles',
+      name: 'High-Voltage Plasma',
+      subtitle: 'Tesla Lightning Arc',
+      description: 'Crackling electric blue lightning bolts, plasma arcs, and high-voltage kinetic discharges.',
+      price: 850,
+      rarity: 'Epic',
+      badge: 'OVERDRIVE',
+      accentGradient: 'from-cyan-300 via-blue-500 to-indigo-600',
+      borderGlow: 'border-cyan-300/80 shadow-[0_0_22px_rgba(34,211,238,0.7)]',
+      iconType: 'particle',
+      image: btlE4Img,
+      spriteImages: [btlE4Img, keyImg, diamondStarSparkleImg],
+    },
+    {
+      id: 'particle_blizzard_ice',
+      category: 'particles',
+      name: 'Glacial Frostbite',
+      subtitle: 'Crystalline Ice Shards',
+      description: 'Freezing glacial snowflakes, diamond ice crystals, and arctic cold blue frost trail particles.',
+      price: 900,
+      rarity: 'Legendary',
+      badge: 'FROST',
+      accentGradient: 'from-sky-200 via-cyan-400 to-blue-600',
+      borderGlow: 'border-sky-300/80 shadow-[0_0_22px_rgba(56,189,248,0.7)]',
+      iconType: 'particle',
+      image: diamondStarSpriteImg,
+      spriteImages: [diamondStarSpriteImg, btlE2Img, starSpriteImg],
+    },
+    {
+      id: 'particle_nature_leaves',
+      category: 'particles',
+      name: 'Emerald Spirit Leaves',
+      subtitle: 'Mystic Forest Fireflies',
+      description: 'Swirling glowing emerald leaves dancing alongside luminous golden forest fireflies.',
+      price: 750,
+      rarity: 'Epic',
+      badge: 'NATURE',
+      accentGradient: 'from-emerald-300 via-green-500 to-teal-600',
+      borderGlow: 'border-emerald-400/70 shadow-[0_0_20px_rgba(52,211,153,0.6)]',
+      iconType: 'particle',
+      image: crystalRoseImg,
+      spriteImages: [crystalRoseImg, currencyStarImg, btlE1Img],
+    },
+  ],
   accessories: [
     {
       id: 'accessory_star_earrings',
@@ -548,6 +712,7 @@ function loadInitialStoreCatalogue(): Record<StoreCategory, StoreItem[]> {
           bottles: mergeCategory('bottles', DEFAULT_STORE_CATALOGUE.bottles),
           bombs: mergeCategory('bombs', DEFAULT_STORE_CATALOGUE.bombs),
           balls: mergeCategory('balls', DEFAULT_STORE_CATALOGUE.balls),
+          particles: mergeCategory('particles', DEFAULT_STORE_CATALOGUE.particles || []),
           accessories: mergeCategory('accessories', DEFAULT_STORE_CATALOGUE.accessories || []),
         };
       }
@@ -557,6 +722,7 @@ function loadInitialStoreCatalogue(): Record<StoreCategory, StoreItem[]> {
     bottles: [...DEFAULT_STORE_CATALOGUE.bottles],
     bombs: [...DEFAULT_STORE_CATALOGUE.bombs],
     balls: [...DEFAULT_STORE_CATALOGUE.balls],
+    particles: [...(DEFAULT_STORE_CATALOGUE.particles || [])],
     accessories: [...(DEFAULT_STORE_CATALOGUE.accessories || [])],
   };
 }
@@ -567,6 +733,7 @@ export function syncStoreCatalogueInMemory(newCatalogue: Record<StoreCategory, S
   STORE_CATALOGUE.bottles = [...newCatalogue.bottles];
   STORE_CATALOGUE.bombs = [...newCatalogue.bombs];
   STORE_CATALOGUE.balls = [...newCatalogue.balls];
+  STORE_CATALOGUE.particles = [...(newCatalogue.particles || [])];
   STORE_CATALOGUE.accessories = [...(newCatalogue.accessories || [])];
   try {
     if (typeof localStorage !== 'undefined') {
@@ -584,6 +751,7 @@ export function getStoreCatalogue(): Record<StoreCategory, StoreItem[]> {
     bottles: [...STORE_CATALOGUE.bottles],
     bombs: [...STORE_CATALOGUE.bombs],
     balls: [...STORE_CATALOGUE.balls],
+    particles: [...(STORE_CATALOGUE.particles || [])],
     accessories: [...(STORE_CATALOGUE.accessories || [])],
   };
 }
@@ -649,6 +817,10 @@ export function deleteStoreItem(itemId: string): Record<StoreCategory, StoreItem
       eco.equippedSkins.balls = STORE_CATALOGUE.balls[0]?.id || 'ball_cyan_orbs';
       needEcoSave = true;
     }
+    if (eco.equippedSkins.particles === itemId) {
+      eco.equippedSkins.particles = STORE_CATALOGUE.particles[0]?.id || 'particle_classic_blaze';
+      needEcoSave = true;
+    }
     if (eco.equippedSkins.accessories === itemId) {
       eco.equippedSkins.accessories = undefined;
       needEcoSave = true;
@@ -665,6 +837,7 @@ export function resetStoreCatalogueToDefault(): Record<StoreCategory, StoreItem[
   STORE_CATALOGUE.bottles = [...DEFAULT_STORE_CATALOGUE.bottles];
   STORE_CATALOGUE.bombs = [...DEFAULT_STORE_CATALOGUE.bombs];
   STORE_CATALOGUE.balls = [...DEFAULT_STORE_CATALOGUE.balls];
+  STORE_CATALOGUE.particles = [...(DEFAULT_STORE_CATALOGUE.particles || [])];
   STORE_CATALOGUE.accessories = [...(DEFAULT_STORE_CATALOGUE.accessories || [])];
   syncStoreCatalogueInMemory(STORE_CATALOGUE);
   return getStoreCatalogue();
@@ -786,11 +959,13 @@ const DEFAULT_STATE: EconomyState = {
     'bottle_btl_001',
     'bomb_classic_tnt',
     'ball_cyan_orbs',
+    'particle_classic_blaze',
   ],
   equippedSkins: {
     bottles: 'bottle_btl_001',
     bombs: 'bomb_classic_tnt',
     balls: 'ball_cyan_orbs',
+    particles: 'particle_classic_blaze',
     accessories: '',
   },
   starEarrings: {
@@ -830,6 +1005,9 @@ export function getEconomyState(): EconomyState {
     if (!rawUnlocked.includes('bottle_btl_001')) {
       rawUnlocked.push('bottle_btl_001');
     }
+    if (!rawUnlocked.includes('particle_classic_blaze')) {
+      rawUnlocked.push('particle_classic_blaze');
+    }
     // Backward compatibility for previous Day 7 IDs
     if (rawUnlocked.includes('bomb_day7_vault_core') && !rawUnlocked.includes(DAY7_BUNDLE_BOMB_ID)) {
       rawUnlocked.push(DAY7_BUNDLE_BOMB_ID);
@@ -842,8 +1020,9 @@ export function getEconomyState(): EconomyState {
     const validBottleIds = STORE_CATALOGUE.bottles.map((b) => b.id);
     const validBombIds = STORE_CATALOGUE.bombs.map((b) => b.id);
     const validBallIds = STORE_CATALOGUE.balls.map((b) => b.id);
+    const validParticleIds = (STORE_CATALOGUE.particles || []).map((p) => p.id);
     const validAccessoryIds = STORE_CATALOGUE.accessories.map((a) => a.id);
-    const allValidIds = new Set([...validBottleIds, ...validBombIds, ...validBallIds, ...validAccessoryIds, 'btl_e_001', 'bomb_day7_vault_core', 'ball_day7_nebula_orb', 'accessory_star_earrings']);
+    const allValidIds = new Set([...validBottleIds, ...validBombIds, ...validBallIds, ...validParticleIds, ...validAccessoryIds, 'btl_e_001', 'bomb_day7_vault_core', 'ball_day7_nebula_orb', 'accessory_star_earrings', 'particle_classic_blaze']);
 
     // Parse Star Earrings Condition progress
     const rawEarrings = parsed.starEarrings || {};
@@ -927,6 +1106,11 @@ export function getEconomyState(): EconomyState {
       equippedBalls = 'ball_cyan_orbs';
     }
 
+    let equippedParticles = parsed.equippedSkins?.particles;
+    if (!validParticleIds.includes(equippedParticles)) {
+      equippedParticles = 'particle_classic_blaze';
+    }
+
     const currentState: EconomyState = {
       stars: typeof parsed.stars === 'number' ? parsed.stars : DEFAULT_STATE.stars,
       unlockedItems: cleanUnlocked.length > 0 ? cleanUnlocked : DEFAULT_STATE.unlockedItems,
@@ -934,6 +1118,7 @@ export function getEconomyState(): EconomyState {
         bottles: equippedBottles,
         bombs: equippedBombs,
         balls: equippedBalls,
+        particles: equippedParticles,
         accessories: parsed.equippedSkins?.accessories || (isUnlocked ? 'accessory_star_earrings' : ''),
       },
       starEarrings,
