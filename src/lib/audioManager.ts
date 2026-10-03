@@ -157,9 +157,14 @@ export class AudioManager {
     this.hapticsEnabled = hapticsEnabled;
     Haptics.setEnabled(hapticsEnabled);
 
-    if (masterGainNode && audioCtx) {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
+    if (masterGainNode && ctx) {
       try {
-        masterGainNode.gain.setValueAtTime(this.masterVolume, audioCtx.currentTime);
+        masterGainNode.gain.setValueAtTime(this.masterVolume, ctx.currentTime);
       } catch (e) {}
     }
 

@@ -23,10 +23,18 @@ import {
   TRAIL_WEBP_PARTICLE_SPRITES,
   TRAIL_PARTICLE_FILES,
 } from '../../lib/economy';
+import {
+  updateTrailParticlePhysics,
+  renderTrailThemeBackground,
+  renderStyledTrailParticle,
+  TrailHistoryPoint,
+  TrailParticle,
+} from '../../lib/trailVisualFX';
 import { BombPongGameOverModal } from './BombPongGameOverModal';
 import { BombPongBackground } from '../BombPongBackground';
 import defaultBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
-import fireParticleImgSrc from '../../assets/images/fire_particle_blaze_1790403813873.jpg';
+import fireParticleImgSrc from '../../assets/images/particle_blaze_fire.webp';
+import { processSpriteImage } from '../../lib/imageProcessing';
 
 export interface BombPongGameProps {
   settings: AppSettings;
@@ -204,7 +212,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     };
   }, [bombImageUrl]);
 
-  // Preload the 2 dedicated independent .webp particle images for screen blending trail effects
+  // Preload all dedicated independent .webp particle images for screen blending trail effects
   const webpParticleImagesRef = useRef<HTMLImageElement[]>([]);
   useEffect(() => {
     const files =
@@ -212,16 +220,22 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         ? equippedParticleItem.spriteImages
         : TRAIL_PARTICLE_FILES[equippedParticleId] || TRAIL_WEBP_PARTICLE_SPRITES;
     const loaded: HTMLImageElement[] = [];
-    files.slice(0, 2).forEach((url, idx) => {
-      const img = new Image();
-      img.src = url;
-      img.onload = () => {
+    files.forEach((url, idx) => {
+      processSpriteImage(url, 'screen', 0).then((dataUrl) => {
+        const img = new Image();
+        img.src = dataUrl;
         loaded[idx] = img;
-      };
-      loaded[idx] = img;
+      }).catch(() => {
+        const img = new Image();
+        img.src = url;
+        loaded[idx] = img;
+      });
     });
     webpParticleImagesRef.current = loaded;
   }, [equippedParticleId, equippedParticleItem]);
+
+  // Trail History positions for smooth ribbons & lightning arcs
+  const trailHistoryRef = useRef<TrailHistoryPoint[]>([]);
 
   // Arena Dimensions & Logical Resolution
   const arenaRef = useRef({
@@ -806,34 +820,38 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
         bomb.x += bomb.vx;
         bomb.y += bomb.vy;
         bomb.rotation += bomb.speed * 0.04;
-        bomb.pulse = 1 + Math.sin(time * 0.015) * 0.1;
+        // Record continuous trail path points for ribbon streams and lightning arcs
+        trailHistoryRef.current.unshift({ x: fuseWorldX, y: fuseWorldY, time, radius: bomb.radius });
+        if (trailHistoryRef.current.length > 10) {
+          trailHistoryRef.current.pop();
+        }
 
-        // Dynamic Fuse Blaze & Glowing Light Sparks Generator (capped and silky smooth)
-        if (particlesRef.current.length < 32) {
-          const spawnCount = bomb.speed > bomb.baseSpeed * 1.3 ? 2 : 1;
+        // Dynamic Fuse Blaze & Glowing Light Sparks Generator (smaller glow, wider scatter, faded lifespan)
+        if (particlesRef.current.length < 48) {
+          const spawnCount = bomb.speed > bomb.baseSpeed * 1.3 ? 3 : 2;
           for (let s = 0; s < spawnCount; s++) {
-            const sparkAngle = bomb.rotation - Math.PI / 4 + (Math.random() - 0.5) * 1.2;
-            const sparkSpeed = 1.0 + Math.random() * 2.8;
-            const trailVx = -bomb.vx * 0.22;
-            const trailVy = -bomb.vy * 0.22 - 0.35;
+            const sparkAngle = bomb.rotation - Math.PI / 4 + (Math.random() - 0.5) * 2.2;
+            const sparkSpeed = 1.2 + Math.random() * 3.4;
+            const trailVx = -bomb.vx * 0.22 + (Math.random() - 0.5) * 1.5;
+            const trailVy = -bomb.vy * 0.22 - 0.2 + (Math.random() - 0.5) * 1.5;
             const roll = Math.random();
-            const pType: Particle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
+            const pType: Particle['type'] = roll < 0.38 ? 'webp_sprite' : roll < 0.78 ? 'glow_light' : 'spark';
             const themeColor = activePalette[Math.floor(Math.random() * activePalette.length)];
 
             particlesRef.current.push({
-              x: fuseWorldX + (Math.random() - 0.5) * 3,
-              y: fuseWorldY + (Math.random() - 0.5) * 3,
+              x: fuseWorldX + (Math.random() - 0.5) * 4,
+              y: fuseWorldY + (Math.random() - 0.5) * 4,
               vx: Math.cos(sparkAngle) * sparkSpeed + trailVx,
               vy: Math.sin(sparkAngle) * sparkSpeed + trailVy,
               color: themeColor,
-              size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
+              size: pType === 'webp_sprite' ? 23.25 + Math.random() * 6.75 : pType === 'glow_light' ? 2.6 + Math.random() * 2.0 : 1.0 + Math.random() * 1.4,
               alpha: 1,
               life: 0,
-              maxLife: pType === 'webp_sprite' ? 18 + Math.random() * 10 : pType === 'glow_light' ? 14 + Math.random() * 8 : 8 + Math.random() * 6,
+              maxLife: pType === 'webp_sprite' ? 18 + Math.random() * 8 : pType === 'glow_light' ? 15 + Math.random() * 8 : 10 + Math.random() * 6,
               rotation: Math.random() * Math.PI * 2,
               rotSpeed: (Math.random() - 0.5) * 0.25,
               type: pType,
-              spriteIndex: Math.floor(Math.random() * 2),
+              spriteIndex: Math.floor(Math.random() * 3),
             });
           }
         }
@@ -888,14 +906,14 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
               vx: Math.cos(angle) * spd,
               vy: Math.sin(angle) * spd,
               color: themeColor,
-              size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
+              size: pType === 'webp_sprite' ? 23.25 + Math.random() * 6.75 : pType === 'glow_light' ? 2.6 + Math.random() * 2.0 : 1.0 + Math.random() * 1.4,
               alpha: 1,
               life: 0,
               maxLife: 14 + Math.random() * 8,
               rotation: Math.random() * Math.PI * 2,
               rotSpeed: (Math.random() - 0.5) * 0.25,
               type: pType,
-              spriteIndex: Math.floor(Math.random() * 2),
+              spriteIndex: Math.floor(Math.random() * 3),
             });
           }
 
@@ -944,14 +962,14 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
               vx: Math.cos(angle) * spd,
               vy: Math.sin(angle) * spd,
               color: themeColor,
-              size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
+              size: pType === 'webp_sprite' ? 23.25 + Math.random() * 6.75 : pType === 'glow_light' ? 2.6 + Math.random() * 2.0 : 1.0 + Math.random() * 1.4,
               alpha: 1,
               life: 0,
               maxLife: 14 + Math.random() * 8,
               rotation: Math.random() * Math.PI * 2,
               rotSpeed: (Math.random() - 0.5) * 0.25,
               type: pType,
-              spriteIndex: Math.floor(Math.random() * 2),
+              spriteIndex: Math.floor(Math.random() * 3),
             });
           }
 
@@ -1083,72 +1101,33 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
 
       // 7a. Core Glow Light at the tip of the bomb
       if (bomb.active || gamePhase === 'ready' || gamePhase === 'countdown') {
-        const coreRadius = bomb.radius * 0.42 * (0.85 + Math.sin(time * 0.02) * 0.15);
-        const glowCanvas = getCachedGlowCanvas(activePalette[0] || '#f59e0b');
-        ctx.drawImage(
-          glowCanvas,
-          fuseWorldX - coreRadius,
-          fuseWorldY - coreRadius,
-          coreRadius * 2,
-          coreRadius * 2
-        );
-
-        // Tip .webp sparkle with screen blending
+        // Tip .webp sparkle (unblurred, un-dimmed, 1:1 aspect)
         const webpImages = webpParticleImagesRef.current;
         if (webpImages[0] && webpImages[0].complete) {
-          const sparkleSize = bomb.radius * (0.85 + Math.sin(time * 0.04) * 0.15);
+          const sparkleSize = bomb.radius * 0.9;
           ctx.save();
+          ctx.globalCompositeOperation = 'screen';
+          ctx.globalAlpha = 0.95;
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.translate(fuseWorldX, fuseWorldY);
           ctx.rotate(bomb.rotation + time * 0.004);
-          ctx.globalAlpha = 0.95;
           ctx.drawImage(webpImages[0], -sparkleSize / 2, -sparkleSize / 2, sparkleSize, sparkleSize);
           ctx.restore();
         }
       }
 
-      // 7b. Floating / Trailing Particles with Screen Blending Mode & CSS Glow Light (Zero shadowBlur)
+      // 7b. Specialized Theme Trail Backgrounds (Neon Ribbon, Electric Lightning, Acoustic Waves, etc.)
+      renderTrailThemeBackground(ctx, equippedParticleId, trailHistoryRef.current, activePalette, time);
+
+      // 7c. Floating / Trailing Particles with Specialized Theme Physics & Styling
       const webpImages = webpParticleImagesRef.current;
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
         const p = particlesRef.current[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.95;
-        p.vy *= 0.95;
-        p.rotation += p.rotSpeed;
-        p.life += 1;
-        const progress = p.life / p.maxLife;
-        p.alpha = Math.max(0, Math.pow(1 - progress, 1.4));
+        updateTrailParticlePhysics(p, equippedParticleId, time);
+        renderStyledTrailParticle(ctx, p, equippedParticleId, webpImages, getCachedGlowCanvas, time);
 
-        if (p.type === 'webp_sprite') {
-          const targetImg = webpImages.length > 0 ? webpImages[(p.spriteIndex ?? 0) % webpImages.length] : null;
-          if (targetImg && targetImg.complete) {
-            const curSize = p.size * (1 - progress * 0.28);
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.rotation);
-            ctx.globalAlpha = p.alpha * 0.95;
-            // Draw tighter optical glow behind sprite with cached canvas
-            const glowCanvas = getCachedGlowCanvas(p.color);
-            ctx.drawImage(glowCanvas, -curSize * 0.5, -curSize * 0.5, curSize, curSize);
-            ctx.drawImage(targetImg, -curSize / 2, -curSize / 2, curSize, curSize);
-            ctx.restore();
-          }
-        } else if (p.type === 'glow_light') {
-          // CSS Glow Light: Tighter hardware-accelerated radial aura
-          const curSize = Math.max(1, p.size * (1 - progress * 0.3));
-          ctx.globalAlpha = p.alpha * 0.9;
-          const glowCanvas = getCachedGlowCanvas(p.color);
-          ctx.drawImage(glowCanvas, p.x - curSize * 0.75, p.y - curSize * 0.75, curSize * 1.5, curSize * 1.5);
-        } else {
-          // Glowing Sparks with screen blending, zero shadowBlur
-          ctx.globalAlpha = p.alpha;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, Math.max(0.6, p.size * (1 - progress)), 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        if (p.life >= p.maxLife) {
+        if (p.life >= p.maxLife || p.alpha <= 0.01) {
           particlesRef.current.splice(i, 1);
         }
       }
@@ -1252,111 +1231,114 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
 
       {/* VIEW: MODE SELECTION OVERLAY */}
       {gamePhase === 'mode_select' && (
-        <div className="absolute inset-0 z-30 flex flex-col justify-between p-6 sm:p-10 bg-black/40 backdrop-blur-md pointer-events-auto">
+        <div className="absolute inset-0 z-30 flex flex-col justify-center items-center p-6 sm:p-10 bg-black/40 backdrop-blur-md pointer-events-auto pt-[max(4.5rem,calc(env(safe-area-inset-top)+3.5rem))] pb-[max(1.5rem,calc(env(safe-area-inset-bottom)+1rem))]">
           {/* Top Glow Ambiance */}
           <div className="absolute -top-20 -left-20 w-64 h-64 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-pink-500/15 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Header */}
-          <div className="relative z-10 text-center mt-12 sm:mt-8">
-            <h1 className="text-3xl sm:text-4xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400">
-              BOMB PONG
-            </h1>
-            <p className="text-xs font-bold text-slate-400 tracking-widest uppercase mt-1">
-              CHOOSE BATTLE MODE
-            </p>
-          </div>
-
-          {/* Mode Selection Cards */}
-          <div className="relative z-10 max-w-md mx-auto w-full space-y-4 my-auto">
-            {/* 2P LOCAL DUEL */}
-            <div
-              onClick={() => handleStartDuel(false)}
-              className="group relative cursor-pointer p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-pink-950/40 via-purple-950/30 to-slate-900/60 border border-pink-500/40 hover:border-pink-400 hover:shadow-[0_0_25px_rgba(236,72,153,0.35)] active:scale-[0.98] transition-all overflow-hidden"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.6)]">
-                    <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base sm:text-lg font-black text-white tracking-wide">
-                        2-PLAYER DUEL
-                      </h3>
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-pink-500/25 text-pink-300 border border-pink-500/40">
-                        PVP
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-0.5 leading-snug">
-                      Head-to-head tabletop ping pong on shared screen.
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-pink-400 group-hover:translate-x-1 transition-transform shrink-0" />
-              </div>
+          {/* Grouped Main Content: Header sits slightly above game mode panels */}
+          <div className="relative z-10 w-full max-w-md mx-auto flex flex-col items-center">
+            {/* Header: Sits slightly above the game mode panels */}
+            <div className="text-center mb-4 sm:mb-5">
+              <h1 className="text-3xl sm:text-4xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400 drop-shadow-[0_2px_12px_rgba(236,72,153,0.5)]">
+                BOMB PONG
+              </h1>
+              <p className="text-xs font-bold text-slate-300 tracking-widest uppercase mt-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+                CHOOSE BATTLE MODE
+              </p>
             </div>
 
-            {/* VS CYBER BOT */}
-            <div
-              onClick={() => handleStartDuel(true)}
-              className="group relative cursor-pointer p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-cyan-950/40 via-blue-950/30 to-slate-900/60 border border-cyan-500/40 hover:border-cyan-400 hover:shadow-[0_0_25px_rgba(6,182,212,0.35)] active:scale-[0.98] transition-all overflow-hidden"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.6)]">
-                    <Bot className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base sm:text-lg font-black text-white tracking-wide">
-                        VS CYBER BOT
-                      </h3>
-                      <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-cyan-500/25 text-cyan-300 border border-cyan-500/40">
-                        SOLO AI
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-0.5 leading-snug">
-                      Battle autonomous AI paddle reflexes.
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-cyan-400 group-hover:translate-x-1 transition-transform shrink-0" />
-              </div>
-
-              {/* Difficulty Tabs */}
+            {/* Mode Selection Cards */}
+            <div className="w-full space-y-4">
+              {/* 2P LOCAL DUEL */}
               <div
-                className="mt-3.5 pt-3 border-t border-slate-800/80 flex items-center justify-between"
-                onClick={(e) => e.stopPropagation()}
+                onClick={() => handleStartDuel(false)}
+                className="group relative cursor-pointer p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-pink-950/40 via-purple-950/30 to-slate-900/60 border border-pink-500/40 hover:border-pink-400 hover:shadow-[0_0_25px_rgba(236,72,153,0.35)] active:scale-[0.98] transition-all overflow-hidden"
               >
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                  Difficulty:
-                </span>
-                <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
-                  {(['easy', 'normal', 'hard'] as BotDifficulty[]).map((diff) => (
-                    <button
-                      key={diff}
-                      onClick={() => {
-                        SoundEngine.playButtonClick();
-                        Haptics.buttonClick();
-                        setBotDifficulty(diff);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-black uppercase transition-all ${
-                        botDifficulty === diff
-                          ? 'bg-cyan-500 text-slate-950 shadow-[0_0_8px_rgba(6,182,212,0.6)]'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {diff}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-pink-600 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.6)]">
+                      <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base sm:text-lg font-black text-white tracking-wide">
+                          2-PLAYER DUEL
+                        </h3>
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-pink-500/25 text-pink-300 border border-pink-500/40">
+                          PVP
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5 leading-snug">
+                        Head-to-head tabletop ping pong on shared screen.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-pink-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                </div>
+              </div>
+
+              {/* VS CYBER BOT */}
+              <div
+                onClick={() => handleStartDuel(true)}
+                className="group relative cursor-pointer p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-cyan-950/40 via-blue-950/30 to-slate-900/60 border border-cyan-500/40 hover:border-cyan-400 hover:shadow-[0_0_25px_rgba(6,182,212,0.35)] active:scale-[0.98] transition-all overflow-hidden"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.6)]">
+                      <Bot className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base sm:text-lg font-black text-white tracking-wide">
+                          VS CYBER BOT
+                        </h3>
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-cyan-500/25 text-cyan-300 border border-cyan-500/40">
+                          SOLO AI
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5 leading-snug">
+                        Battle autonomous AI paddle reflexes.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-cyan-400 group-hover:translate-x-1 transition-transform shrink-0" />
+                </div>
+
+                {/* Difficulty Tabs */}
+                <div
+                  className="mt-3.5 pt-3 border-t border-slate-800/80 flex items-center justify-between"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    Difficulty:
+                  </span>
+                  <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
+                    {(['easy', 'normal', 'hard'] as BotDifficulty[]).map((diff) => (
+                      <button
+                        key={diff}
+                        onClick={() => {
+                          SoundEngine.playButtonClick();
+                          Haptics.buttonClick();
+                          setBotDifficulty(diff);
+                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-black uppercase transition-all ${
+                          botDifficulty === diff
+                            ? 'bg-cyan-500 text-slate-950 shadow-[0_0_8px_rgba(6,182,212,0.6)]'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {diff}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="relative z-10 text-center text-xs text-slate-500 mb-4">
-            Equipped bomb skin & particle trail sync from your Store collection
+            <div className="relative z-10 text-center text-xs text-slate-400/80 mt-4">
+              Equipped bomb skin & particle trail sync from your Store collection
+            </div>
           </div>
         </div>
       )}

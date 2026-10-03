@@ -4,9 +4,9 @@
  */
 
 // Core Named Video Imports
-import neonPartyVideo from '../assets/videos/Chibi DJ Neon Party Animation.mp4';
+import neonPartyVideo from '../assets/videos/Chibi DJ Party 2K Background Animation.mov';
 import rouletteBgVideo from '../assets/videos/Finger Roulette Background Animation.mp4';
-import spectrumVideo from '../assets/videos/Neon DJ Disc Background Animation.mp4';
+import spectrumVideo from '../assets/videos/Neon DJ Disc Background Animation.mov';
 import splashBgVideo from '../assets/videos/Chibi Party Splash Screen Background Animation.mp4';
 
 // Core Named Image Imports for Game Modes & Backgrounds
@@ -19,19 +19,18 @@ import btl004 from '../assets/images/Btl_E_004.webp';
 import cyberBombSprite from '../assets/images/bombs/Bomb Sprite.webp';
 import cyberBallSprite from '../assets/images/balls/Ball Sprite.webp';
 import chibiBombPongImg from '../assets/images/Chibi Bomb Pong Game.webp';
-import pongModeBg from '../assets/images/pong_mode_bg_1790404409295.jpg';
-import pongCourtBg from '../assets/images/pong_court_bg_1790404428944.jpg';
+import pongCourtBg from '../assets/images/Pong Game Background.webp';
 
 import { preloadTransparentImages } from './bottleAlphaCache';
 import { AudioManager } from './audioManager';
 
 // Dynamic Vite Asset Globs - Automatically indexes all app media
-const allImagesGlob = import.meta.glob<string>('../assets/images/**/*.{webp,png,jpg,jpeg,svg}', {
+const allImagesGlob = import.meta.glob<string>('../assets/images/**/*.{webp,png,svg}', {
   eager: true,
   import: 'default',
 });
 
-const allVideosGlob = import.meta.glob<string>('../assets/videos/**/*.{mp4,webm}', {
+const allVideosGlob = import.meta.glob<string>('../assets/videos/**/*.{webm,mp4}', {
   eager: true,
   import: 'default',
 });
@@ -153,7 +152,6 @@ function buildPreloadQueue(): PreloadItem[] {
     { name: 'Bomb Game Background', url: bombGameBg, desc: 'Decoding Bomb Game Background...' },
     { name: 'Finger Roulette Background', url: rouletteGameBg, desc: 'Decoding Finger Roulette Background...' },
     { name: 'Pong Court Background', url: pongCourtBg, desc: 'Decoding Pong Court Arena Background...' },
-    { name: 'Pong Mode Background', url: pongModeBg, desc: 'Decoding Pong Mode Selection Background...' },
     { name: 'Chibi Bomb Pong Game Banner', url: chibiBombPongImg, desc: 'Decoding Chibi Bomb Pong Game Banner...' },
     { name: 'Bottle Skin 001', url: btl001, desc: 'Decoding Bottle Skin 001...' },
     { name: 'Bottle Skin 002', url: btl002, desc: 'Decoding Bottle Skin 002...' },
@@ -396,12 +394,6 @@ export const GAME_ASSET_REGISTRY: Record<GameModeId, GameAssetDefinition[]> = {
       url: cyberBombSprite,
       type: 'image',
       description: 'Buffering Bomb Pong Ball & Fuse Sparks...',
-    },
-    {
-      name: 'Pong Bomb Mode Selection Background',
-      url: pongModeBg,
-      type: 'image',
-      description: 'Decoding Cyber Pong Mode Arena...',
     },
     {
       name: 'Pong Bomb Gameplay Court Background',

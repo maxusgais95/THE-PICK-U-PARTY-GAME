@@ -6,9 +6,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Sparkles, Check, Move, RefreshCw } from 'lucide-react';
 import { StoreItem, TRAIL_PARTICLE_FILES, TRAIL_PARTICLE_DETAILS, TRAIL_WEBP_PARTICLE_SPRITES } from '../lib/economy';
+import {
+  updateTrailParticlePhysics,
+  renderTrailThemeBackground,
+  renderStyledTrailParticle,
+  TrailHistoryPoint,
+  TrailParticle,
+} from '../lib/trailVisualFX';
 import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
 import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
 import { SoundEngine, Haptics } from '../lib/audio';
+import { processSpriteImage } from '../lib/imageProcessing';
 
 // High-performance offscreen canvas glow cache with tight optical radius (smaller glow)
 const glowCanvasCache = new Map<string, HTMLCanvasElement>();
@@ -45,23 +53,6 @@ interface TrailSimulationModalProps {
   onClose: () => void;
   onEquip: (item: StoreItem) => void;
   onPurchase: (item: StoreItem) => void;
-}
-
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  color: string;
-  glowColor?: string;
-  size: number;
-  alpha: number;
-  life: number;
-  maxLife: number;
-  rotation: number;
-  rotSpeed: number;
-  type: 'webp_sprite' | 'glow_light' | 'spark';
-  spriteIndex: number;
 }
 
 interface Shockwave {
@@ -138,13 +129,16 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
         : TRAIL_PARTICLE_FILES[item.id] || TRAIL_WEBP_PARTICLE_SPRITES;
 
     const loadedWebp: HTMLImageElement[] = [];
-    files.slice(0, 2).forEach((src, idx) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
+    files.forEach((src, idx) => {
+      processSpriteImage(src, 'screen', 0).then((dataUrl) => {
+        const img = new Image();
+        img.src = dataUrl;
         loadedWebp[idx] = img;
-      };
-      loadedWebp[idx] = img;
+      }).catch(() => {
+        const img = new Image();
+        img.src = src;
+        loadedWebp[idx] = img;
+      });
     });
     webpImagesRef.current = loadedWebp;
   }, [isOpen, item]);
@@ -181,8 +175,9 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
       isDragged: false,
     };
 
-    const particles: Particle[] = [];
+    const particles: TrailParticle[] = [];
     const shockwaves: Shockwave[] = [];
+    const trailHistory: TrailHistoryPoint[] = [];
     const palette = PARTICLE_COLOR_PALETTES[item.id] || PARTICLE_COLOR_PALETTES.particle_classic_blaze;
     const coreColors = PARTICLE_CORE_COLORS[item.id] || PARTICLE_CORE_COLORS.particle_classic_blaze;
 
@@ -191,7 +186,7 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
         const angle = baseAngle + (Math.random() - 0.5) * Math.PI * 1.2;
         const spd = 2 + Math.random() * 4.5;
         const roll = Math.random();
-        const pType: Particle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
+        const pType: TrailParticle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
         const themeColor = palette[Math.floor(Math.random() * palette.length)];
         particles.push({
           x,
@@ -199,14 +194,14 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
           vx: Math.cos(angle) * spd,
           vy: Math.sin(angle) * spd,
           color: themeColor,
-          size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
+          size: pType === 'webp_sprite' ? 23.25 + Math.random() * 6.75 : pType === 'glow_light' ? 2.6 + Math.random() * 2.0 : 1.0 + Math.random() * 1.4,
           alpha: 1,
           life: 0,
           maxLife: 16 + Math.random() * 10,
           rotation: Math.random() * Math.PI * 2,
           rotSpeed: (Math.random() - 0.5) * 0.25,
           type: pType,
-          spriteIndex: Math.floor(Math.random() * 2),
+          spriteIndex: Math.floor(Math.random() * 3),
         });
       }
     };
@@ -251,7 +246,9 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
     window.addEventListener('pointerup', onPointerUp);
 
     // Optimized 60FPS Animation Loop
+    let time = 0;
     const render = () => {
+      time += 16.6 * speedMultiplierRef.current;
       // 1. Clear with dark arena background (direct fast clear)
       ctx.fillStyle = '#06030c';
       ctx.fillRect(0, 0, width, height);
@@ -309,35 +306,40 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
         }
       }
 
-      ball.rotation += 0.04 + Math.hypot(ball.vx, ball.vy) * 0.015;
+      // Record continuous trail path points for ribbon streams and lightning arcs
+      trailHistory.unshift({ x: ball.x, y: ball.y, time, radius: ball.radius });
+      if (trailHistory.length > 10) {
+        trailHistory.pop();
+      }
 
-      // 4. Spawn Trail Particles Behind Ball (smaller, tighter glow)
+      // 4. Spawn Trail Particles Behind Ball (smaller glow, wider scatter, faded lifespan)
       const speed = Math.hypot(ball.vx, ball.vy);
-      if (particles.length < 24) {
-        const spawnCount = speed > 3.8 ? 2 : 1;
+      if (particles.length < 40) {
+        const spawnCount = speed > 3.0 ? 3 : 2;
         for (let s = 0; s < spawnCount; s++) {
-          const sparkAngle = ball.rotation + Math.PI + (Math.random() - 0.5) * 1.1;
-          const sparkSpeed = 0.8 + Math.random() * 2.2;
-          const trailVx = -ball.vx * 0.2;
-          const trailVy = -ball.vy * 0.2;
+          const sparkAngle = ball.rotation + Math.PI + (Math.random() - 0.5) * 2.2;
+          const sparkSpeed = 1.0 + Math.random() * 3.2;
+          const trailVx = -ball.vx * 0.22 + (Math.random() - 0.5) * 1.4;
+          const trailVy = -ball.vy * 0.22 + (Math.random() - 0.5) * 1.4;
           const roll = Math.random();
-          const pType: Particle['type'] = roll < 0.45 ? 'webp_sprite' : roll < 0.82 ? 'glow_light' : 'spark';
+          const pType: TrailParticle['type'] = roll < 0.38 ? 'webp_sprite' : roll < 0.78 ? 'glow_light' : 'spark';
           const themeColor = palette[Math.floor(Math.random() * palette.length)];
 
           particles.push({
-            x: ball.x + (Math.random() - 0.5) * 3,
-            y: ball.y + (Math.random() - 0.5) * 3,
+            x: ball.x + (Math.random() - 0.5) * 4,
+            y: ball.y + (Math.random() - 0.5) * 4,
             vx: Math.cos(sparkAngle) * sparkSpeed + trailVx,
             vy: Math.sin(sparkAngle) * sparkSpeed + trailVy,
             color: themeColor,
-            size: pType === 'webp_sprite' ? 9 + Math.random() * 8 : pType === 'glow_light' ? 7 + Math.random() * 7 : 1.8 + Math.random() * 2.2,
+            size: pType === 'webp_sprite' ? 23.25 + Math.random() * 6.75 : pType === 'glow_light' ? 2.6 + Math.random() * 2.0 : 1.0 + Math.random() * 1.4,
             alpha: 1,
             life: 0,
-            maxLife: pType === 'webp_sprite' ? 18 + Math.random() * 10 : pType === 'glow_light' ? 14 + Math.random() * 8 : 8 + Math.random() * 6,
+            maxLife: pType === 'webp_sprite' ? 18 + Math.random() * 8 : pType === 'glow_light' ? 15 + Math.random() * 8 : 10 + Math.random() * 6,
             rotation: Math.random() * Math.PI * 2,
             rotSpeed: (Math.random() - 0.5) * 0.25,
             type: pType,
-            spriteIndex: Math.floor(Math.random() * 2),
+            spriteIndex: Math.floor(Math.random() * 3),
+            seed: Math.random() * 100,
           });
         }
       }
@@ -360,51 +362,19 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
         }
       }
 
-      // 6. Hardware-Accelerated Particle Render Loop with Screen Blending
+      // 6. Hardware-Accelerated Specialized Theme Trail Background
+      renderTrailThemeBackground(ctx, item.id, trailHistory, palette, time);
+
+      // 7. Particle Render Loop with Specialized Theme Physics & Styling
       ctx.globalCompositeOperation = 'screen';
       const webpImages = webpImagesRef.current;
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.95;
-        p.vy *= 0.95;
-        p.rotation += p.rotSpeed;
-        p.life += 1;
-        const progress = p.life / p.maxLife;
-        p.alpha = Math.max(0, Math.pow(1 - progress, 1.4));
+        updateTrailParticlePhysics(p, item.id, time);
+        renderStyledTrailParticle(ctx, p, item.id, webpImages, getCachedGlowCanvas, time);
 
-        if (p.type === 'webp_sprite') {
-          const targetImg = webpImages.length > 0 ? webpImages[p.spriteIndex % webpImages.length] : null;
-          if (targetImg && targetImg.complete) {
-            const curSize = p.size * (1 - progress * 0.28);
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.rotation);
-            ctx.globalAlpha = p.alpha * 0.95;
-            // Draw tighter optical glow behind sprite
-            const glowCanvas = getCachedGlowCanvas(p.color);
-            ctx.drawImage(glowCanvas, -curSize * 0.5, -curSize * 0.5, curSize, curSize);
-            ctx.drawImage(targetImg, -curSize / 2, -curSize / 2, curSize, curSize);
-            ctx.restore();
-          }
-        } else if (p.type === 'glow_light') {
-          // CSS Glow Light: Tighter hardware-accelerated radial aura
-          const curSize = Math.max(1, p.size * (1 - progress * 0.3));
-          ctx.globalAlpha = p.alpha * 0.88;
-          const glowCanvas = getCachedGlowCanvas(p.color);
-          ctx.drawImage(glowCanvas, p.x - curSize * 0.75, p.y - curSize * 0.75, curSize * 1.5, curSize * 1.5);
-        } else {
-          // Glowing Sparks with screen blending
-          ctx.globalAlpha = p.alpha;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, Math.max(0.6, p.size * (1 - progress)), 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        if (p.life >= p.maxLife) {
+        if (p.life >= p.maxLife || p.alpha <= 0.01) {
           particles.splice(i, 1);
         }
       }
@@ -413,15 +383,15 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1.0;
 
-      // Ambient core glow under orb
-      const coreGrad = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball.radius * 1.4);
+      // Subtle ambient core glow under orb
+      const coreGrad = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball.radius * 1.1);
       coreGrad.addColorStop(0, coreColors[0]);
       coreGrad.addColorStop(0.4, coreColors[1]);
       coreGrad.addColorStop(0.8, coreColors[2]);
       coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = coreGrad;
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.radius * 1.4, 0, Math.PI * 2);
+      ctx.arc(ball.x, ball.y, ball.radius * 1.1, 0, Math.PI * 2);
       ctx.fill();
 
       // Bomb Graphic
@@ -534,24 +504,25 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
           </div>
         </div>
 
-        {/* 2 Dedicated Independent .webp Sprites & Theme Glow Light Swatches */}
+        {/* 3 Dedicated Independent .webp Sprites & Theme Glow Light Swatches */}
         {(() => {
           const details = TRAIL_PARTICLE_DETAILS[item.id] || {
-            sprites: (item.spriteImages && item.spriteImages.length >= 2
+            sprites: (item.spriteImages && item.spriteImages.length >= 3
               ? item.spriteImages
-              : TRAIL_PARTICLE_FILES[item.id] || TRAIL_WEBP_PARTICLE_SPRITES) as [string, string],
-            names: ['Particle Sprite 1', 'Particle Sprite 2'] as [string, string],
-            descriptions: ['Screen blend .webp', 'Screen blend .webp'] as [string, string],
+              : TRAIL_PARTICLE_FILES[item.id] || TRAIL_WEBP_PARTICLE_SPRITES) as [string, string, string],
+            names: ['Particle Sprite 1', 'Particle Sprite 2', 'Particle Sprite 3'] as [string, string, string],
+            descriptions: ['Screen blend .webp', 'Screen blend .webp', 'Screen blend .webp'] as [string, string, string],
             palette: palette,
           };
           const sprite1 = item.spriteImages?.[0] || details.sprites[0];
           const sprite2 = item.spriteImages?.[1] || details.sprites[1];
+          const sprite3 = item.spriteImages?.[2] || details.sprites[2];
 
           return (
             <div className="px-4 py-3 bg-neutral-950/80 border-t border-purple-500/20">
               <div className="text-[10px] font-header font-bold uppercase tracking-wider text-purple-300/80 mb-2 flex items-center justify-between">
                 <span>Trail Particle Sprites</span>
-                <span className="text-[9px] text-gray-400">2 Independent .webp Files</span>
+                <span className="text-[9px] text-gray-400">3 Particle FX Sprites</span>
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
                 {/* Sprite 1 */}
@@ -559,11 +530,11 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
                   <img
                     src={sprite1}
                     alt={details.names[0]}
-                    className="w-5 h-5 object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]"
+                    className="w-5 h-5 object-contain"
                   />
                   <div className="flex flex-col">
                     <span className="text-[9px] font-bold text-white font-header">{details.names[0]}</span>
-                    <span className="text-[7.5px] text-purple-300 uppercase">particle_1.webp</span>
+                    <span className="text-[7.5px] text-purple-300 uppercase">Primary FX</span>
                   </div>
                 </div>
 
@@ -572,13 +543,28 @@ export const TrailSimulationModal: React.FC<TrailSimulationModalProps> = ({
                   <img
                     src={sprite2}
                     alt={details.names[1]}
-                    className="w-5 h-5 object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]"
+                    className="w-5 h-5 object-contain"
                   />
                   <div className="flex flex-col">
                     <span className="text-[9px] font-bold text-white font-header">{details.names[1]}</span>
-                    <span className="text-[7.5px] text-purple-300 uppercase">particle_2.webp</span>
+                    <span className="text-[7.5px] text-purple-300 uppercase">Secondary FX</span>
                   </div>
                 </div>
+
+                {/* Sprite 3 */}
+                {sprite3 && (
+                  <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-purple-950/50 border border-purple-400/40 shrink-0 shadow-sm">
+                    <img
+                      src={sprite3}
+                      alt={details.names[2] || 'Particle Sprite 3'}
+                      className="w-5 h-5 object-contain"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-[9px] font-bold text-white font-header">{details.names[2] || 'Particle 3'}</span>
+                      <span className="text-[7.5px] text-purple-300 uppercase">Accent FX</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Theme CSS Glow Light Palette Swatches */}
                 <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-black/60 border border-white/15 shrink-0">

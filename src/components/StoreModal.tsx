@@ -197,45 +197,26 @@ export const StoreModal: React.FC<StoreModalProps> = ({
             {/* Subtle Vignette & Border Shading */}
             <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none rounded-xl" />
 
-            {/* Trail FX indicator pill */}
-            <div className="absolute top-1.5 right-1.5 z-30 flex items-center gap-1 bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-white/20 shadow-sm pointer-events-none">
-              <Sparkles className="w-2.5 h-2.5 text-amber-300 animate-pulse" />
-              <span className="text-[8px] font-header font-bold text-white tracking-widest uppercase">TRAIL</span>
-            </div>
-
-            {/* Hover / Active Preview Effect Overlay Pill */}
-            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/45 backdrop-blur-[2px] opacity-0 group-hover/trail:opacity-100 transition-opacity rounded-xl pointer-events-none">
-              <div className="px-2.5 py-1 rounded-full bg-purple-600/90 border border-purple-300/80 text-white font-header font-bold text-[9px] tracking-wider flex items-center gap-1 shadow-[0_0_15px_rgba(168,85,247,0.85)]">
-                <Play className="w-2.5 h-2.5 fill-white text-white" />
-                <span>PREVIEW FX</span>
+            {/* Hover overlay hint */}
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px] opacity-0 group-hover/trail:opacity-100 transition-opacity rounded-xl pointer-events-none">
+              <div className="w-8 h-8 rounded-full bg-purple-600/90 border border-purple-300/80 text-white flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.85)]">
+                <Play className="w-3.5 h-3.5 fill-white text-white translate-x-0.5" />
               </div>
             </div>
 
-            {/* Floating 2 .webp independent particles preview pill in bottom-left */}
-            {sprites.length >= 2 ? (
-              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1.5 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/25 shadow-sm">
-                <img
-                  src={sprites[0]}
-                  alt="Particle 1"
-                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.95)] mix-blend-screen"
-                />
-                <img
-                  src={sprites[1]}
-                  alt="Particle 2"
-                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.95)] mix-blend-screen"
-                />
-                <span className="text-[7.5px] font-bold text-slate-200 uppercase font-header tracking-wider">2× WEBP</span>
+            {/* Subtle sprite icons in bottom-left */}
+            {sprites.length > 0 && (
+              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/15">
+                {sprites.slice(0, 3).map((sprite, idx) => (
+                  <img
+                    key={idx}
+                    src={sprite}
+                    alt={`Particle ${idx + 1}`}
+                    className="w-3.5 h-3.5 object-contain"
+                  />
+                ))}
               </div>
-            ) : sprites[0] ? (
-              <div className="absolute bottom-1.5 left-1.5 z-30 pointer-events-none flex items-center gap-1 bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-white/25 shadow-sm">
-                <img
-                  src={sprites[0]}
-                  alt="GLOW FX preview"
-                  className="w-3.5 h-3.5 object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.95)] animate-pulse mix-blend-screen"
-                />
-                <span className="text-[7.5px] font-bold text-slate-200 uppercase font-header">GLOW FX</span>
-              </div>
-            ) : null}
+            )}
           </div>
         );
       }
@@ -526,22 +507,6 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                     </div>
                   )}
 
-                  {/* Dedicated Preview Effect Button for Trail items */}
-                  {item.category === 'particles' && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        SoundEngine.playButtonClick();
-                        Haptics.buttonClick();
-                        setSimulatingTrail(item);
-                      }}
-                      className="w-full mb-2 py-1 px-2 rounded-full bg-purple-500/15 hover:bg-purple-500/30 border border-purple-400/40 hover:border-purple-300 text-purple-200 hover:text-white font-header font-bold text-[10px] tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
-                    >
-                      <Play className="w-2.5 h-2.5 fill-purple-300 text-purple-300" />
-                      <span>PREVIEW EFFECT</span>
-                    </button>
-                  )}
 
                   {/* Action Button */}
                   <div>

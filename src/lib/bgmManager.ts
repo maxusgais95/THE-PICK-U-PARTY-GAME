@@ -99,21 +99,30 @@ export class BgmManager {
    */
   public static updateConfig(enabled: boolean, volume: number) {
     const wasEnabled = this.musicEnabled;
-    const oldVolume = this.musicVolume;
     this.musicEnabled = enabled;
     this.musicVolume = Math.max(0, Math.min(1, volume));
+    this.hasUserInteracted = true;
 
     this.initChannels();
 
-    if (!enabled && wasEnabled) {
-      // Smooth fade out to silence and pause
-      this.fadeOutAndPause(350);
-    } else if (enabled && !wasEnabled) {
-      // Resume current track with smooth fade in
-      this.fadeInAndResume(400);
-    } else if (enabled && this.musicVolume !== oldVolume) {
-      // Live volume adjust without disrupting crossfades
-      this.adjustCurrentVolume();
+    // Immediately update volume on both channels
+    if (this.channelA) {
+      try {
+        this.channelA.volume = (enabled && this.musicVolume > 0) ? this.musicVolume : 0;
+      } catch (e) {}
+    }
+    if (this.channelB) {
+      try {
+        this.channelB.volume = (enabled && this.musicVolume > 0) ? this.musicVolume : 0;
+      } catch (e) {}
+    }
+
+    if (!enabled || this.musicVolume === 0) {
+      this.fadeOutAndPause(200);
+    } else if (enabled && this.musicVolume > 0) {
+      if (!wasEnabled || !this.isPlaying()) {
+        this.fadeInAndResume(300);
+      }
     }
   }
 

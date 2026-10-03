@@ -35,125 +35,134 @@ import bombSamuraiImg from '../assets/images/bombs/Bomb Samurai.webp';
 import bombSonicImg from '../assets/images/bombs/Bomb Sonic.webp';
 import bombSpriteImg from '../assets/images/bombs/Bomb Sprite.webp';
 // Particle effect assets
-import particleFlameClassicImg from '../assets/images/fire_particle_blaze_1790403813873.jpg';
-import particleNeonTrailImg from '../assets/images/particle_neon_trail_1790404771555.jpg';
-import particleMusicNotesImg from '../assets/images/particle_music_notes_1790404785022.jpg';
-import particleStarSparkImg from '../assets/images/particle_star_spark_1790404799837.jpg';
-import particleGalaxyTrailImg from '../assets/images/particle_galaxy_trail_1790404812457.jpg';
-import particleSakuraImg from '../assets/images/particle_sakura_1790404826117.jpg';
-import particleElectricShockImg from '../assets/images/particle_electric_shock_1790404840369.jpg';
-import particleBlizzardIceImg from '../assets/images/particle_blizzard_ice_1790404856638.jpg';
-import particleNatureLeavesImg from '../assets/images/particle_nature_leaves_1790404868691.jpg';
+import particleFlameClassicImg from '../assets/images/particle_blaze_fire.webp';
+import particleNeonTrailImg from '../assets/images/particle_neon_trail.webp';
+import particleMusicNotesImg from '../assets/images/particle_music_notes.webp';
+import particleStarSparkImg from '../assets/images/particle_star_spark.webp';
+import particleGalaxyTrailImg from '../assets/images/particle_galaxy_trail.webp';
+import particleSakuraImg from '../assets/images/particle_sakura.webp';
+import particleElectricShockImg from '../assets/images/particle_electric_shock.webp';
+import particleBlizzardIceImg from '../assets/images/particle_blizzard_ice.webp';
+import particleNatureLeavesImg from '../assets/images/particle_nature_leaves.webp';
 import diamondStarSparkleImg from '../assets/images/diamond_star_sparkle.webp';
 import diamondStarSpriteImg from '../assets/images/diamond_star_sprite.webp';
 import musicNoteSpriteImg from '../assets/images/Music Note Sprite.webp';
 import starSpriteImg from '../assets/images/Star Sprite.webp';
 
-// 2 Independent .webp image files for each trail particle effect (18 independent files)
+// 3 Independent .webp image files for each trail particle effect (27 independent files)
 import classicP1 from '../assets/images/trails/classic/particle_1.webp';
 import classicP2 from '../assets/images/trails/classic/particle_2.webp';
+import classicP3 from '../assets/images/trails/classic/particle_3.webp';
 
 import neonP1 from '../assets/images/trails/neon/particle_1.webp';
 import neonP2 from '../assets/images/trails/neon/particle_2.webp';
+import neonP3 from '../assets/images/trails/neon/particle_3.webp';
 
 import musicP1 from '../assets/images/trails/music/particle_1.webp';
 import musicP2 from '../assets/images/trails/music/particle_2.webp';
+import musicP3 from '../assets/images/trails/music/particle_3.webp';
 
 import starP1 from '../assets/images/trails/star/particle_1.webp';
 import starP2 from '../assets/images/trails/star/particle_2.webp';
+import starP3 from '../assets/images/trails/star/particle_3.webp';
 
 import galaxyP1 from '../assets/images/trails/galaxy/particle_1.webp';
 import galaxyP2 from '../assets/images/trails/galaxy/particle_2.webp';
+import galaxyP3 from '../assets/images/trails/galaxy/particle_3.webp';
 
 import sakuraP1 from '../assets/images/trails/sakura/particle_1.webp';
 import sakuraP2 from '../assets/images/trails/sakura/particle_2.webp';
+import sakuraP3 from '../assets/images/trails/sakura/particle_3.webp';
 
 import electricP1 from '../assets/images/trails/electric/particle_1.webp';
 import electricP2 from '../assets/images/trails/electric/particle_2.webp';
+import electricP3 from '../assets/images/trails/electric/particle_3.webp';
 
 import blizzardP1 from '../assets/images/trails/blizzard/particle_1.webp';
 import blizzardP2 from '../assets/images/trails/blizzard/particle_2.webp';
+import blizzardP3 from '../assets/images/trails/blizzard/particle_3.webp';
 
 import natureP1 from '../assets/images/trails/nature/particle_1.webp';
 import natureP2 from '../assets/images/trails/nature/particle_2.webp';
+import natureP3 from '../assets/images/trails/nature/particle_3.webp';
 
-export const TRAIL_PARTICLE_FILES: Record<string, [string, string]> = {
-  particle_classic_blaze: [classicP1, classicP2],
-  particle_neon_trail: [neonP1, neonP2],
-  particle_music_notes: [musicP1, musicP2],
-  particle_star_spark: [starP1, starP2],
-  particle_galaxy_trail: [galaxyP1, galaxyP2],
-  particle_sakura: [sakuraP1, sakuraP2],
-  particle_electric_shock: [electricP1, electricP2],
-  particle_blizzard_ice: [blizzardP1, blizzardP2],
-  particle_nature_leaves: [natureP1, natureP2],
+export const TRAIL_PARTICLE_FILES: Record<string, [string, string, string]> = {
+  particle_classic_blaze: [classicP1, classicP2, classicP3],
+  particle_neon_trail: [neonP1, neonP2, neonP3],
+  particle_music_notes: [musicP1, musicP2, musicP3],
+  particle_star_spark: [starP1, starP2, starP3],
+  particle_galaxy_trail: [galaxyP1, galaxyP2, galaxyP3],
+  particle_sakura: [sakuraP1, sakuraP2, sakuraP3],
+  particle_electric_shock: [electricP1, electricP2, electricP3],
+  particle_blizzard_ice: [blizzardP1, blizzardP2, blizzardP3],
+  particle_nature_leaves: [natureP1, natureP2, natureP3],
 };
 
 export interface TrailParticleDetails {
-  sprites: [string, string];
-  names: [string, string];
-  descriptions: [string, string];
+  sprites: [string, string, string];
+  names: [string, string, string];
+  descriptions: [string, string, string];
   palette: string[];
 }
 
 export const TRAIL_PARTICLE_DETAILS: Record<string, TrailParticleDetails> = {
   particle_classic_blaze: {
-    sprites: [classicP1, classicP2],
-    names: ['Phoenix Flame', 'Blaze Ember'],
-    descriptions: ['Incandescent fire burst', 'Radiant burning cinder'],
+    sprites: [classicP1, classicP2, classicP3],
+    names: ['Phoenix Flame', 'Blaze Ember', 'Inferno Spark'],
+    descriptions: ['Incandescent fire burst', 'Radiant burning cinder', 'Golden searing fireball flare'],
     palette: ['#ff7043', '#ffee58', '#e53935'],
   },
   particle_neon_trail: {
-    sprites: [neonP1, neonP2],
-    names: ['Cyber Rhombus', 'Magenta Pulse Ring'],
-    descriptions: ['High-speed cyan laser diamond', 'Neon overdrive wave'],
+    sprites: [neonP1, neonP2, neonP3],
+    names: ['Cyber Rhombus', 'Magenta Pulse Ring', 'Hex Cyber Shard'],
+    descriptions: ['High-speed cyan laser diamond', 'Neon overdrive wave', 'Luminous hyper-neon geometric spark'],
     palette: ['#00e5ff', '#ff4081', '#00b0ff'],
   },
   particle_music_notes: {
-    sprites: [musicP1, musicP2],
-    names: ['Eighth Note', 'Equalizer Beat'],
-    descriptions: ['Luminous melodic stave note', 'Pulsing dance floor bar'],
+    sprites: [musicP1, musicP2, musicP3],
+    names: ['Eighth Note', 'Equalizer Beat', 'Treble Clef Beam'],
+    descriptions: ['Luminous melodic stave note', 'Pulsing dance floor bar', 'Resonating harmonic pitch wave'],
     palette: ['#d946ef', '#38bdf8', '#a855f7'],
   },
   particle_star_spark: {
-    sprites: [starP1, starP2],
-    names: ['Diamond Starlight', 'Celestial Flare'],
-    descriptions: ['4-point glittering star', '8-point supernova prism'],
+    sprites: [starP1, starP2, starP3],
+    names: ['Diamond Starlight', 'Celestial Flare', 'Cosmic Twinkle Gem'],
+    descriptions: ['4-point glittering star', '8-point supernova prism', 'Cross-glinting golden sparkle gem'],
     palette: ['#fbbf24', '#f59e0b', '#fef08a'],
   },
   particle_galaxy_trail: {
-    sprites: [galaxyP1, galaxyP2],
-    names: ['Spiral Vortex', 'Astral Nebula'],
-    descriptions: ['Cosmic vortex cluster', 'Interstellar dust flare'],
+    sprites: [galaxyP1, galaxyP2, galaxyP3],
+    names: ['Spiral Vortex', 'Astral Nebula', 'Pulsar Astral Core'],
+    descriptions: ['Cosmic vortex cluster', 'Interstellar dust flare', 'Deep violet cosmic ray orb'],
     palette: ['#c084fc', '#818cf8', '#6366f1'],
   },
   particle_sakura: {
-    sprites: [sakuraP1, sakuraP2],
-    names: ['Sakura Petal', 'Cherry Bloom'],
-    descriptions: ['Graceful drifting petal', 'Luminous 5-petal flower'],
+    sprites: [sakuraP1, sakuraP2, sakuraP3],
+    names: ['Sakura Petal', 'Cherry Bloom', 'Blossom Bud Cluster'],
+    descriptions: ['Graceful drifting petal', 'Luminous 5-petal flower', 'Twin fluttering rosebud petals'],
     palette: ['#f472b6', '#fbcfe8', '#db2777'],
   },
   particle_electric_shock: {
-    sprites: [electricP1, electricP2],
-    names: ['Lightning Bolt', 'Tesla Plasma'],
-    descriptions: ['Zigzag electric arc', 'High-voltage kinetic spark'],
+    sprites: [electricP1, electricP2, electricP3],
+    names: ['Lightning Bolt', 'Tesla Plasma', 'Plasma Thunder Orb'],
+    descriptions: ['Zigzag electric arc', 'High-voltage kinetic spark', 'Concentrated cyan plasma sphere'],
     palette: ['#67e8f9', '#3b82f6', '#06b6d4'],
   },
   particle_blizzard_ice: {
-    sprites: [blizzardP1, blizzardP2],
-    names: ['Snowflake Crystal', 'Glacial Ice Prism'],
-    descriptions: ['Hexagonal frost crystal', 'Faceted diamond ice shard'],
+    sprites: [blizzardP1, blizzardP2, blizzardP3],
+    names: ['Snowflake Crystal', 'Glacial Ice Prism', 'Frost Needle Star'],
+    descriptions: ['Hexagonal frost crystal', 'Faceted diamond ice shard', 'Sub-zero frozen needle star'],
     palette: ['#38bdf8', '#bae6fd', '#0284c7'],
   },
   particle_nature_leaves: {
-    sprites: [natureP1, natureP2],
-    names: ['Emerald Leaf', 'Spirit Firefly'],
-    descriptions: ['Enchanted forest foliage', 'Bioluminescent spirit glow'],
+    sprites: [natureP1, natureP2, natureP3],
+    names: ['Emerald Leaf', 'Spirit Firefly', 'Mystic Clover Sprout'],
+    descriptions: ['Enchanted forest foliage', 'Bioluminescent spirit glow', 'Gleaming 3-leaf lucky clover'],
     palette: ['#34d399', '#fef08a', '#10b981'],
   },
 };
 
-export const TRAIL_WEBP_PARTICLE_SPRITES: string[] = [classicP1, classicP2];
+export const TRAIL_WEBP_PARTICLE_SPRITES: string[] = [classicP1, classicP2, classicP3];
 
 // WebP sprite assets for all trail themes
 import btlE1Img from '../assets/images/Btl_E_001.webp';
@@ -641,7 +650,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-orange-500/60 shadow-[0_0_15px_rgba(249,115,22,0.4)]',
       iconType: 'particle',
       image: particleFlameClassicImg,
-      spriteImages: [classicP1, classicP2],
+      spriteImages: [classicP1, classicP2, classicP3],
     },
     {
       id: 'particle_neon_trail',
@@ -656,7 +665,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-cyan-400/60 shadow-[0_0_18px_rgba(6,182,212,0.5)]',
       iconType: 'particle',
       image: particleNeonTrailImg,
-      spriteImages: [neonP1, neonP2],
+      spriteImages: [neonP1, neonP2, neonP3],
     },
     {
       id: 'particle_music_notes',
@@ -671,7 +680,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-purple-400/60 shadow-[0_0_18px_rgba(168,85,247,0.5)]',
       iconType: 'particle',
       image: particleMusicNotesImg,
-      spriteImages: [musicP1, musicP2],
+      spriteImages: [musicP1, musicP2, musicP3],
     },
     {
       id: 'particle_star_spark',
@@ -686,7 +695,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-amber-300/70 shadow-[0_0_20px_rgba(251,191,36,0.6)]',
       iconType: 'particle',
       image: particleStarSparkImg,
-      spriteImages: [starP1, starP2],
+      spriteImages: [starP1, starP2, starP3],
     },
     {
       id: 'particle_galaxy_trail',
@@ -701,7 +710,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-indigo-400/70 shadow-[0_0_20px_rgba(99,102,241,0.6)]',
       iconType: 'particle',
       image: particleGalaxyTrailImg,
-      spriteImages: [galaxyP1, galaxyP2],
+      spriteImages: [galaxyP1, galaxyP2, galaxyP3],
     },
     {
       id: 'particle_sakura',
@@ -716,7 +725,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-pink-300/70 shadow-[0_0_18px_rgba(244,114,182,0.6)]',
       iconType: 'particle',
       image: particleSakuraImg,
-      spriteImages: [sakuraP1, sakuraP2],
+      spriteImages: [sakuraP1, sakuraP2, sakuraP3],
     },
     {
       id: 'particle_electric_shock',
@@ -731,7 +740,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-cyan-300/80 shadow-[0_0_22px_rgba(34,211,238,0.7)]',
       iconType: 'particle',
       image: particleElectricShockImg,
-      spriteImages: [electricP1, electricP2],
+      spriteImages: [electricP1, electricP2, electricP3],
     },
     {
       id: 'particle_blizzard_ice',
@@ -746,7 +755,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-sky-300/80 shadow-[0_0_22px_rgba(56,189,248,0.7)]',
       iconType: 'particle',
       image: particleBlizzardIceImg,
-      spriteImages: [blizzardP1, blizzardP2],
+      spriteImages: [blizzardP1, blizzardP2, blizzardP3],
     },
     {
       id: 'particle_nature_leaves',
@@ -761,7 +770,7 @@ export const DEFAULT_STORE_CATALOGUE: Record<StoreCategory, StoreItem[]> = {
       borderGlow: 'border-emerald-400/70 shadow-[0_0_20px_rgba(52,211,153,0.6)]',
       iconType: 'particle',
       image: particleNatureLeavesImg,
-      spriteImages: [natureP1, natureP2],
+      spriteImages: [natureP1, natureP2, natureP3],
     },
   ],
   accessories: [

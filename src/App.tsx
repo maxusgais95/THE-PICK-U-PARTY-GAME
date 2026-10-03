@@ -535,6 +535,8 @@ export default function App() {
           (currentView === 'pong' && isPongInCourt) ||
           (currentView === 'kaboom' && isKaboomInGame)
         }
+        isPongInCourt={isPongInCourt}
+        isKaboomInGame={isKaboomInGame}
         onBack={() => {
           window.dispatchEvent(new CustomEvent('picku_game_back'));
         }}

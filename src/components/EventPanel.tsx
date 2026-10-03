@@ -92,23 +92,28 @@ export const EventPanel: React.FC<EventPanelProps> = ({ onOpenEvents }) => {
       id="main-hub-event-panel-btn"
       onClick={handleClick}
       aria-label={`Open ${primaryEvent.title} Event`}
-      className={`group relative flex flex-col justify-center px-3 py-2 rounded-[18px] bg-black/55 backdrop-blur-md border border-fuchsia-500/40 shadow-[0_0_18px_rgba(217,70,239,0.3)] hover:border-fuchsia-400 active:scale-95 transition-all text-left w-[110px] sm:w-[124px] cursor-pointer pointer-events-auto select-none overflow-hidden ${
+      className={`group relative flex flex-col justify-center px-3 py-2 rounded-[18px] bg-black/55 backdrop-blur-md border border-fuchsia-500/40 shadow-[0_0_18px_rgba(217,70,239,0.3)] hover:border-fuchsia-400 active:scale-95 transition-all text-left w-[110px] sm:w-[124px] cursor-pointer pointer-events-auto select-none ${
         hasClaimable ? 'animate-glow-pulse' : ''
       }`}
     >
-      {/* Background Ambience Tint */}
-      <div
-        className="absolute -inset-1 opacity-20 pointer-events-none group-hover:opacity-35 transition-opacity"
-        style={{
-          background: `radial-gradient(circle at top right, ${
-            primaryEvent.accentColor || '#d946ef'
-          }, transparent 70%)`,
-        }}
-      />
+      {/* Subtle Ambient Outer Glow */}
+      <div className="absolute -inset-0.5 rounded-[18px] bg-fuchsia-500/10 blur-sm pointer-events-none group-hover:bg-fuchsia-500/25 transition-all" />
 
-      {/* Unclaimed Milestone Ping */}
+      {/* Background Ambience Tint Clipped Cleanly to Rounded Corner */}
+      <div className="absolute inset-0 rounded-[18px] overflow-hidden pointer-events-none">
+        <div
+          className="absolute -inset-1 opacity-20 group-hover:opacity-35 transition-opacity"
+          style={{
+            background: `radial-gradient(circle at top right, ${
+              primaryEvent.accentColor || '#d946ef'
+            }, transparent 70%)`,
+          }}
+        />
+      </div>
+
+      {/* Unclaimed Milestone Notification Ping Indicator (Floats outside corner without clipping) */}
       {hasClaimable && (
-        <span className="absolute -top-1 -right-1 flex h-3 w-3 z-20">
+        <span className="absolute -top-1 -right-1 flex h-3 w-3 z-30 pointer-events-none">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-400 border-2 border-black" />
         </span>
@@ -116,17 +121,17 @@ export const EventPanel: React.FC<EventPanelProps> = ({ onOpenEvents }) => {
 
       {/* Top Header Row: LIVE Badge & Icon */}
       <div className="relative z-10 flex items-center justify-between w-full mb-1">
-        <div className="flex items-center gap-1">
-          <span className="relative flex h-1.5 w-1.5">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="relative flex h-2 w-2 shrink-0 items-center justify-center">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400 shadow-[0_0_6px_#34d399]" />
           </span>
-          <span className="text-[9px] font-black uppercase tracking-wider text-fuchsia-300 drop-shadow-[0_0_6px_rgba(217,70,239,0.8)]">
+          <span className="text-[9px] font-black uppercase tracking-wider text-fuchsia-300 drop-shadow-[0_0_6px_rgba(217,70,239,0.8)] truncate">
             LIVE EVENT
           </span>
         </div>
 
-        <div className="relative flex items-center justify-center text-amber-400">
+        <div className="relative flex items-center justify-center text-amber-400 shrink-0">
           {primaryEvent.eventType === 'connected' ? (
             <Zap className="w-3.5 h-3.5 text-amber-300 group-hover:scale-115 transition-transform" />
           ) : (

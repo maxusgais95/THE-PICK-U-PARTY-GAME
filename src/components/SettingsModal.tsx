@@ -301,11 +301,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      const nextSfx = !(settings.sfxEnabled ?? settings.soundEnabled);
-                      onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx });
+                      const currentSfx = settings.sfxEnabled ?? settings.soundEnabled;
+                      const nextSfx = !currentSfx;
+                      const currentVol = settings.sfxVolume ?? settings.soundVolume;
+                      const nextVol = nextSfx ? (currentVol === 0 ? 0.8 : currentVol) : 0;
+                      onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx, sfxVolume: nextVol, soundVolume: nextVol });
                       SoundEngine.updateConfig(
                         nextSfx,
-                        settings.sfxVolume ?? settings.soundVolume,
+                        nextVol,
                         settings.hapticsEnabled,
                         settings.musicEnabled ?? true,
                         settings.musicVolume ?? 0.7
@@ -357,11 +360,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        const nextSfx = !(settings.sfxEnabled ?? settings.soundEnabled);
-                        onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx });
+                        const currentSfx = settings.sfxEnabled ?? settings.soundEnabled;
+                        const nextSfx = !currentSfx;
+                        const currentVol = settings.sfxVolume ?? settings.soundVolume;
+                        const nextVol = nextSfx ? (currentVol === 0 ? 0.8 : currentVol) : 0;
+                        onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx, sfxVolume: nextVol, soundVolume: nextVol });
                         SoundEngine.updateConfig(
                           nextSfx,
-                          settings.sfxVolume ?? settings.soundVolume,
+                          nextVol,
                           settings.hapticsEnabled,
                           settings.musicEnabled ?? true,
                           settings.musicVolume ?? 0.7
@@ -397,24 +403,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   min="0"
                   max="1"
                   step="0.05"
-                  disabled={!(settings.sfxEnabled ?? settings.soundEnabled)}
-                  value={(settings.sfxEnabled ?? settings.soundEnabled) ? (settings.sfxVolume ?? settings.soundVolume) : 0}
+                  value={settings.sfxVolume ?? settings.soundVolume}
                   onChange={(e) => {
                     const vol = parseFloat(e.target.value);
-                    onUpdateSettings({ sfxVolume: vol, soundVolume: vol });
+                    const shouldEnable = vol > 0;
+                    onUpdateSettings({
+                      sfxVolume: vol,
+                      soundVolume: vol,
+                      sfxEnabled: shouldEnable,
+                      soundEnabled: shouldEnable,
+                    });
                     SoundEngine.updateConfig(
-                      settings.sfxEnabled ?? settings.soundEnabled,
+                      shouldEnable,
                       vol,
                       settings.hapticsEnabled,
                       settings.musicEnabled ?? true,
                       settings.musicVolume ?? 0.7
                     );
                   }}
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer transition-opacity ${
-                    (settings.sfxEnabled ?? settings.soundEnabled)
-                      ? 'bg-gray-800 accent-cyan-400 opacity-100'
-                      : 'bg-gray-800/50 accent-gray-500 opacity-40 cursor-not-allowed'
-                  }`}
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-800 accent-cyan-400 opacity-100 transition-opacity"
                 />
               </div>
 
@@ -424,16 +431,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      const nextMusic = !(settings.musicEnabled ?? true);
-                      onUpdateSettings({ musicEnabled: nextMusic });
+                      const currentMusic = settings.musicEnabled ?? true;
+                      const nextMusic = !currentMusic;
+                      const currentMusicVol = settings.musicVolume ?? 0.7;
+                      const nextMusicVol = nextMusic ? (currentMusicVol === 0 ? 0.7 : currentMusicVol) : 0;
+                      onUpdateSettings({ musicEnabled: nextMusic, musicVolume: nextMusicVol });
                       SoundEngine.updateConfig(
                         settings.sfxEnabled ?? settings.soundEnabled,
                         settings.sfxVolume ?? settings.soundVolume,
                         settings.hapticsEnabled,
                         nextMusic,
-                        settings.musicVolume ?? 0.7
+                        nextMusicVol
                       );
-                      if (settings.sfxEnabled ?? settings.soundEnabled) {
+                      if (nextMusic && (settings.sfxEnabled ?? settings.soundEnabled)) {
                         SoundEngine.playButtonClick();
                       }
                     }}
@@ -480,16 +490,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        const nextMusic = !(settings.musicEnabled ?? true);
-                        onUpdateSettings({ musicEnabled: nextMusic });
+                        const currentMusic = settings.musicEnabled ?? true;
+                        const nextMusic = !currentMusic;
+                        const currentMusicVol = settings.musicVolume ?? 0.7;
+                        const nextMusicVol = nextMusic ? (currentMusicVol === 0 ? 0.7 : currentMusicVol) : 0;
+                        onUpdateSettings({ musicEnabled: nextMusic, musicVolume: nextMusicVol });
                         SoundEngine.updateConfig(
                           settings.sfxEnabled ?? settings.soundEnabled,
                           settings.sfxVolume ?? settings.soundVolume,
                           settings.hapticsEnabled,
                           nextMusic,
-                          settings.musicVolume ?? 0.7
+                          nextMusicVol
                         );
-                        if (settings.sfxEnabled ?? settings.soundEnabled) {
+                        if (nextMusic && (settings.sfxEnabled ?? settings.soundEnabled)) {
                           SoundEngine.playButtonClick();
                         }
                       }}
@@ -520,24 +533,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   min="0"
                   max="1"
                   step="0.05"
-                  disabled={!(settings.musicEnabled ?? true)}
-                  value={(settings.musicEnabled ?? true) ? (settings.musicVolume ?? 0.7) : 0}
+                  value={settings.musicVolume ?? 0.7}
                   onChange={(e) => {
                     const vol = parseFloat(e.target.value);
-                    onUpdateSettings({ musicVolume: vol });
+                    const shouldEnable = vol > 0;
+                    onUpdateSettings({
+                      musicVolume: vol,
+                      musicEnabled: shouldEnable,
+                    });
                     SoundEngine.updateConfig(
                       settings.sfxEnabled ?? settings.soundEnabled,
                       settings.sfxVolume ?? settings.soundVolume,
                       settings.hapticsEnabled,
-                      settings.musicEnabled ?? true,
+                      shouldEnable,
                       vol
                     );
                   }}
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer transition-opacity ${
-                    (settings.musicEnabled ?? true)
-                      ? 'bg-gray-800 accent-pink-500 opacity-100'
-                      : 'bg-gray-800/50 accent-gray-500 opacity-40 cursor-not-allowed'
-                  }`}
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-800 accent-pink-500 opacity-100 transition-opacity"
                 />
               </div>
 

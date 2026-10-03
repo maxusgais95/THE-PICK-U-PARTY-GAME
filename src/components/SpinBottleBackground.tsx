@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef, useMemo, useState } from 'react';
-import spectrumVideo from '../assets/videos/Neon DJ Disc Background Animation.mp4';
+import spectrumVideo from '../assets/videos/Neon DJ Disc Background Animation.mov';
 import { getAssetUrl } from '../lib/assetPreloader';
 import { ThemeId } from '../types';
 import { THEMES } from '../lib/themes';
@@ -446,7 +446,7 @@ export const SpinBottleBackground: React.FC<SpinBottleBackgroundProps> = ({
 
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none flex items-center justify-center">
-      {/* 1. Animated Video Background: Music Visualizer Spectrum Circle Animated.mp4 (Crystal clear, vivid neon) */}
+      {/* 1. Animated Video Background: Neon DJ Disc Background Animation.webm (Crystal clear, vivid neon) */}
       <video
         ref={videoRef}
         src={getAssetUrl(spectrumVideo)}

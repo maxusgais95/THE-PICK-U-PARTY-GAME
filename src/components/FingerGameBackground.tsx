@@ -109,7 +109,7 @@ export const FingerGameBackground: React.FC<FingerGameBackgroundProps> = ({
       className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none bg-black"
       style={{ backgroundColor: currentTheme.bgBase }}
     >
-      {/* 1. Static Image Background: Finger Roulette Background.jpg */}
+      {/* 1. Static Image Background: Finger Roulette Background.webp */}
       {/* Active during idle and enabled back when video ends / round resolves */}
       <img
         src={getAssetUrl(rouletteBgImage)}
@@ -126,7 +126,7 @@ export const FingerGameBackground: React.FC<FingerGameBackgroundProps> = ({
       <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/65 via-black/25 to-transparent pointer-events-none z-[1]" />
 
-      {/* 3. Animated Video Background: Finger Roulette Background Animation.mp4 */}
+      {/* 3. Animated Video Background: Finger Roulette Background Animation.webm */}
       {/* Enabled when all players place their fingers, plays until finished, then disabled */}
       <video
         ref={videoRef}

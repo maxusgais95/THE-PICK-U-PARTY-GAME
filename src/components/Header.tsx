@@ -20,6 +20,8 @@ interface HeaderProps {
   onBack?: () => void;
   onRestart?: () => void;
   showGameActionButtons?: boolean;
+  isPongInCourt?: boolean;
+  isKaboomInGame?: boolean;
   onOpenSettings: (tab?: 'game' | 'bottle' | 'stats') => void;
   onOpenStore?: () => void;
   onOpenInfo?: () => void;
@@ -42,6 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
   onBack,
   onRestart,
   showGameActionButtons = false,
+  isPongInCourt = false,
+  isKaboomInGame = false,
   onOpenSettings,
   onOpenStore,
   onOpenInfo,
@@ -58,6 +62,11 @@ export const Header: React.FC<HeaderProps> = ({
   const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
   const [supportsFullscreen, setSupportsFullscreen] = React.useState<boolean>(true);
   const currentTheme = THEMES[settings.theme] || THEMES['cyber-neon'];
+
+  // Mode/grid selection screens: Pong battle mode select or Kaboom bomb grid select
+  const isSelectionScreen =
+    (currentView === 'pong' && !isPongInCourt) ||
+    (currentView === 'kaboom' && !isKaboomInGame);
 
   React.useEffect(() => {
     const doc = document as any;
@@ -232,8 +241,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Ball Skin Quick Switcher in Kaboom Mode */}
-        {currentView === 'kaboom' && onToggleBallSkin && (
+        {/* Ball Skin Quick Switcher in Kaboom Mode ONLY during gameplay */}
+        {currentView === 'kaboom' && isKaboomInGame && onToggleBallSkin && (
           <button
             onClick={() => {
               SoundEngine.playButtonClick();
@@ -248,8 +257,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Fullscreen Button (in game modes) */}
-        {currentView !== 'hub' && supportsFullscreen && (
+        {/* Fullscreen Button (in game modes, hidden in mode/grid selection pages) */}
+        {currentView !== 'hub' && !isSelectionScreen && supportsFullscreen && (
           <button
             onClick={toggleFullscreen}
             aria-label="Toggle Fullscreen"
@@ -263,8 +272,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Bomb Skin Quick Switcher in Kaboom & Bomb Pong Mode */}
-        {(currentView === 'kaboom' || currentView === 'pong') && onToggleBombSkin && (
+        {/* Bomb Skin Quick Switcher in Kaboom & Bomb Pong Mode ONLY during gameplay */}
+        {((currentView === 'kaboom' && isKaboomInGame) || (currentView === 'pong' && isPongInCourt)) && onToggleBombSkin && (
           <button
             onClick={() => {
               SoundEngine.playButtonClick();
@@ -279,8 +288,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Particle Trail Skin Quick Switcher in Pong Mode ONLY (Cycles purchased trail effects) */}
-        {currentView === 'pong' && onToggleParticleSkin && (
+        {/* Particle Trail Skin Quick Switcher in Pong Mode ONLY during gameplay (Cycles purchased trail effects) */}
+        {currentView === 'pong' && isPongInCourt && onToggleParticleSkin && (
           <button
             onClick={() => {
               SoundEngine.playButtonClick();
@@ -295,8 +304,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Game Guide Button - Immediately next to Bomb Skin */}
-        {(onOpenGuide || onOpenInfo) && (
+        {/* Game Guide Button - Hidden on battle mode and bomb grid selection pages */}
+        {(onOpenGuide || onOpenInfo) && !isSelectionScreen && (
           <button
             onClick={() => {
               SoundEngine.playButtonClick();
