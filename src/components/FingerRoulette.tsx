@@ -23,54 +23,104 @@ interface FingerRouletteProps {
 // (blue cyan, magenta red, purple blue, orange red, red yellow)
 export const HOLOGRAPHIC_TARGET_PALETTES = [
   {
-    name: 'Blue Cyan',
-    primary: '#00f0ff',
-    secondary: '#0066ff',
-    ringColor: '#00f0ff',
-    accent: '#38bdf8',
-    glow: 'rgba(0, 240, 255, 0.85)',
-    subGlow: 'rgba(0, 102, 255, 0.55)',
-    gradient: 'linear-gradient(135deg, #0066ff, #00f0ff)',
+    name: 'Pastel Sky',
+    primary: '#38bdf8',
+    secondary: '#bae6fd',
+    ringColor: '#7dd3fc',
+    accent: '#e0f2fe',
+    glow: 'rgba(125, 211, 252, 0.35)',
+    subGlow: 'rgba(186, 230, 253, 0.25)',
+    gradient: 'linear-gradient(135deg, #7dd3fc, #bae6fd)',
   },
   {
-    name: 'Magenta Red',
-    primary: '#ff007f',
-    secondary: '#ff1744',
-    ringColor: '#ff007f',
-    accent: '#f43f5e',
-    glow: 'rgba(255, 0, 127, 0.85)',
-    subGlow: 'rgba(255, 23, 68, 0.55)',
-    gradient: 'linear-gradient(135deg, #ff007f, #ff1744)',
+    name: 'Pastel Rose',
+    primary: '#f472b6',
+    secondary: '#fbcfe8',
+    ringColor: '#f472b6',
+    accent: '#fdf2f8',
+    glow: 'rgba(244, 114, 182, 0.35)',
+    subGlow: 'rgba(251, 207, 232, 0.25)',
+    gradient: 'linear-gradient(135deg, #f472b6, #fbcfe8)',
   },
   {
-    name: 'Purple Blue',
-    primary: '#a855f7',
-    secondary: '#3b82f6',
+    name: 'Pastel Lavender',
+    primary: '#c084fc',
+    secondary: '#e9d5ff',
     ringColor: '#c084fc',
-    accent: '#818cf8',
-    glow: 'rgba(168, 85, 247, 0.85)',
-    subGlow: 'rgba(59, 130, 246, 0.55)',
-    gradient: 'linear-gradient(135deg, #a855f7, #3b82f6)',
+    accent: '#faf5ff',
+    glow: 'rgba(192, 132, 252, 0.35)',
+    subGlow: 'rgba(233, 213, 255, 0.25)',
+    gradient: 'linear-gradient(135deg, #c084fc, #e9d5ff)',
   },
   {
-    name: 'Orange Red',
-    primary: '#ff6a00',
-    secondary: '#ff2200',
-    ringColor: '#ff7700',
-    accent: '#fb923c',
-    glow: 'rgba(255, 106, 0, 0.85)',
-    subGlow: 'rgba(255, 34, 0, 0.55)',
-    gradient: 'linear-gradient(135deg, #ff7a00, #ff1e00)',
+    name: 'Pastel Peach',
+    primary: '#fb923c',
+    secondary: '#fed7aa',
+    ringColor: '#fb923c',
+    accent: '#fff7ed',
+    glow: 'rgba(251, 146, 60, 0.35)',
+    subGlow: 'rgba(254, 215, 170, 0.25)',
+    gradient: 'linear-gradient(135deg, #fb923c, #fed7aa)',
   },
   {
-    name: 'Red Yellow',
-    primary: '#ff1744',
-    secondary: '#ffd000',
-    ringColor: '#ffd000',
-    accent: '#facc15',
-    glow: 'rgba(255, 208, 0, 0.85)',
-    subGlow: 'rgba(255, 23, 68, 0.55)',
-    gradient: 'linear-gradient(135deg, #ff1744, #ffd000)',
+    name: 'Pastel Mint',
+    primary: '#34d399',
+    secondary: '#a7f3d0',
+    ringColor: '#34d399',
+    accent: '#ecfdf5',
+    glow: 'rgba(52, 211, 153, 0.35)',
+    subGlow: 'rgba(167, 243, 208, 0.25)',
+    gradient: 'linear-gradient(135deg, #34d399, #a7f3d0)',
+  },
+  {
+    name: 'Pastel Buttercup',
+    primary: '#facc15',
+    secondary: '#fef08a',
+    ringColor: '#facc15',
+    accent: '#fefce8',
+    glow: 'rgba(250, 204, 21, 0.35)',
+    subGlow: 'rgba(254, 240, 138, 0.25)',
+    gradient: 'linear-gradient(135deg, #facc15, #fef08a)',
+  },
+  {
+    name: 'Pastel Lilac',
+    primary: '#e879f9',
+    secondary: '#f5d0fe',
+    ringColor: '#e879f9',
+    accent: '#fdf4ff',
+    glow: 'rgba(232, 121, 249, 0.35)',
+    subGlow: 'rgba(245, 208, 254, 0.25)',
+    gradient: 'linear-gradient(135deg, #e879f9, #f5d0fe)',
+  },
+  {
+    name: 'Pastel Periwinkle',
+    primary: '#818cf8',
+    secondary: '#c7d2fe',
+    ringColor: '#818cf8',
+    accent: '#eef2ff',
+    glow: 'rgba(129, 140, 248, 0.35)',
+    subGlow: 'rgba(199, 210, 254, 0.25)',
+    gradient: 'linear-gradient(135deg, #818cf8, #c7d2fe)',
+  },
+  {
+    name: 'Pastel Aqua',
+    primary: '#2dd4bf',
+    secondary: '#99f6e4',
+    ringColor: '#2dd4bf',
+    accent: '#f0fdfa',
+    glow: 'rgba(45, 212, 191, 0.35)',
+    subGlow: 'rgba(153, 246, 228, 0.25)',
+    gradient: 'linear-gradient(135deg, #2dd4bf, #99f6e4)',
+  },
+  {
+    name: 'Pastel Coral',
+    primary: '#fb7185',
+    secondary: '#fecdd3',
+    ringColor: '#fb7185',
+    accent: '#fff1f2',
+    glow: 'rgba(251, 113, 133, 0.35)',
+    subGlow: 'rgba(254, 205, 211, 0.25)',
+    gradient: 'linear-gradient(135deg, #fb7185, #fecdd3)',
   },
 ];
 
@@ -88,12 +138,13 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
   // Game state: 'waiting' | 'countdown' | 'resolved'
   const [gameState, setGameState] = useState<'waiting' | 'countdown' | 'resolved'>('waiting');
   const [isResultLocked, setIsResultLocked] = useState<boolean>(false);
-  const [countdownNum, setCountdownNum] = useState<number>(settings.countdownSeconds);
+  const [countdownRemaining, setCountdownRemaining] = useState<number>(settings.countdownSeconds);
   const [touches, setTouches] = useState<Map<string | number, TouchPlayer>>(new Map());
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const touchesRef = useRef<Map<string | number, TouchPlayer>>(new Map());
   const indicatorRefs = useRef<Map<string | number, HTMLDivElement>>(new Map());
+  const innerRefs = useRef<Map<string | number, HTMLDivElement>>(new Map());
   const moveRafPendingRef = useRef<boolean>(false);
   const countdownIntervalRef = useRef<number | null>(null);
   const resultUnlockTimerRef = useRef<number | null>(null);
@@ -141,12 +192,14 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
     gameStateRef.current = 'waiting';
     setGameState('waiting');
     onGameStateChangeRef.current?.('waiting');
+    setCountdownRemaining(settings.countdownSeconds);
     touchesRef.current.clear();
     indicatorRefs.current.clear();
+    innerRefs.current.clear();
     setTouches(new Map());
     availableColorsRef.current = [...INITIAL_COLOR_INDICES];
     notifyTouches(new Map());
-  }, [notifyTouches]);
+  }, [notifyTouches, settings.countdownSeconds]);
 
   // Resolve outcome (pick targetCount losers)
   const resolveRound = useCallback(() => {
@@ -237,7 +290,7 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
         gameStateRef.current = 'countdown';
         setGameState('countdown');
         onGameStateChangeRef.current?.('countdown');
-        setCountdownNum(settings.countdownSeconds);
+        setCountdownRemaining(settings.countdownSeconds);
         SoundEngine.playCountdownTick(settings.countdownSeconds, settings.countdownSeconds);
 
         let currentVal = settings.countdownSeconds;
@@ -246,7 +299,7 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
         countdownIntervalRef.current = window.setInterval(() => {
           currentVal -= 1;
           if (currentVal > 0) {
-            setCountdownNum(currentVal);
+            setCountdownRemaining(currentVal);
             SoundEngine.playCountdownTick(currentVal, settings.countdownSeconds);
           } else {
             resolveRound();
@@ -257,6 +310,7 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
       if (gameStateRef.current === 'countdown') {
         if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
         countdownIntervalRef.current = null;
+        setCountdownRemaining(settings.countdownSeconds);
         gameStateRef.current = 'waiting';
         setGameState('waiting');
         onGameStateChangeRef.current?.('waiting');
@@ -318,12 +372,18 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
     e.preventDefault();
     if (gameStateRef.current === 'resolved') return;
 
+    const isSquishEnabled = settings.fingerAnimation?.squish ?? true;
+
     let hasMoved = false;
     for (let i = 0; i < e.changedTouches.length; i++) {
       const t = e.changedTouches[i];
       const existing = touchesRef.current.get(t.identifier);
       if (existing) {
         const { x, y } = getRelativeCoords(t.clientX, t.clientY);
+        const dx = x - existing.x;
+        const dy = y - existing.y;
+        const dist = Math.hypot(dx, dy);
+
         existing.x = x;
         existing.y = y;
         hasMoved = true;
@@ -331,6 +391,20 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
         const el = indicatorRefs.current.get(t.identifier);
         if (el) {
           el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+        }
+
+        // Soft Liquid Drag Squish on inner element
+        if (isSquishEnabled) {
+          const innerEl = innerRefs.current.get(t.identifier);
+          if (innerEl) {
+            if (dist > 1.5) {
+              const angle = Math.atan2(dy, dx);
+              const stretch = Math.min(0.2, dist * 0.015);
+              innerEl.style.transform = `rotate(${angle}rad) scale(${1 + stretch}, ${1 - stretch * 0.7}) rotate(${-angle}rad)`;
+            } else {
+              innerEl.style.transform = '';
+            }
+          }
         }
       }
     }
@@ -359,6 +433,7 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
     for (let i = 0; i < e.changedTouches.length; i++) {
       const t = e.changedTouches[i];
       indicatorRefs.current.delete(t.identifier);
+      innerRefs.current.delete(t.identifier);
       const existing = touchesRef.current.get(t.identifier);
       if (existing) {
         availableColorsRef.current.push(existing.colorIndex);
@@ -552,17 +627,6 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
         </div>
       )}
 
-      {/* Giant Background Countdown Number */}
-      {gameState === 'countdown' && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <span
-            className="font-header text-[15rem] font-black tracking-tighter text-white/10 select-none animate-ping"
-            style={{ animationDuration: '1s' }}
-          >
-            {countdownNum}
-          </span>
-        </div>
-      )}
 
       {/* Interactive Touch Player Holographic Target Rings */}
       {touchArray.map((player) => {
@@ -583,6 +647,19 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
           }
         }
 
+        const animConfig = settings.fingerAnimation ?? {
+          springPop: true,
+          tensionPulse: true,
+          squish: true,
+          outcomeReveal: true,
+          pastelAura: true,
+        };
+
+        const tensionDuration =
+          gameState === 'countdown' && animConfig.tensionPulse
+            ? Math.max(0.38, 2.2 * (countdownRemaining / settings.countdownSeconds))
+            : 2.2;
+
         return (
           <div
             key={player.id}
@@ -593,116 +670,99 @@ export const FingerRoulette: React.FC<FingerRouletteProps> = ({
                 indicatorRefs.current.delete(player.id);
               }
             }}
-            className={`absolute top-0 left-0 w-20 h-20 pointer-events-none z-30 flex items-center justify-center will-change-transform ${
+            className={`absolute top-0 left-0 w-32 h-32 pointer-events-none z-30 flex items-center justify-center will-change-transform ${
               isSafeDim
-                ? 'opacity-35 transition-opacity duration-300'
+                ? 'opacity-30 transition-opacity duration-300'
                 : 'opacity-100'
             }`}
             style={{
               transform: `translate3d(${player.x}px, ${player.y}px, 0) translate(-50%, -50%)`,
             }}
           >
-            {/* Loser Hyper Pulsing Triple Shock Rings */}
-            {isLoser && (
-              <>
-                <div className="absolute -inset-6 rounded-full border-2 border-pink-500 animate-hyperRing1 pointer-events-none" />
-                <div className="absolute -inset-9 rounded-full border-2 border-red-500 animate-hyperRing2 pointer-events-none" />
-                <div className="absolute -inset-12 rounded-full border border-white animate-hyperRing3 pointer-events-none" />
-              </>
+            {/* 1. Spring Pop: Expanding Water-Drop Dispersion Ripple on initial touch down */}
+            {animConfig.springPop && gameState !== 'resolved' && (
+              <div
+                key={`ripple-${player.id}`}
+                className="absolute w-[94px] h-[94px] rounded-full pointer-events-none animate-touch-ripple"
+                style={{
+                  background: palette.gradient,
+                }}
+              />
             )}
 
-            {/* Ambient Breathing Neon Halo Disc (Party Touch Aura) */}
-            <div
-              className="absolute -inset-6 rounded-full pointer-events-none animate-party-halo"
-              style={{
-                background: `radial-gradient(circle at 50% 50%, ${
-                  isLoser ? 'rgba(255, 0, 85, 0.5)' : palette.glow
-                } 0%, transparent 72%)`,
-              }}
-            />
-
-            {/* Outward Radiating Soundwave Ripple 1 (Fluid Party Beat - No Rotation) */}
-            <div
-              className="absolute -inset-2.5 rounded-full pointer-events-none animate-party-ripple1"
-              style={{
-                border: `2px solid ${isLoser ? '#ff0055' : palette.primary}`,
-                boxShadow: `0 0 14px ${isLoser ? '#ff0055' : palette.glow}`,
-              }}
-            />
-
-            {/* Outward Radiating Soundwave Ripple 2 (Phase Offset Ripple - No Rotation) */}
-            <div
-              className="absolute -inset-2.5 rounded-full pointer-events-none animate-party-ripple2"
-              style={{
-                border: `1.5px solid ${isLoser ? '#ff3366' : palette.secondary}`,
-                boxShadow: `0 0 10px ${isLoser ? 'rgba(255, 0, 85, 0.7)' : palette.subGlow}`,
-              }}
-            />
-
-            {/* Concentric Neon Party Core Ring (Rhythmic Breathing Pulse) */}
-            <div
-              className="absolute -inset-0.5 rounded-full pointer-events-none animate-party-pulse"
-              style={{
-                border: `2px solid ${isLoser ? '#ff0055' : palette.primary}`,
-                boxShadow: `0 0 12px ${isLoser ? '#ff0055' : palette.glow}, inset 0 0 8px ${
-                  isLoser ? '#ff0033' : palette.subGlow
-                }`,
-              }}
-            />
-
-            {/* Inner Glass Specular Accent Rim */}
-            <div
-              className="absolute inset-1.5 rounded-full pointer-events-none"
-              style={{
-                border: `1px solid ${isLoser ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.45)'}`,
-              }}
-            />
-
-            {/* Center Neon Party Pad Disc (Glossy Touch Jewel - No Crosshairs) */}
-            <div
-              className={`absolute inset-2.5 rounded-full flex items-center justify-center pointer-events-none ${
-                isLoser ? 'animate-hyperPulse' : ''
-              }`}
-              style={{
-                background: `radial-gradient(circle at 38% 38%, ${
-                  isLoser ? 'rgba(255, 0, 85, 0.65)' : `${palette.primary}45`
-                } 0%, rgba(6, 8, 22, 0.95) 85%)`,
-                border: `1.5px solid ${isLoser ? '#ffd700' : palette.primary}`,
-                boxShadow: `
-                  0 0 18px ${isLoser ? '#ff0055' : palette.glow},
-                  inset 0 0 12px ${isLoser ? '#ff0033' : palette.subGlow}
-                `,
-              }}
-            >
-              {/* Center Holographic Pip Badge */}
+            {/* 2. Soft Ambient Pastel Underglow Aura Breathing for non-selected */}
+            {!isLoser && animConfig.pastelAura && (
               <div
-                className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center font-header font-bold ${
-                  isLoser
-                    ? 'bg-white text-rose-600 border border-rose-400 shadow-[0_0_16px_#ffffff]'
-                    : isSafeDim
-                    ? 'bg-black/70 text-emerald-300 border border-emerald-400/50'
-                    : 'bg-black/60 text-white border border-white/20'
-                } uppercase backdrop-blur-md`}
+                className="absolute w-[100px] h-[100px] rounded-full pointer-events-none filter blur-[14px] opacity-40 animate-touch-aura"
                 style={{
-                  boxShadow: isLoser
-                    ? '0 0 16px #ffffff, 0 0 24px rgba(244,63,94,0.8)'
+                  background: palette.gradient,
+                }}
+              />
+            )}
+
+            {/* 3. Pulsing Red Outer Glow Aura for Selected Indicator */}
+            {isLoser && (
+              <div
+                className="absolute -inset-4 rounded-full pointer-events-none filter blur-[18px] animate-selected-red-aura"
+                style={{
+                  background: 'radial-gradient(circle, rgba(239, 68, 68, 0.95) 20%, rgba(220, 38, 38, 0.6) 55%, transparent 75%)',
+                }}
+              />
+            )}
+
+            {/* 4. Outcome Reveal Loser Shockwave Halo Ring */}
+            {isLoser && animConfig.outcomeReveal && (
+              <div
+                className="absolute w-[94px] h-[94px] rounded-full pointer-events-none animate-ping opacity-60"
+                style={{
+                  background: 'radial-gradient(circle, rgba(239,63,94,0.8) 0%, transparent 70%)',
+                  animationDuration: '1.2s',
+                }}
+              />
+            )}
+
+            {/* Flat Simple Pastel Gradient Circle with Subtle Wiggle Scale or Selected Bigger Pulse */}
+            <div
+              className={animConfig.springPop && gameState !== 'resolved' ? 'animate-touch-spring-entry' : ''}
+            >
+              <div
+                ref={(el) => {
+                  if (el) {
+                    innerRefs.current.set(player.id, el);
+                  } else {
+                    innerRefs.current.delete(player.id);
+                  }
+                }}
+                className={`w-[94px] h-[94px] rounded-full flex items-center justify-center pointer-events-none select-none relative ${
+                  isLoser
+                    ? 'animate-selected-pulse'
                     : isSafeDim
-                    ? '0 0 10px rgba(16,185,129,0.5)'
-                    : `0 0 8px ${palette.glow}`,
+                    ? animConfig.outcomeReveal
+                      ? 'animate-outcome-safe-fade'
+                      : 'animate-touch-wiggle'
+                    : 'animate-touch-wiggle'
+                }`}
+                style={{
+                  background: palette.gradient,
+                  boxShadow: !isLoser ? '0 4px 16px rgba(0, 0, 0, 0.15)' : undefined,
+                  animationDuration:
+                    !isLoser && !isSafeDim && gameState === 'countdown' && animConfig.tensionPulse
+                      ? `${tensionDuration}s`
+                      : undefined,
                 }}
               >
-                {isLoser ? (
-                  <span className="text-[7.5px] font-black tracking-tighter">LOSER</span>
-                ) : isSafeDim ? (
-                  <span className="text-[7.5px] font-black tracking-tighter text-emerald-300">SAFE</span>
-                ) : (
-                  <span
-                    className="text-[10px] font-black tracking-wider"
-                    style={{ textShadow: `0 0 6px ${palette.primary}` }}
-                  >
-                    {badgeContent}
-                  </span>
-                )}
+                {/* Flat Clean Typography */}
+                <span
+                  className={`font-black select-none tracking-wider text-white ${
+                    isLoser
+                      ? 'text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]'
+                      : isSafeDim
+                      ? 'text-xs drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]'
+                      : 'text-xl drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]'
+                  }`}
+                >
+                  {badgeContent}
+                </span>
               </div>
             </div>
           </div>

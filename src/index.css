@@ -671,6 +671,183 @@
   animation: partyTouchHalo 2s ease-in-out infinite;
 }
 
+/* Finger Touched Indicator Subtle Wiggle Scale Animation */
+@keyframes fingerTouchWiggleScale {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  20% {
+    transform: scale(1.05) rotate(-2.5deg);
+  }
+  45% {
+    transform: scale(0.965) rotate(1.5deg);
+  }
+  70% {
+    transform: scale(1.04) rotate(-1.5deg);
+  }
+  85% {
+    transform: scale(0.985) rotate(1deg);
+  }
+}
+
+.animate-touch-wiggle {
+  animation: fingerTouchWiggleScale 2.2s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Selected Player Flat Gradient Bigger Pulse Animation with Red Box Glow */
+@keyframes selectedGradientBiggerPulse {
+  0%, 100% {
+    transform: scale(1.0);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.75), 0 0 35px rgba(239, 68, 68, 0.45);
+  }
+  50% {
+    transform: scale(1.24);
+    box-shadow: 0 0 36px rgba(239, 68, 68, 1), 0 0 70px rgba(239, 68, 68, 0.85);
+  }
+}
+
+.animate-selected-pulse {
+  animation: selectedGradientBiggerPulse 0.85s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  transform-origin: center center;
+  will-change: transform, box-shadow;
+}
+
+/* 1. Spring Touchdown Entry Pop */
+@keyframes touchSpringEntry {
+  0% {
+    transform: scale(0.25);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.16);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-touch-spring-entry {
+  animation: touchSpringEntry 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* 2. Water-drop Dispersion Ripple */
+@keyframes touchEntryRipple {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-touch-ripple {
+  animation: touchEntryRipple 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+/* 3. Outcome Reveal Loser Explosive Pop */
+@keyframes outcomeLoserPop {
+  0% {
+    transform: scale(0.9);
+  }
+  25% {
+    transform: scale(1.28);
+  }
+  55% {
+    transform: scale(0.98);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-outcome-loser-pop {
+  animation: outcomeLoserPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, selectedGradientBiggerPulse 0.85s cubic-bezier(0.25, 1, 0.5, 1) 0.65s infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* 4. Outcome Reveal Safe Player Dissolve */
+@keyframes outcomeSafeFade {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.25;
+  }
+}
+
+.animate-outcome-safe-fade {
+  animation: outcomeSafeFade 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+/* 5. Soft Ambient Pastel Underglow Aura Breathing */
+@keyframes touchPastelAuraPulse {
+  0%, 100% {
+    transform: scale(1.02);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.26);
+    opacity: 0.6;
+  }
+}
+
+.animate-touch-aura {
+  animation: touchPastelAuraPulse 2.4s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+/* Pulsing Red Outer Glow for Selected Indicator */
+@keyframes selectedRedGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.8), 0 0 35px rgba(239, 68, 68, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(239, 68, 68, 1), 0 0 60px rgba(239, 68, 68, 0.75);
+  }
+}
+
+.animate-red-glow-pulse {
+  animation: selectedRedGlowPulse 1.1s ease-in-out infinite;
+}
+
+@keyframes selectedRedAuraPulse {
+  0%, 100% {
+    transform: scale(1.05);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.48);
+    opacity: 1;
+  }
+}
+
+.animate-selected-red-aura {
+  animation: selectedRedAuraPulse 0.85s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
 /* PICK'U PARTY Title Occasional Light Sweep */
 @keyframes titleLightSweep {
   0% {

@@ -106,43 +106,27 @@ export const BackgroundCanvas: React.FC<BackgroundCanvasProps> = ({
       wasIdle = false;
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Draw Dynamic Connecting Lines Between Touches
-      if (currentTouches.length > 1) {
+      // 1. Team Laser Cords (Only when team lines are active for Team Picker)
+      if (currentTouches.length > 1 && currentShowTeam) {
         ctx.save();
-        if (currentShowTeam) {
-          // Connect players of the SAME team with thick glowing laser cords
-          for (let i = 0; i < currentTouches.length; i++) {
-            for (let j = i + 1; j < currentTouches.length; j++) {
-              const t1 = currentTouches[i];
-              const t2 = currentTouches[j];
-              if (t1.teamIndex !== undefined && t2.teamIndex !== undefined && t1.teamIndex === t2.teamIndex) {
-                const teamPalette = themeColors.teamPalettes[t1.teamIndex % themeColors.teamPalettes.length];
-                ctx.strokeStyle = teamPalette.solid;
-                ctx.lineWidth = 4;
-                ctx.shadowColor = teamPalette.solid;
-                ctx.shadowBlur = 16;
-                ctx.globalAlpha = 0.85;
+        for (let i = 0; i < currentTouches.length; i++) {
+          for (let j = i + 1; j < currentTouches.length; j++) {
+            const t1 = currentTouches[i];
+            const t2 = currentTouches[j];
+            if (t1.teamIndex !== undefined && t2.teamIndex !== undefined && t1.teamIndex === t2.teamIndex) {
+              const teamPalette = themeColors.teamPalettes[t1.teamIndex % themeColors.teamPalettes.length];
+              ctx.strokeStyle = teamPalette.solid;
+              ctx.lineWidth = 4;
+              ctx.shadowColor = teamPalette.solid;
+              ctx.shadowBlur = 16;
+              ctx.globalAlpha = 0.85;
 
-                ctx.beginPath();
-                ctx.moveTo(t1.x, t1.y);
-                ctx.lineTo(t2.x, t2.y);
-                ctx.stroke();
-              }
+              ctx.beginPath();
+              ctx.moveTo(t1.x, t1.y);
+              ctx.lineTo(t2.x, t2.y);
+              ctx.stroke();
             }
           }
-        } else {
-          // Standard connecting network mesh
-          ctx.strokeStyle = themeColors.primary;
-          ctx.lineWidth = 1.5;
-          ctx.globalAlpha = 0.35;
-          ctx.beginPath();
-          for (let i = 0; i < currentTouches.length; i++) {
-            for (let j = i + 1; j < currentTouches.length; j++) {
-              ctx.moveTo(currentTouches[i].x, currentTouches[i].y);
-              ctx.lineTo(currentTouches[j].x, currentTouches[j].y);
-            }
-          }
-          ctx.stroke();
         }
         ctx.restore();
       }

@@ -26,6 +26,13 @@ const DEFAULT_SETTINGS: AppSettings = {
   soundEnabled: true,
   soundVolume: 0.8,
   hapticsEnabled: true,
+  fingerAnimation: {
+    springPop: true,
+    tensionPulse: true,
+    squish: true,
+    outcomeReveal: true,
+    pastelAura: true,
+  },
 };
 
 function normalizeSettings(data: Partial<AppSettings>): AppSettings {
@@ -60,8 +67,25 @@ function normalizeSettings(data: Partial<AppSettings>): AppSettings {
   if (!merged.bottleFriction || merged.bottleFriction < 0.990) {
     merged.bottleFriction = 0.992;
   }
-  if (![5, 8, 10].includes(merged.countdownSeconds)) {
+  if (![3, 5, 8].includes(merged.countdownSeconds)) {
     merged.countdownSeconds = 5;
+  }
+  if (!merged.fingerAnimation) {
+    merged.fingerAnimation = {
+      springPop: true,
+      tensionPulse: true,
+      squish: true,
+      outcomeReveal: true,
+      pastelAura: true,
+    };
+  } else {
+    merged.fingerAnimation = {
+      springPop: merged.fingerAnimation.springPop ?? true,
+      tensionPulse: merged.fingerAnimation.tensionPulse ?? true,
+      squish: merged.fingerAnimation.squish ?? true,
+      outcomeReveal: merged.fingerAnimation.outcomeReveal ?? true,
+      pastelAura: merged.fingerAnimation.pastelAura ?? true,
+    };
   }
   return merged;
 }

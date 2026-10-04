@@ -86,11 +86,8 @@ export function drawTrailMesh(
   const isCosmic = trailId === 'particle_galaxy_trail';
   const isMusic = trailId === 'particle_music_notes';
 
-  // 1. ==============================================================
-  //    HYPER ZIG ZAG ELECTRIC ARC TRAIL
-  // ==============================================================
-  if (isElectric) {
-    drawHyperZigZagElectricTrail(ctx, points, palette, time, baseHeadRadius);
+  // Note: Long tail trail for neon and harsh zig-zag for electric are disabled
+  if (isElectric || isNeon) {
     ctx.restore();
     return;
   }

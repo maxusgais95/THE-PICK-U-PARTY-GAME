@@ -4,9 +4,10 @@
  */
 
 import React from 'react';
-import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb, ArrowLeft, RotateCcw, Sparkles } from 'lucide-react';
+import { Settings, Home, Maximize, Minimize, Info, BookOpen, Disc, Bomb, ArrowLeft, RotateCcw, Sparkles, Timer } from 'lucide-react';
 import { ChampagneBottleIcon } from './ChampagneBottleIcon';
 import { CurrencyHud } from './CurrencyHud';
+import { FingerAnimationToggle } from './FingerAnimationToggle';
 import { AppSettings, ScreenView } from '../types';
 import { THEMES } from '../lib/themes';
 import { SoundEngine, Haptics } from '../lib/audio';
@@ -34,6 +35,7 @@ interface HeaderProps {
   onToggleParticleSkin?: () => void;
   onEconomyUpdated?: (state: EconomyState) => void;
   onRefillStars?: (amount: number) => void;
+  onUpdateSettings?: (settings: Partial<AppSettings>) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -58,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleParticleSkin,
   onEconomyUpdated,
   onRefillStars,
+  onUpdateSettings,
 }) => {
   const [isFullscreen, setIsFullscreen] = React.useState<boolean>(false);
   const [supportsFullscreen, setSupportsFullscreen] = React.useState<boolean>(true);
@@ -172,6 +175,30 @@ export const Header: React.FC<HeaderProps> = ({
               <Home className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-cyan-300 drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
             </button>
 
+            {/* Quick Countdown Duration Cycle Toggle in Roulette Mode */}
+            {currentView === 'roulette' && (
+              <button
+                type="button"
+                onClick={() => {
+                  SoundEngine.playButtonClick();
+                  Haptics.buttonClick();
+                  const options = [3, 5, 8];
+                  const currentIndex = options.indexOf(settings.countdownSeconds);
+                  const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % options.length;
+                  const nextSec = options[nextIndex];
+                  onUpdateSettings?.({ countdownSeconds: nextSec });
+                }}
+                aria-label={`Cycle Countdown (${settings.countdownSeconds}s)`}
+                title={`Countdown: ${settings.countdownSeconds}s (Tap to cycle 3s/5s/8s)`}
+                className="h-9 sm:h-10 px-2.5 sm:px-3 shrink-0 rounded-[14px] sm:rounded-[16px] bg-black/50 backdrop-blur-md border border-amber-400/50 shadow-[0_0_12px_rgba(251,191,36,0.25)] flex items-center gap-1.5 text-amber-300 hover:border-amber-300 active:scale-95 transition-all cursor-pointer select-none"
+              >
+                <Timer className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2] text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                <span className="font-header font-black text-xs sm:text-sm tracking-wider text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]">
+                  {settings.countdownSeconds}s
+                </span>
+              </button>
+            )}
+
             {/* Back & Restart buttons exclusively in gameplay for bomb game and bomb pong */}
             {showGameActionButtons && (
               <>
@@ -226,6 +253,13 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Action Buttons (Compact, non-overlapping) */}
       <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto z-40">
+        {/* Finger Animation Options Quick Toggle in Roulette Mode */}
+        {currentView === 'roulette' && (
+          <FingerAnimationToggle
+            settings={settings}
+            onUpdateSettings={onUpdateSettings}
+          />
+        )}
         {/* Bottle Sprite Quick Switcher in Bottle Mode */}
         {currentView === 'bottle' && onToggleBottleSprite && (
           <button

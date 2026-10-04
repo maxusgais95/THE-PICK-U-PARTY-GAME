@@ -261,40 +261,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TAB 1: GAME RULES */}
           {activeTab === 'game' && (
             <div className="space-y-3.5">
-              {/* Countdown Duration */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                <div>
-                  <div className="text-xs font-extrabold uppercase tracking-wide text-white">
-                    Countdown
-                  </div>
-                  <div className="text-[11px] text-gray-400">Suspense hold timer</div>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  {[5, 8, 10].map((sec) => {
-                    const isSelected = settings.countdownSeconds === sec;
-                    return (
-                      <button
-                        key={sec}
-                        onClick={() => {
-                          SoundEngine.playButtonClick();
-                          onUpdateSettings({ countdownSeconds: sec });
-                        }}
-                        style={{
-                          backgroundColor: isSelected ? currentTheme.secondary : 'rgba(255, 255, 255, 0.05)',
-                          color: isSelected ? '#ffffff' : '#d1d5db',
-                          borderColor: isSelected ? currentTheme.secondary : 'rgba(255, 255, 255, 0.1)',
-                          boxShadow: isSelected ? `0 0 10px ${currentTheme.secondary}66` : 'none',
-                        }}
-                        className="px-2.5 py-1.5 rounded-xl font-black text-xs transition-all border cursor-pointer active:scale-95"
-                      >
-                        {sec}s
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* 1. SFX Audio Control */}
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
                 <div className="flex items-center justify-between">

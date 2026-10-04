@@ -55,33 +55,26 @@ export function updateTrailParticlePhysics(
 
   switch (trailId) {
     case 'particle_electric_shock': {
-      // High-voltage sharp zig-zag distortion & heavy angular lightning snaps
-      if (Math.random() < 0.65) {
-        const zapDist = (1 - progress * 0.3) * (3.5 + Math.random() * 8.5);
-        const zapAngle = (Math.floor(Math.random() * 8) * Math.PI) / 4 + (Math.random() - 0.5) * 0.8;
-        p.x += Math.cos(zapAngle) * zapDist;
-        p.y += Math.sin(zapAngle) * zapDist;
-      }
-      p.x += p.vx + (Math.random() - 0.5) * 2.2;
-      p.y += p.vy + (Math.random() - 0.5) * 2.2;
-      p.vx *= 0.85;
-      p.vy *= 0.85;
-      p.rotation += p.rotSpeed * 2.2 + (Math.random() - 0.5) * 0.9;
-      const isStrobe = Math.random() > 0.15;
-      const zapFlicker = isStrobe ? 1.0 : 0.25;
-      p.alpha = Math.max(0, Math.pow(1 - progress, 1.8) * zapFlicker);
+      // Smooth kinetic electric plasma drift: removed harsh angular zig-zag snaps
+      p.x += p.vx * 0.94 + Math.sin(p.life * 0.45 + p.seed) * 0.35;
+      p.y += p.vy * 0.94 + Math.cos(p.life * 0.45 + p.seed) * 0.35;
+      p.vx *= 0.91;
+      p.vy *= 0.91;
+      p.rotation += p.rotSpeed * 1.2 + baseJitter;
+      const zapFlicker = 0.85 + Math.sin(p.life * 0.8 + p.seed) * 0.15;
+      p.alpha = Math.max(0, Math.pow(1 - progress, 1.6) * zapFlicker);
       break;
     }
 
     case 'particle_neon_trail': {
-      // Soft, smooth fluid aerodynamic drift: no harsh velocity drop or aggressive inward crunch
-      const lateral = Math.sin(p.life * 0.25 + p.seed) * 0.45;
-      p.x += p.vx * 0.95 + lateral;
-      p.y += p.vy * 0.95;
-      p.vx *= 0.96;
-      p.vy *= 0.96;
+      // Soft, clean aerodynamic drift without lingering long tail
+      const lateral = Math.sin(p.life * 0.25 + p.seed) * 0.35;
+      p.x += p.vx * 0.92 + lateral;
+      p.y += p.vy * 0.92;
+      p.vx *= 0.92;
+      p.vy *= 0.92;
       p.rotation += p.rotSpeed * 0.8 + baseJitter * 0.8;
-      p.alpha = Math.max(0, Math.pow(1 - progress, 1.2));
+      p.alpha = Math.max(0, Math.pow(1 - progress, 1.7));
       break;
     }
 
@@ -207,116 +200,9 @@ export function renderTrailThemeBackground(
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
 
-  if (trailId === 'particle_neon_trail') {
-    // Cyber Soft Smooth Neon Laser Ribbon Stream: Luminous, soft, wide, smooth flow without harsh tapering
-    const pts = historyPoints;
-    const len = pts.length;
-    if (len >= 2) {
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < len - 1; i++) {
-        const xc = (pts[i].x + pts[i + 1].x) / 2;
-        const yc = (pts[i].y + pts[i + 1].y) / 2;
-        ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
-      }
-      if (len > 2) {
-        ctx.quadraticCurveTo(pts[len - 1].x, pts[len - 1].y, pts[len - 1].x, pts[len - 1].y);
-      } else {
-        ctx.lineTo(pts[1].x, pts[1].y);
-      }
-
-      // Soft Cyan to Pink/Magenta Gradient
-      const grad = ctx.createLinearGradient(pts[0].x, pts[0].y, pts[len - 1].x, pts[len - 1].y);
-      grad.addColorStop(0, activePalette[0] || '#00f3ff');
-      grad.addColorStop(0.5, activePalette[1] || '#ff4081');
-      grad.addColorStop(1, activePalette[2] || '#00b0ff');
-
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      // Layer 1: Wide Outer Soft Ambient Neon Halo Bloom
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 14;
-      ctx.globalAlpha = 0.22;
-      ctx.stroke();
-
-      // Layer 2: Medium Soft Luminous Body
-      ctx.lineWidth = 7;
-      ctx.globalAlpha = 0.55;
-      ctx.stroke();
-
-      // Layer 3: Vibrant Core Stream
-      ctx.lineWidth = 3.2;
-      ctx.globalAlpha = 0.85;
-      ctx.stroke();
-
-      // Layer 4: Soft Pure White Core Wire
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.2;
-      ctx.globalAlpha = 0.9;
-      ctx.stroke();
-    }
-  } else if (trailId === 'particle_electric_shock') {
-    // High-Voltage Sharp Zig-Zag & Distorted Electric Arc Lightning Bolts
-    const pts = historyPoints;
-    const len = pts.length;
-    if (len >= 2) {
-      const isFlicker = Math.random() > 0.12;
-      if (isFlicker) {
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'miter';
-
-        // Outer ambient plasma electricity aura glow
-        ctx.strokeStyle = activePalette[0] || '#00f3ff';
-        ctx.lineWidth = 4.5;
-        ctx.globalAlpha = 0.35;
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < len; i++) {
-          const midX = (pts[i - 1].x + pts[i].x) / 2 + (Math.random() - 0.5) * 12;
-          const midY = (pts[i - 1].y + pts[i].y) / 2 + (Math.random() - 0.5) * 12;
-          ctx.lineTo(midX, midY);
-          ctx.lineTo(pts[i].x, pts[i].y);
-        }
-        ctx.stroke();
-
-        // Sharp main zig-zag electric bolt
-        ctx.strokeStyle = activePalette[1] || '#38bdf8';
-        ctx.lineWidth = 2.2;
-        ctx.globalAlpha = 0.85;
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < len; i++) {
-          const midX1 = pts[i - 1].x + (pts[i].x - pts[i - 1].x) * 0.33 + (Math.random() - 0.5) * 14;
-          const midY1 = pts[i - 1].y + (pts[i].y - pts[i - 1].y) * 0.33 + (Math.random() - 0.5) * 14;
-          const midX2 = pts[i - 1].x + (pts[i].x - pts[i - 1].x) * 0.66 + (Math.random() - 0.5) * 14;
-          const midY2 = pts[i - 1].y + (pts[i].y - pts[i - 1].y) * 0.66 + (Math.random() - 0.5) * 14;
-          ctx.lineTo(midX1, midY1);
-          ctx.lineTo(midX2, midY2);
-          ctx.lineTo(pts[i].x, pts[i].y);
-
-          // Random energetic branch discharge bolt
-          if (Math.random() < 0.35) {
-            const branchLen = 8 + Math.random() * 14;
-            const branchAngle = Math.random() * Math.PI * 2;
-            ctx.moveTo(midX1, midY1);
-            ctx.lineTo(
-              midX1 + Math.cos(branchAngle) * branchLen,
-              midY1 + Math.sin(branchAngle) * branchLen
-            );
-            ctx.moveTo(midX1, midY1);
-          }
-        }
-        ctx.stroke();
-
-        // Intense Searing White Lightning Core
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.0;
-        ctx.globalAlpha = 0.95;
-        ctx.stroke();
-      }
-    }
-  } else if (trailId === 'particle_music_notes') {
+  // Background continuous ribbons:
+  // Note: Long tail trail effect for neon trail and harsh zig-zag electric arc trail have been removed.
+  if (trailId === 'particle_music_notes') {
     // Acoustic Soundwave Ripples pulsing along the path
     const latest = historyPoints[0];
     if (latest) {
@@ -381,8 +267,8 @@ export function renderStyledTrailParticle(
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rotation);
 
-      // Electric trail decays fast; Neon trail decays gently without harsh tapering
-      const shrinkExp = trailId === 'particle_electric_shock' ? 1.6 : trailId === 'particle_neon_trail' ? 0.95 : 1.25;
+      // Electric and Neon trails shrink cleanly to eliminate lingering tail effects
+      const shrinkExp = trailId === 'particle_electric_shock' ? 1.6 : trailId === 'particle_neon_trail' ? 1.45 : 1.25;
 
       // Smoothly shrink to disappear over lifetime, keeping strict 1:1 aspect ratio
       const curSize = Math.max(0, p.size * (1 - Math.pow(progress, shrinkExp)));

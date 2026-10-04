@@ -553,6 +553,7 @@ export default function App() {
         onToggleBombSkin={handleCycleBombSkin}
         onToggleParticleSkin={handleCycleParticleSkin}
         onEconomyUpdated={setEconomy}
+        onUpdateSettings={handleUpdateSettings}
       />
 
       {/* Screen Views */}

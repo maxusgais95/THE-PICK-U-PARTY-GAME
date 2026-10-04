@@ -83,11 +83,20 @@ export interface ThemeColors {
   }[];
 }
 
+export interface FingerAnimationSettings {
+  springPop: boolean; // Elastic touchdown pop & dissipation ripple
+  tensionPulse: boolean; // Accelerated breathing/wiggle tempo during countdown
+  squish: boolean; // Liquid drag squish / inertia stretch on movement
+  outcomeReveal: boolean; // Suspense freeze & explosive shockwave reveal
+  pastelAura: boolean; // Ambient blurred pastel underglow breathing
+}
+
 export interface AppSettings {
   // Game Play
   minPlayers: number; // 2..5
   targetCount: number; // 1..(minPlayers - 1)
-  countdownSeconds: number; // 5, 8, 10
+  countdownSeconds: number; // 3, 5, 8
+  fingerAnimation?: FingerAnimationSettings;
   
   // Bottle
   bottleStyle: BottleBuiltinStyle | 'custom';

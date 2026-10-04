@@ -452,13 +452,17 @@ export class AudioManager {
     Haptics.countdownTick(remainingSeconds, totalSeconds);
     if (!this.soundEnabled) return;
 
-    const urgency = 1 - Math.max(0, remainingSeconds / (totalSeconds || 5));
+    const total = Math.max(1, totalSeconds || 3);
+    // Normalized progression from 0 (start) to 1 (final tick)
+    const progress = Math.min(1, Math.max(0, (total - remainingSeconds) / Math.max(1, total - 1)));
     const isUrgent = remainingSeconds <= 1;
     const fileName = isUrgent ? 'countdown_tick_urgent.wav' : 'countdown_tick.wav';
-    const rate = 0.95 + urgency * 0.35;
+    
+    // Clear pitch shift across countdown: starts at 1.0x and climbs to 1.5x
+    const rate = 1.0 + progress * 0.5;
 
     const played = this.playSample(fileName, {
-      volume: 0.9 + urgency * 0.2,
+      volume: 0.95 + progress * 0.15,
       playbackRate: rate,
     });
 
@@ -467,7 +471,7 @@ export class AudioManager {
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
-        const baseFreq = 400 + urgency * 450;
+        const baseFreq = 440 + progress * 400;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sawtooth';
@@ -475,7 +479,7 @@ export class AudioManager {
         const filter = ctx.createBiquadFilter();
         filter.type = 'bandpass';
         filter.frequency.setValueAtTime(baseFreq * 1.5, now);
-        filter.Q.setValueAtTime(4 + urgency * 4, now);
+        filter.Q.setValueAtTime(4 + progress * 4, now);
 
         osc.frequency.setValueAtTime(baseFreq, now);
         osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.1);

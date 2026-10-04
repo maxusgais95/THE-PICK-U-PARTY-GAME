@@ -58,16 +58,16 @@ export const FingerGameBackground: React.FC<FingerGameBackgroundProps> = ({
     if (isVideoActive) {
       // Calculate speed criteria:
       // Video length is exactly 10s.
-      // 1. 5s countdown: speed up (2.0x) so 10s video finishes in 5s
-      // 2. 8s countdown: normal speed (1.25x) so 10s video finishes in 8s
-      // 3. 10s countdown: speed down (1.0x) so 10s video finishes in 10s
+      // 1. 3s countdown: fast speed (3.33x) so 10s video finishes in 3s
+      // 2. 5s countdown: speed up (2.0x) so 10s video finishes in 5s
+      // 3. 8s countdown: normal speed (1.25x) so 10s video finishes in 8s
       let playbackRate = 1.0;
-      if (countdownSeconds === 5) {
+      if (countdownSeconds === 3) {
+        playbackRate = 3.33; // Fast speed to match 3s countdown
+      } else if (countdownSeconds === 5) {
         playbackRate = 2.0; // Speed up
       } else if (countdownSeconds === 8) {
         playbackRate = 1.25; // Normal speed to match end duration
-      } else if (countdownSeconds === 10) {
-        playbackRate = 1.0; // Speed down to match end duration
       } else {
         playbackRate = 10.0 / Math.max(1, countdownSeconds);
       }
