@@ -78,7 +78,7 @@ const PARTICLE_COLOR_PALETTES: Record<string, string[]> = {
 
 const PARTICLE_CORE_COLORS: Record<string, [string, string, string]> = {
   particle_classic_blaze: ['rgba(255, 255, 220, 0.95)', 'rgba(255, 180, 0, 0.75)', 'rgba(255, 60, 0, 0.35)'],
-  particle_neon_trail: ['rgba(255, 255, 255, 0.95)', 'rgba(6, 182, 212, 0.85)', 'rgba(236, 72, 153, 0.45)'],
+  particle_neon_trail: ['rgba(255, 255, 255, 0.65)', 'rgba(6, 182, 212, 0.45)', 'rgba(236, 72, 153, 0.20)'],
   particle_music_notes: ['rgba(255, 255, 255, 0.95)', 'rgba(168, 85, 247, 0.85)', 'rgba(236, 72, 153, 0.45)'],
   particle_star_spark: ['rgba(255, 255, 255, 0.98)', 'rgba(251, 191, 36, 0.85)', 'rgba(245, 158, 11, 0.4)'],
   particle_galaxy_trail: ['rgba(255, 255, 255, 0.95)', 'rgba(129, 140, 248, 0.85)', 'rgba(192, 132, 252, 0.4)'],

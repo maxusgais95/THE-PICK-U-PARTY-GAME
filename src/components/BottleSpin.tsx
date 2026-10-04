@@ -185,10 +185,10 @@ export const BottleSpin: React.FC<BottleSpinProps> = ({
               ctx.globalCompositeOperation = 'screen';
               ctx.lineCap = 'round';
 
-              // Pass 1: Wide ambient bloom
+              // Pass 1: Soft ambient bloom
               ctx.strokeStyle = theme.primary;
-              ctx.lineWidth = 16 * dpr;
-              ctx.globalAlpha = Math.min(0.35, 0.15 + (currentTrail / 85) * 0.2);
+              ctx.lineWidth = 12 * dpr;
+              ctx.globalAlpha = Math.min(0.22, 0.08 + (currentTrail / 85) * 0.14);
               ctx.beginPath();
               if (isCW) {
                 ctx.arc(cx, cy, rTip, tipAngleRad - trailRad, tipAngleRad, false);
@@ -197,10 +197,10 @@ export const BottleSpin: React.FC<BottleSpinProps> = ({
               }
               ctx.stroke();
 
-              // Pass 2: Vivid neon core
+              // Pass 2: Smooth neon core
               ctx.strokeStyle = theme.secondary;
-              ctx.lineWidth = 5 * dpr;
-              ctx.globalAlpha = Math.min(0.85, 0.4 + (currentTrail / 85) * 0.45);
+              ctx.lineWidth = 3.5 * dpr;
+              ctx.globalAlpha = Math.min(0.55, 0.22 + (currentTrail / 85) * 0.3);
               ctx.beginPath();
               if (isCW) {
                 ctx.arc(cx, cy, rTip, tipAngleRad - trailRad, tipAngleRad, false);
@@ -209,11 +209,11 @@ export const BottleSpin: React.FC<BottleSpinProps> = ({
               }
               ctx.stroke();
 
-              // Pass 3: White filament near the tip
+              // Pass 3: Delicate filament near the tip
               const whiteRad = trailRad * 0.32;
               ctx.strokeStyle = '#ffffff';
-              ctx.lineWidth = 2.4 * dpr;
-              ctx.globalAlpha = Math.min(0.95, 0.6 + (currentTrail / 85) * 0.35);
+              ctx.lineWidth = 1.6 * dpr;
+              ctx.globalAlpha = Math.min(0.6, 0.3 + (currentTrail / 85) * 0.25);
               ctx.beginPath();
               if (isCW) {
                 ctx.arc(cx, cy, rTip, tipAngleRad - whiteRad, tipAngleRad, false);
@@ -222,17 +222,17 @@ export const BottleSpin: React.FC<BottleSpinProps> = ({
               }
               ctx.stroke();
 
-              // Pass 4: Glowing tip flare
+              // Pass 4: Soft tip flare
               const tipX = cx + Math.cos(tipAngleRad) * rTip;
               const tipY = cy + Math.sin(tipAngleRad) * rTip;
-              const flareRad = (10 + (currentTrail / 85) * 8) * dpr;
+              const flareRad = (8 + (currentTrail / 85) * 6) * dpr;
 
               const flareGrad = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, flareRad);
               flareGrad.addColorStop(0, '#ffffff');
               flareGrad.addColorStop(0.3, theme.secondary);
               flareGrad.addColorStop(1, 'transparent');
               ctx.fillStyle = flareGrad;
-              ctx.globalAlpha = 0.9;
+              ctx.globalAlpha = 0.55;
               ctx.beginPath();
               ctx.arc(tipX, tipY, flareRad, 0, Math.PI * 2);
               ctx.fill();

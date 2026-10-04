@@ -273,16 +273,6 @@ export function renderStyledTrailParticle(
       // Smoothly shrink to disappear over lifetime, keeping strict 1:1 aspect ratio
       const curSize = Math.max(0, p.size * (1 - Math.pow(progress, shrinkExp)));
       if (curSize > 0.3) {
-        // Soft ambient glow halo behind neon sprites
-        if (trailId === 'particle_neon_trail') {
-          ctx.save();
-          ctx.globalAlpha = p.alpha * 0.35;
-          ctx.fillStyle = p.color || '#00f3ff';
-          ctx.beginPath();
-          ctx.arc(0, 0, curSize * 0.85, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
         ctx.drawImage(targetImg, -curSize / 2, -curSize / 2, curSize, curSize);
       }
 
