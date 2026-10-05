@@ -9,6 +9,7 @@ import {
   Sparkles,
   Zap,
   RotateCw,
+  RotateCcw,
   Bomb,
   Lightbulb,
   Star,
@@ -318,6 +319,10 @@ export const AboutGuideModal: React.FC<AboutGuideModalProps> = ({
                     <span>Tactical Power-Up Spheres:</span>
                   </p>
                   <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                    <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
+                      <RotateCcw className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                      <span><strong>Reverse:</strong> Inverts turn order</span>
+                    </div>
                     <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
                       <Radio className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       <span><strong>Radar:</strong> Reveals safe spot</span>

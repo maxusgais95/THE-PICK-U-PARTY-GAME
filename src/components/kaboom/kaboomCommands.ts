@@ -116,7 +116,6 @@ export const KABOOM_COMMANDS: KaboomCommand[] = [
     icon: 'Zap',
     tag: 'PENALTY TRAP',
   },
-
   {
     id: 'drink_sip',
     title: 'SIP OR SHOT',

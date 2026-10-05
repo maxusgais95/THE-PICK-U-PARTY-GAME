@@ -211,18 +211,31 @@ export interface DailyLoginRewards {
   lastClaimDate: string; // 'YYYY-MM-DD' of the last day claimed
 }
 
+export type QuestActionType =
+  | 'attendance'
+  | 'bottle_spin'
+  | 'roulette_round'
+  | 'kaboom_tile'
+  | 'kaboom_victory'
+  | 'kaboom_bonus'
+  | 'pong_match'
+  | 'pong_victory'
+  | 'pong_rally_5'
+  | 'pong_bounce';
+
 export interface DailyQuest {
   id: string;
+  templateId?: string;
   title: string;
   description: string;
   targetCount: number;
   currentCount: number;
   starReward: number;
   isClaimed: boolean;
-  gameMode?: 'roulette' | 'bottle' | 'kaboom' | 'hub' | 'settings' | 'pong';
-  rerolled?: boolean;
+  gameMode?: 'roulette' | 'bottle' | 'kaboom' | 'pong' | 'hub' | 'settings';
+  actionType: QuestActionType;
+  isRerolled?: boolean;
 }
-
 
 export interface EconomyState {
   stars: number;
@@ -245,7 +258,6 @@ export interface EconomyState {
   totalLoginsCount?: number;
   lifetimeStarsEarned?: number;
   questsCompletedCount?: number;
-  questRerolledToday?: boolean;
 }
 
 const STORAGE_KEY = 'picku_party_economy_v1';
@@ -987,125 +999,333 @@ export function getTimeUntilMidnight(): {
   return { hours, minutes, seconds, totalMs: diffMs, formatted };
 }
 
-export const MASTER_DAILY_QUEST_POOL: DailyQuest[] = [
+export interface QuestTemplate {
+  templateId: string;
+  title: string;
+  description: string;
+  targetCount: number;
+  starReward: number;
+  gameMode: 'roulette' | 'bottle' | 'kaboom' | 'pong' | 'hub';
+  actionType: QuestActionType;
+}
+
+export const QUEST_ATTENDANCE_TEMPLATE: QuestTemplate = {
+  templateId: 'quest_daily_party',
+  title: 'Party Attendance',
+  description: 'Check in to the party club today to earn daily stars.',
+  targetCount: 1,
+  starReward: 50,
+  gameMode: 'hub',
+  actionType: 'attendance',
+};
+
+export const QUEST_TEMPLATES_POOL: QuestTemplate[] = [
+  // Bottle Spin Tasks
   {
-    id: 'quest_daily_party',
-    title: 'Party Attendance',
-    description: 'Check in to the party club today to earn daily stars.',
-    targetCount: 1,
-    currentCount: 1,
-    starReward: 50,
-    isClaimed: false,
-    gameMode: 'hub',
-  },
-  {
-    id: 'quest_bottle_spin',
+    templateId: 'quest_bottle_spin_3',
     title: 'Bottle Spin Party',
     description: 'Spin the bottle 3 times with party friends.',
     targetCount: 3,
-    currentCount: 0,
     starReward: 50,
-    isClaimed: false,
     gameMode: 'bottle',
+    actionType: 'bottle_spin',
   },
   {
-    id: 'quest_bottle_expert',
-    title: 'Bottle Twister Expert',
-    description: 'Spin the bottle 6 times with party guests.',
-    targetCount: 6,
-    currentCount: 0,
+    templateId: 'quest_bottle_spin_5',
+    title: 'Spin Whirlwind',
+    description: 'Spin the bottle 5 times in party sessions.',
+    targetCount: 5,
+    starReward: 70,
+    gameMode: 'bottle',
+    actionType: 'bottle_spin',
+  },
+  {
+    templateId: 'quest_bottle_spin_8',
+    title: 'Spinning Marathon',
+    description: 'Keep the party moving! Spin the bottle 8 times today.',
+    targetCount: 8,
     starReward: 90,
-    isClaimed: false,
     gameMode: 'bottle',
+    actionType: 'bottle_spin',
   },
+
+  // Finger Roulette Tasks
   {
-    id: 'quest_roulette_picker',
+    templateId: 'quest_roulette_picker_2',
     title: 'Finger Picker Host',
     description: 'Complete 2 rounds of Finger Roulette selection.',
     targetCount: 2,
-    currentCount: 0,
     starReward: 50,
-    isClaimed: false,
     gameMode: 'roulette',
+    actionType: 'roulette_round',
   },
   {
-    id: 'quest_roulette_frenzy',
-    title: 'Roulette Frenzy',
-    description: 'Complete 4 rounds of Finger Roulette.',
+    templateId: 'quest_roulette_picker_4',
+    title: 'High-Voltage Touch',
+    description: 'Gather friends and complete 4 Finger Roulette rounds.',
     targetCount: 4,
-    currentCount: 0,
-    starReward: 90,
-    isClaimed: false,
+    starReward: 75,
     gameMode: 'roulette',
+    actionType: 'roulette_round',
   },
   {
-    id: 'quest_kaboom_tiles',
+    templateId: 'quest_roulette_picker_6',
+    title: 'Roulette Party Crowd',
+    description: 'Survive or decide in 6 Finger Roulette showdowns.',
+    targetCount: 6,
+    starReward: 100,
+    gameMode: 'roulette',
+    actionType: 'roulette_round',
+  },
+
+  // Kaboom (Bomb Game) Tasks
+  {
+    templateId: 'quest_kaboom_tiles_5',
     title: 'Safe Tile Sweeper',
     description: 'Reveal 5 safe ball tiles in KABOOM mode without detonating.',
     targetCount: 5,
-    currentCount: 0,
-    starReward: 75,
-    isClaimed: false,
+    starReward: 60,
     gameMode: 'kaboom',
+    actionType: 'kaboom_tile',
   },
   {
-    id: 'quest_kaboom_victory',
+    templateId: 'quest_kaboom_tiles_10',
+    title: 'Minefield Navigator',
+    description: 'Safely uncover 10 ball tiles across KABOOM matches.',
+    targetCount: 10,
+    starReward: 85,
+    gameMode: 'kaboom',
+    actionType: 'kaboom_tile',
+  },
+  {
+    templateId: 'quest_kaboom_tiles_15',
+    title: 'Grid Demolitionist',
+    description: 'Safely uncover 15 ball tiles across KABOOM games.',
+    targetCount: 15,
+    starReward: 110,
+    gameMode: 'kaboom',
+    actionType: 'kaboom_tile',
+  },
+  {
+    templateId: 'quest_kaboom_victory_1',
     title: 'Kaboom Champion',
     description: 'Safely clear a board or avoid bombs to win 1 KABOOM round.',
     targetCount: 1,
-    currentCount: 0,
-    starReward: 100,
-    isClaimed: false,
-    gameMode: 'kaboom',
-  },
-  {
-    id: 'quest_pong_match',
-    title: 'Pong Duelist',
-    description: 'Complete a match of Bomb Pong.',
-    targetCount: 1,
-    currentCount: 0,
     starReward: 75,
-    isClaimed: false,
-    gameMode: 'pong',
+    gameMode: 'kaboom',
+    actionType: 'kaboom_victory',
   },
   {
-    id: 'quest_pong_rally',
-    title: 'Rally Master',
-    description: 'Achieve a rally count of 8 or more in Bomb Pong.',
-    targetCount: 8,
-    currentCount: 0,
-    starReward: 85,
-    isClaimed: false,
+    templateId: 'quest_kaboom_victory_2',
+    title: 'Bomb Squad Elite',
+    description: 'Win 2 KABOOM rounds with zero detonated bombs.',
+    targetCount: 2,
+    starReward: 120,
+    gameMode: 'kaboom',
+    actionType: 'kaboom_victory',
+  },
+  {
+    templateId: 'quest_kaboom_bonus_2',
+    title: 'Mystery Seeker',
+    description: 'Discover 2 tactical bonus items hidden in KABOOM tiles.',
+    targetCount: 2,
+    starReward: 70,
+    gameMode: 'kaboom',
+    actionType: 'kaboom_bonus',
+  },
+
+  // Bomb Pong Tasks
+  {
+    templateId: 'quest_pong_match_1',
+    title: 'Pong Challenger',
+    description: 'Complete 1 match of Bomb Pong.',
+    targetCount: 1,
+    starReward: 50,
     gameMode: 'pong',
+    actionType: 'pong_match',
+  },
+  {
+    templateId: 'quest_pong_match_2',
+    title: 'Court Veteran',
+    description: 'Play 2 high-octane Bomb Pong matches.',
+    targetCount: 2,
+    starReward: 80,
+    gameMode: 'pong',
+    actionType: 'pong_match',
+  },
+  {
+    templateId: 'quest_pong_victory_1',
+    title: 'Bomb Pong Victor',
+    description: 'Win 1 Bomb Pong match against Solo Bot or 2P.',
+    targetCount: 1,
+    starReward: 75,
+    gameMode: 'pong',
+    actionType: 'pong_victory',
+  },
+  {
+    templateId: 'quest_pong_rally_5',
+    title: 'Rally Apprentice',
+    description: 'Achieve a rally of 5 or more paddle bounces in Bomb Pong.',
+    targetCount: 1,
+    starReward: 60,
+    gameMode: 'pong',
+    actionType: 'pong_rally_5',
+  },
+  {
+    templateId: 'quest_pong_bounces_15',
+    title: 'Paddle Maestro',
+    description: 'Rack up 15 total paddle bounces across Bomb Pong games.',
+    targetCount: 15,
+    starReward: 75,
+    gameMode: 'pong',
+    actionType: 'pong_bounce',
   },
 ];
 
-export function createDefaultQuests(dateStr?: string): DailyQuest[] {
-  const dStr = dateStr || getTodayDateString();
-  let seed = 0;
-  for (let i = 0; i < dStr.length; i++) {
-    seed = (seed * 31 + dStr.charCodeAt(i)) % 1000000007;
-  }
-  const rng = () => {
-    seed = (seed * 16807) % 2147483647;
-    return (seed - 1) / 2147483646;
+export function generateDailyQuests(): DailyQuest[] {
+  // Always include daily attendance as Slot 1
+  const attendanceQuest: DailyQuest = {
+    id: QUEST_ATTENDANCE_TEMPLATE.templateId,
+    templateId: QUEST_ATTENDANCE_TEMPLATE.templateId,
+    title: QUEST_ATTENDANCE_TEMPLATE.title,
+    description: QUEST_ATTENDANCE_TEMPLATE.description,
+    targetCount: QUEST_ATTENDANCE_TEMPLATE.targetCount,
+    currentCount: 1, // Ready to claim immediately upon daily login!
+    starReward: QUEST_ATTENDANCE_TEMPLATE.starReward,
+    isClaimed: false,
+    gameMode: QUEST_ATTENDANCE_TEMPLATE.gameMode,
+    actionType: QUEST_ATTENDANCE_TEMPLATE.actionType,
+    isRerolled: false,
   };
 
-  const pool = [...MASTER_DAILY_QUEST_POOL];
-  const partyQuest = pool.find((q) => q.id === 'quest_daily_party') || pool[0];
-  const otherPool = pool.filter((q) => q.id !== partyQuest.id);
+  // Select 4 diverse quests across game modes
+  const modes: ('bottle' | 'roulette' | 'kaboom' | 'pong')[] = ['bottle', 'roulette', 'kaboom', 'pong'];
+  const shuffledModes = [...modes].sort(() => Math.random() - 0.5);
 
-  for (let i = otherPool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [otherPool[i], otherPool[j]] = [otherPool[j], otherPool[i]];
+  const selectedQuests: DailyQuest[] = [attendanceQuest];
+
+  // Try to pick one quest from each of the 4 gameplay modes
+  shuffledModes.forEach((mode) => {
+    const candidates = QUEST_TEMPLATES_POOL.filter((t) => t.gameMode === mode);
+    if (candidates.length > 0) {
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      selectedQuests.push({
+        id: picked.templateId,
+        templateId: picked.templateId,
+        title: picked.title,
+        description: picked.description,
+        targetCount: picked.targetCount,
+        currentCount: 0,
+        starReward: picked.starReward,
+        isClaimed: false,
+        gameMode: picked.gameMode,
+        actionType: picked.actionType,
+        isRerolled: false,
+      });
+    }
+  });
+
+  // Ensure 5 quests in total
+  if (selectedQuests.length < 5) {
+    const existingIds = new Set(selectedQuests.map((q) => q.templateId || q.id));
+    const remaining = QUEST_TEMPLATES_POOL.filter((t) => !existingIds.has(t.templateId));
+    while (selectedQuests.length < 5 && remaining.length > 0) {
+      const idx = Math.floor(Math.random() * remaining.length);
+      const picked = remaining.splice(idx, 1)[0];
+      selectedQuests.push({
+        id: picked.templateId,
+        templateId: picked.templateId,
+        title: picked.title,
+        description: picked.description,
+        targetCount: picked.targetCount,
+        currentCount: 0,
+        starReward: picked.starReward,
+        isClaimed: false,
+        gameMode: picked.gameMode,
+        actionType: picked.actionType,
+        isRerolled: false,
+      });
+    }
   }
 
-  const selected = [partyQuest, ...otherPool.slice(0, 4)];
-  return selected.map((q) => ({
-    ...q,
-    currentCount: q.id === 'quest_daily_party' ? 1 : 0,
+  return selectedQuests;
+}
+
+export function createDefaultQuests(): DailyQuest[] {
+  return generateDailyQuests();
+}
+
+export const REROLL_STAR_COST = 25;
+
+export function rerollDailyQuest(
+  questId: string,
+  method: 'ad' | 'stars'
+): { success: boolean; error?: string; updatedState: EconomyState; newQuest?: DailyQuest } {
+  const state = getEconomyState();
+  const questIndex = state.dailyQuests.findIndex((q) => q.id === questId);
+  if (questIndex === -1) {
+    return { success: false, error: 'Quest not found', updatedState: state };
+  }
+
+  const quest = state.dailyQuests[questIndex];
+  if (quest.isClaimed) {
+    return { success: false, error: 'Cannot reroll already claimed quest', updatedState: state };
+  }
+  if (quest.currentCount >= quest.targetCount) {
+    return { success: false, error: 'Cannot reroll completed quest', updatedState: state };
+  }
+  if (quest.isRerolled) {
+    return { success: false, error: 'First reroll for this task has already been used today', updatedState: state };
+  }
+
+  let nextStars = state.stars;
+  if (method === 'stars') {
+    if (state.stars < REROLL_STAR_COST) {
+      return { success: false, error: `Need at least ${REROLL_STAR_COST} stars to reroll`, updatedState: state };
+    }
+    nextStars -= REROLL_STAR_COST;
+  }
+
+  // Find all active templates to avoid assigning a duplicate task
+  const activeIds = new Set(state.dailyQuests.map((q) => q.templateId || q.id));
+  const availableTemplates = QUEST_TEMPLATES_POOL.filter(
+    (t) => !activeIds.has(t.templateId) && t.templateId !== quest.id && t.templateId !== quest.templateId
+  );
+
+  const fallbackPool = availableTemplates.length > 0
+    ? availableTemplates
+    : QUEST_TEMPLATES_POOL.filter((t) => t.templateId !== quest.id && t.templateId !== quest.templateId);
+
+  if (fallbackPool.length === 0) {
+    return { success: false, error: 'No alternate quests available right now', updatedState: state };
+  }
+
+  const picked = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+  const newQuest: DailyQuest = {
+    id: picked.templateId,
+    templateId: picked.templateId,
+    title: picked.title,
+    description: picked.description,
+    targetCount: picked.targetCount,
+    currentCount: 0,
+    starReward: picked.starReward,
     isClaimed: false,
-  }));
+    gameMode: picked.gameMode,
+    actionType: picked.actionType,
+    isRerolled: true, // First reroll used for this task slot today
+  };
+
+  const updatedQuests = [...state.dailyQuests];
+  updatedQuests[questIndex] = newQuest;
+
+  const updatedState: EconomyState = {
+    ...state,
+    stars: nextStars,
+    dailyQuests: updatedQuests,
+  };
+
+  saveEconomyState(updatedState);
+  return { success: true, updatedState, newQuest };
 }
 
 export const MILESTONE_CHEST_REWARD = 250;
@@ -1170,9 +1390,8 @@ const DEFAULT_STATE: EconomyState = {
   claimedLoginDay: 1,
   milestoneChestsOpened: 0,
   totalLoginsCount: 1,
-  lifetimeStarsEarned: 1250,
+  lifetimeStarsEarned: 100,
   questsCompletedCount: 0,
-  questRerolledToday: false,
 };
 
 export function getEconomyState(): EconomyState {
@@ -1243,31 +1462,41 @@ export function getEconomyState(): EconomyState {
 
     let dailyQuests: DailyQuest[];
     let milestoneChestClaimed = Boolean(parsed.milestoneChestClaimed);
-    const questRerolledToday = isNewDay ? false : Boolean(parsed.questRerolledToday);
 
     if (isNewDay) {
       // It's a new day! Reset all quests and milestone chest
-      dailyQuests = createDefaultQuests(todayStr);
+      dailyQuests = generateDailyQuests();
       milestoneChestClaimed = false;
     } else {
-      // Same day: ensure standard 5 quests exist and keep progress
-      const defaultQuests = createDefaultQuests(todayStr);
-      const existingQuests: DailyQuest[] = Array.isArray(parsed.dailyQuests) ? parsed.dailyQuests : [];
-      
-      dailyQuests = defaultQuests.map((defQ) => {
-        const found = existingQuests.find((q) => q.id === defQ.id);
-        if (found) {
+      // Same day: preserve active quests and their progress/reroll state
+      const existingQuests: any[] = Array.isArray(parsed.dailyQuests) ? parsed.dailyQuests : [];
+      if (existingQuests.length === 5) {
+        dailyQuests = existingQuests.map((q) => {
+          let actionType: QuestActionType = q.actionType;
+          if (!actionType) {
+            if (q.id.includes('bottle')) actionType = 'bottle_spin';
+            else if (q.id.includes('roulette')) actionType = 'roulette_round';
+            else if (q.id.includes('kaboom_victory')) actionType = 'kaboom_victory';
+            else if (q.id.includes('kaboom_tiles') || q.id.includes('kaboom_tile')) actionType = 'kaboom_tile';
+            else if (q.id.includes('pong')) actionType = 'pong_match';
+            else actionType = 'attendance';
+          }
           return {
-            ...defQ,
-            currentCount: typeof found.currentCount === 'number' ? found.currentCount : defQ.currentCount,
-            isClaimed: Boolean(found.isClaimed),
+            id: q.id,
+            templateId: q.templateId || q.id,
+            title: q.title,
+            description: q.description,
+            targetCount: q.targetCount,
+            currentCount: typeof q.currentCount === 'number' ? q.currentCount : 0,
+            starReward: q.starReward,
+            isClaimed: Boolean(q.isClaimed),
+            gameMode: q.gameMode || 'hub',
+            actionType,
+            isRerolled: Boolean(q.isRerolled),
           };
-        }
-        return defQ;
-      });
-      // Also allow custom rerolled quests if user rerolled today
-      if (existingQuests.length > 0 && existingQuests.some((eq) => !defaultQuests.some((dq) => dq.id === eq.id))) {
-        dailyQuests = existingQuests;
+        });
+      } else {
+        dailyQuests = generateDailyQuests();
       }
     }
 
@@ -1328,7 +1557,6 @@ export function getEconomyState(): EconomyState {
         typeof parsed.questsCompletedCount === 'number' ? parsed.questsCompletedCount : 0,
         dailyQuests.filter((q) => q.currentCount >= q.targetCount).length
       ),
-      questRerolledToday,
     };
 
     if (isNewDay) {
@@ -1354,13 +1582,13 @@ export function checkAndResetDailyQuests(): EconomyState {
   const current = getEconomyState();
   const today = getTodayDateString();
   if (current.lastDailyResetDate !== today) {
-    const newQuests = createDefaultQuests(today);
+    const newQuests = createDefaultQuests();
+    // Daily attendance quest is fulfilled immediately upon daily check-in
     const initialCompleted = newQuests.filter((q) => q.currentCount >= q.targetCount).length;
     const updated: EconomyState = {
       ...current,
       dailyQuests: newQuests,
       milestoneChestClaimed: false,
-      questRerolledToday: false,
       lastDailyResetDate: today,
       lastDailyReset: Date.now(),
       totalLoginsCount: (current.totalLoginsCount || 1) + 1,
@@ -1373,126 +1601,67 @@ export function checkAndResetDailyQuests(): EconomyState {
 }
 
 export function recordDailyQuestProgress(
-  type: 'bottle_spin' | 'roulette_round' | 'kaboom_tile' | 'kaboom_victory' | 'pong_match' | 'pong_rally' | 'bonus_found',
+  type: QuestActionType | 'bottle_spin' | 'roulette_round' | 'kaboom_tile' | 'kaboom_victory',
   amount: number = 1
 ): { updatedState: EconomyState; completedQuests: DailyQuest[] } {
   const state = checkAndResetDailyQuests();
 
-  let matchingIndices: number[] = [];
-  state.dailyQuests.forEach((q, idx) => {
-    if (q.currentCount >= q.targetCount) return;
-    if (type === 'bottle_spin' && q.gameMode === 'bottle') matchingIndices.push(idx);
-    else if (type === 'roulette_round' && q.gameMode === 'roulette') matchingIndices.push(idx);
-    else if ((type === 'kaboom_tile' || type === 'kaboom_victory' || type === 'bonus_found') && q.gameMode === 'kaboom') matchingIndices.push(idx);
-    else if ((type === 'pong_match' || type === 'pong_rally') && q.gameMode === 'pong') matchingIndices.push(idx);
-  });
+  const legacyIdMap: Record<string, string> = {
+    bottle_spin: 'quest_bottle_spin',
+    roulette_round: 'quest_roulette_picker',
+    kaboom_tile: 'quest_kaboom_tiles',
+    kaboom_victory: 'quest_kaboom_victory',
+  };
 
-  if (matchingIndices.length === 0) {
-    const idMap: Record<string, string> = {
-      bottle_spin: 'quest_bottle_spin',
-      roulette_round: 'quest_roulette_picker',
-      kaboom_tile: 'quest_kaboom_tiles',
-      kaboom_victory: 'quest_kaboom_victory',
-    };
-    const targetId = idMap[type];
-    if (targetId) {
-      const idx = state.dailyQuests.findIndex((q) => q.id === targetId);
-      if (idx !== -1) matchingIndices.push(idx);
+  let stateChanged = false;
+  let newlyCompletedCount = 0;
+  const completedList: DailyQuest[] = [];
+
+  const updatedQuests = state.dailyQuests.map((quest) => {
+    // Match by actionType OR legacy id prefix/match
+    const matchesAction = quest.actionType === type;
+    const matchesLegacy = legacyIdMap[type] && quest.id.startsWith(legacyIdMap[type]);
+    const matchesId = quest.id === legacyIdMap[type];
+
+    if (!matchesAction && !matchesLegacy && !matchesId) {
+      return quest;
     }
-  }
 
-  if (matchingIndices.length === 0) {
-    return { updatedState: state, completedQuests: [] };
-  }
+    if (quest.currentCount >= quest.targetCount) {
+      return quest;
+    }
 
-  const updatedQuests = [...state.dailyQuests];
-  const newlyCompleted: DailyQuest[] = [];
-
-  for (const questIndex of matchingIndices) {
-    const quest = updatedQuests[questIndex];
-    if (quest.currentCount >= quest.targetCount) continue;
-
-    const completedNow = (quest.currentCount + amount) >= quest.targetCount && quest.currentCount < quest.targetCount;
+    stateChanged = true;
     const nextCount = Math.min(quest.targetCount, quest.currentCount + amount);
+    const completedNow = nextCount >= quest.targetCount && quest.currentCount < quest.targetCount;
+    if (completedNow) {
+      newlyCompletedCount += 1;
+      completedList.push({ ...quest, currentCount: nextCount });
+    }
 
-    updatedQuests[questIndex] = {
+    return {
       ...quest,
       currentCount: nextCount,
     };
+  });
 
-    if (completedNow) {
-      newlyCompleted.push(updatedQuests[questIndex]);
-    }
-  }
-
-  if (newlyCompleted.length === 0 && matchingIndices.every((idx) => updatedQuests[idx].currentCount === state.dailyQuests[idx].currentCount)) {
+  if (!stateChanged) {
     return { updatedState: state, completedQuests: [] };
   }
 
   const updatedState: EconomyState = {
     ...state,
     dailyQuests: updatedQuests,
-    questsCompletedCount: (state.questsCompletedCount || 0) + newlyCompleted.length,
+    questsCompletedCount: (state.questsCompletedCount || 0) + newlyCompletedCount,
   };
 
   saveEconomyState(updatedState);
 
   return {
     updatedState,
-    completedQuests: newlyCompleted,
+    completedQuests: completedList,
   };
 }
-
-export function rerollDailyQuest(
-  questId: string
-): { success: boolean; message: string; updatedState: EconomyState } {
-  const state = checkAndResetDailyQuests();
-
-  const questIndex = state.dailyQuests.findIndex((q) => q.id === questId);
-  if (questIndex === -1) {
-    return { success: false, message: 'Quest not found.', updatedState: state };
-  }
-
-  const questToReplace = state.dailyQuests[questIndex];
-  if (questToReplace.rerolled) {
-    return { success: false, message: 'This task has already been rerolled once.', updatedState: state };
-  }
-  if (questToReplace.isClaimed || questToReplace.currentCount >= questToReplace.targetCount) {
-    return { success: false, message: 'Cannot reroll a completed or claimed task.', updatedState: state };
-  }
-
-  const activeIds = new Set(state.dailyQuests.map((q) => q.id));
-  const candidates = MASTER_DAILY_QUEST_POOL.filter((q) => !activeIds.has(q.id));
-
-  if (candidates.length === 0) {
-    return { success: false, message: 'No alternative quests available today.', updatedState: state };
-  }
-
-  const newQuestTemplate = candidates[Math.floor(Math.random() * candidates.length)];
-  const newQuest: DailyQuest = {
-    ...newQuestTemplate,
-    currentCount: 0,
-    isClaimed: false,
-    rerolled: true,
-  };
-
-  const newDailyQuests = [...state.dailyQuests];
-  newDailyQuests[questIndex] = newQuest;
-
-  const updatedState: EconomyState = {
-    ...state,
-    dailyQuests: newDailyQuests,
-  };
-
-  saveEconomyState(updatedState);
-  return {
-    success: true,
-    message: 'Task successfully rerolled for free!',
-    updatedState,
-  };
-}
-
-
 
 export function claimMilestoneChest(): {
   success: boolean;

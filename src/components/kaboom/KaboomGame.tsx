@@ -504,6 +504,7 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
       // OUTCOME 1: BOMB (KABOOM! - GAME OVER LOSS FOR THIS ROUND)
       // ========================================================================
       if (liveTile.type === 'bomb') {
+
         // Detonation! Game Over for this round.
         SoundEngine.playBombExplosion();
         setDetonatedPlayerIndex(currentPlayer);
@@ -586,6 +587,7 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
         if (command.id === 'uno_reverse') {
           setIsReverseOrder((prev) => !prev);
         }
+        recordDailyQuestProgress('kaboom_bonus', 1);
 
         // Reveal this tapped bonus tile
         let updatedTiles = currentTiles.map((t) =>
