@@ -39,8 +39,8 @@ import {
 } from '../lib/events';
 import { SoundEngine, Haptics } from '../lib/audio';
 import { EconomyState } from '../lib/economy';
-import starSpriteImg from '../assets/images/Star Sprite.webp';
-import chestSpriteImg from '../assets/images/Chest Sprite.webp';
+import starSpriteImg from '../assets/images/sprites/Star Sprite.webp';
+import chestSpriteImg from '../assets/images/sprites/Chest Sprite.webp';
 
 interface EventModalProps {
   isOpen: boolean;

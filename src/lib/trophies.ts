@@ -1003,19 +1003,30 @@ export function claimTrophyReward(
 export function calculateTrophyProgress(
   trophy: AchievementTrophy,
   stats: {
-    totalRouletteRounds: number;
-    totalBottleSpins: number;
-    totalKaboomRounds: number;
+    totalRouletteRounds?: number;
+    totalBottleSpins?: number;
+    totalKaboomRounds?: number;
     totalPongRounds?: number;
     pongVictories?: number;
     pongHighestRally?: number;
-    kaboomVictories: number;
-    kaboomBonusCollected: number;
-    unlockedItemCount: number;
+    kaboomVictories?: number;
+    kaboomBonusCollected?: number;
+    unlockedItemCount?: number;
     totalLogins?: number;
     lifetimeStars?: number;
     milestoneChestsOpened?: number;
     questsCompleted?: number;
+    kaboom?: {
+      victories?: number;
+      bonusCollected?: number;
+      totalRounds?: number;
+    };
+    pong?: {
+      victories?: number;
+      highestRally?: number;
+      totalRounds?: number;
+    };
+    [key: string]: any;
   },
   claims: Record<string, TrophyTier[]>
 ): TrophyProgress {
@@ -1023,44 +1034,46 @@ export function calculateTrophyProgress(
 
   switch (trophy.id) {
     case 'roulette_master':
-      currentValue = stats.totalRouletteRounds;
+      currentValue = stats.totalRouletteRounds || 0;
       break;
     case 'bottle_twister':
-      currentValue = stats.totalBottleSpins;
+      currentValue = stats.totalBottleSpins || 0;
       break;
     case 'bomb_defuser':
-      currentValue = stats.kaboomVictories;
+      currentValue = stats.kaboomVictories ?? stats.kaboom?.victories ?? 0;
       break;
     case 'bonus_hunter':
-      currentValue = stats.kaboomBonusCollected;
+      currentValue = stats.kaboomBonusCollected ?? stats.kaboom?.bonusCollected ?? 0;
       break;
     case 'pong_master':
-      currentValue = stats.pongVictories || 0;
+      currentValue = stats.pongVictories ?? stats.pong?.victories ?? 0;
       break;
     case 'pong_rally_legend':
-      currentValue = stats.pongHighestRally || 0;
+      currentValue = stats.pongHighestRally ?? stats.pong?.highestRally ?? 0;
       break;
     case 'party_legend':
+      const kRounds = stats.totalKaboomRounds ?? stats.kaboom?.totalRounds ?? 0;
+      const pRounds = stats.totalPongRounds ?? stats.pong?.totalRounds ?? 0;
       currentValue =
-        stats.totalRouletteRounds +
-        stats.totalBottleSpins +
-        stats.totalKaboomRounds +
-        (stats.totalPongRounds || 0);
+        (stats.totalRouletteRounds || 0) +
+        (stats.totalBottleSpins || 0) +
+        kRounds +
+        pRounds;
       break;
     case 'collector_wardrobe':
-      currentValue = stats.unlockedItemCount;
+      currentValue = stats.unlockedItemCount ?? 0;
       break;
     case 'total_logins':
-      currentValue = stats.totalLogins || 0;
+      currentValue = stats.totalLogins ?? stats.totalLoginsCount ?? 0;
       break;
     case 'midas_touch':
-      currentValue = stats.lifetimeStars || 0;
+      currentValue = stats.lifetimeStars ?? stats.lifetimeStarsEarned ?? stats.stars ?? 0;
       break;
     case 'milestone_chests':
-      currentValue = stats.milestoneChestsOpened || 0;
+      currentValue = stats.milestoneChestsOpened ?? 0;
       break;
     case 'quest_master':
-      currentValue = stats.questsCompleted || 0;
+      currentValue = stats.questsCompleted ?? stats.questsCompletedCount ?? 0;
       break;
     default:
       currentValue = 0;
@@ -1096,7 +1109,7 @@ export function calculateTrophyProgress(
     progressPercent = 100;
   } else {
     const prevThreshold = currentTierConfig ? currentTierConfig.threshold : 0;
-    const range = nextTierConfig.threshold - prevThreshold;
+    const range = Math.max(1, nextTierConfig.threshold - prevThreshold);
     const progressIntoRange = Math.max(0, currentValue - prevThreshold);
     progressPercent = Math.min(
       100,
@@ -1137,29 +1150,15 @@ export function getTrophyImage(
   return trophy.images?.[tier];
 }
 
+const DEFAULT_SKIN_IDS = new Set([
+  'bottle_btl_001',
+  'bomb_classic_tnt',
+  'ball_cyan_orbs',
+  'particle_classic_blaze',
+]);
+
 export function hasUnclaimedTrophies(
-  stats?: {
-    totalRouletteRounds?: number;
-    totalBottleSpins?: number;
-    totalKaboomRounds?: number;
-    totalPongRounds?: number;
-    pongVictories?: number;
-    pongHighestRally?: number;
-    pong?: {
-      victories?: number;
-      highestRally?: number;
-      totalRounds?: number;
-    };
-    kaboom?: {
-      victories?: number;
-      bonusCollected?: number;
-    };
-    unlockedItemCount?: number;
-    totalLogins?: number;
-    lifetimeStars?: number;
-    milestoneChestsOpened?: number;
-    questsCompleted?: number;
-  } | null,
+  stats?: any,
   economy?: EconomyState | null,
   claims?: Record<string, TrophyTier[]>
 ): boolean {
@@ -1168,39 +1167,46 @@ export function hasUnclaimedTrophies(
     const currentEconomy =
       economy || (typeof window !== 'undefined' ? getEconomyState() : undefined);
 
+    const rawUnlocked = currentEconomy?.unlockedItems || [];
+    const unlockedNonDefault = rawUnlocked.filter((id) => !DEFAULT_SKIN_IDS.has(id)).length;
+
     const statsContext = {
       totalRouletteRounds: stats?.totalRouletteRounds || 0,
       totalBottleSpins: stats?.totalBottleSpins || 0,
-      totalKaboomRounds: stats?.totalKaboomRounds || 0,
+      totalKaboomRounds: stats?.totalKaboomRounds || stats?.kaboom?.totalRounds || 0,
       totalPongRounds: stats?.totalPongRounds || stats?.pong?.totalRounds || 0,
-      pongVictories: stats?.pongVictories || stats?.pong?.victories || 0,
-      pongHighestRally: stats?.pongHighestRally || stats?.pong?.highestRally || 0,
-      kaboomVictories: stats?.kaboom?.victories || 0,
-      kaboomBonusCollected: stats?.kaboom?.bonusCollected || 0,
-      unlockedItemCount:
-        currentEconomy?.unlockedItems?.length || stats?.unlockedItemCount || 1,
+      pongVictories: stats?.pongVictories ?? stats?.pong?.victories ?? 0,
+      pongHighestRally: stats?.pongHighestRally ?? stats?.pong?.highestRally ?? 0,
+      kaboomVictories: stats?.kaboomVictories ?? stats?.kaboom?.victories ?? 0,
+      kaboomBonusCollected: stats?.kaboomBonusCollected ?? stats?.kaboom?.bonusCollected ?? 0,
+      unlockedItemCount: stats?.unlockedItemCount ?? unlockedNonDefault,
       totalLogins: Math.max(
         1,
         stats?.totalLogins ||
+          stats?.totalLoginsCount ||
           currentEconomy?.totalLoginsCount ||
           currentEconomy?.dailyLoginRewards?.claimedDays?.length ||
           1
       ),
       lifetimeStars: Math.max(
         stats?.lifetimeStars || 0,
+        stats?.lifetimeStarsEarned || 0,
         currentEconomy?.stars || 0,
         currentEconomy?.lifetimeStarsEarned || 0
       ),
-      milestoneChestsOpened:
-        stats?.milestoneChestsOpened ||
-        currentEconomy?.milestoneChestsOpened ||
-        (currentEconomy?.milestoneChestClaimed ? 1 : 0),
-      questsCompleted:
-        stats?.questsCompleted ||
-        currentEconomy?.questsCompletedCount ||
-        (currentEconomy?.dailyQuests?.filter(
-          (q) => q.currentCount >= q.targetCount
-        ).length || 0),
+      milestoneChestsOpened: Math.max(
+        stats?.milestoneChestsOpened || 0,
+        currentEconomy?.milestoneChestsOpened || 0,
+        currentEconomy?.milestoneChestClaimed ? 1 : 0
+      ),
+      questsCompleted: Math.max(
+        stats?.questsCompleted || 0,
+        stats?.questsCompletedCount || 0,
+        currentEconomy?.questsCompletedCount || 0,
+        (currentEconomy?.dailyQuests || []).filter(
+          (q) => q.isClaimed || q.currentCount >= q.targetCount
+        ).length || 0
+      ),
     };
 
     return TROPHY_DEFINITIONS.some((trophy) => {
@@ -1213,28 +1219,7 @@ export function hasUnclaimedTrophies(
 }
 
 export function getUnclaimedTrophiesCount(
-  stats?: {
-    totalRouletteRounds?: number;
-    totalBottleSpins?: number;
-    totalKaboomRounds?: number;
-    totalPongRounds?: number;
-    pongVictories?: number;
-    pongHighestRally?: number;
-    pong?: {
-      victories?: number;
-      highestRally?: number;
-      totalRounds?: number;
-    };
-    kaboom?: {
-      victories?: number;
-      bonusCollected?: number;
-    };
-    unlockedItemCount?: number;
-    totalLogins?: number;
-    lifetimeStars?: number;
-    milestoneChestsOpened?: number;
-    questsCompleted?: number;
-  } | null,
+  stats?: any,
   economy?: EconomyState | null,
   claims?: Record<string, TrophyTier[]>
 ): number {
@@ -1243,39 +1228,46 @@ export function getUnclaimedTrophiesCount(
     const currentEconomy =
       economy || (typeof window !== 'undefined' ? getEconomyState() : undefined);
 
+    const rawUnlocked = currentEconomy?.unlockedItems || [];
+    const unlockedNonDefault = rawUnlocked.filter((id) => !DEFAULT_SKIN_IDS.has(id)).length;
+
     const statsContext = {
       totalRouletteRounds: stats?.totalRouletteRounds || 0,
       totalBottleSpins: stats?.totalBottleSpins || 0,
-      totalKaboomRounds: stats?.totalKaboomRounds || 0,
+      totalKaboomRounds: stats?.totalKaboomRounds || stats?.kaboom?.totalRounds || 0,
       totalPongRounds: stats?.totalPongRounds || stats?.pong?.totalRounds || 0,
-      pongVictories: stats?.pongVictories || stats?.pong?.victories || 0,
-      pongHighestRally: stats?.pongHighestRally || stats?.pong?.highestRally || 0,
-      kaboomVictories: stats?.kaboom?.victories || 0,
-      kaboomBonusCollected: stats?.kaboom?.bonusCollected || 0,
-      unlockedItemCount:
-        currentEconomy?.unlockedItems?.length || stats?.unlockedItemCount || 1,
+      pongVictories: stats?.pongVictories ?? stats?.pong?.victories ?? 0,
+      pongHighestRally: stats?.pongHighestRally ?? stats?.pong?.highestRally ?? 0,
+      kaboomVictories: stats?.kaboomVictories ?? stats?.kaboom?.victories ?? 0,
+      kaboomBonusCollected: stats?.kaboomBonusCollected ?? stats?.kaboom?.bonusCollected ?? 0,
+      unlockedItemCount: stats?.unlockedItemCount ?? unlockedNonDefault,
       totalLogins: Math.max(
         1,
         stats?.totalLogins ||
+          stats?.totalLoginsCount ||
           currentEconomy?.totalLoginsCount ||
           currentEconomy?.dailyLoginRewards?.claimedDays?.length ||
           1
       ),
       lifetimeStars: Math.max(
         stats?.lifetimeStars || 0,
+        stats?.lifetimeStarsEarned || 0,
         currentEconomy?.stars || 0,
         currentEconomy?.lifetimeStarsEarned || 0
       ),
-      milestoneChestsOpened:
-        stats?.milestoneChestsOpened ||
-        currentEconomy?.milestoneChestsOpened ||
-        (currentEconomy?.milestoneChestClaimed ? 1 : 0),
-      questsCompleted:
-        stats?.questsCompleted ||
-        currentEconomy?.questsCompletedCount ||
-        (currentEconomy?.dailyQuests?.filter(
-          (q) => q.currentCount >= q.targetCount
-        ).length || 0),
+      milestoneChestsOpened: Math.max(
+        stats?.milestoneChestsOpened || 0,
+        currentEconomy?.milestoneChestsOpened || 0,
+        currentEconomy?.milestoneChestClaimed ? 1 : 0
+      ),
+      questsCompleted: Math.max(
+        stats?.questsCompleted || 0,
+        stats?.questsCompletedCount || 0,
+        currentEconomy?.questsCompletedCount || 0,
+        (currentEconomy?.dailyQuests || []).filter(
+          (q) => q.isClaimed || q.currentCount >= q.targetCount
+        ).length || 0
+      ),
     };
 
     return TROPHY_DEFINITIONS.reduce((acc, trophy) => {

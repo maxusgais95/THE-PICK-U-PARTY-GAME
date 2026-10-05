@@ -9,7 +9,7 @@ import { ChampagneBottleIcon } from './ChampagneBottleIcon';
 import { TrailSimulationModal } from './TrailSimulationModal';
 import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
 import kaboomBallImg from '../assets/images/balls/Ball Sprite.webp';
-import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
+import currencyStarImg from '../assets/images/sprites/Currency Star Sprite.webp';
 import {
   StoreCategory,
   StoreItem,

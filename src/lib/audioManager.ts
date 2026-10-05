@@ -35,6 +35,11 @@ export const SOUND_MANIFEST = [
   { id: 'bottle_tick_1', file: 'bottle_tick_1.wav', category: 'bottle', approxKb: 6.7 },
   { id: 'bottle_tick_2', file: 'bottle_tick_2.wav', category: 'bottle', approxKb: 6.7 },
   { id: 'bottle_tick_3', file: 'bottle_tick_3.wav', category: 'bottle', approxKb: 6.7 },
+  { id: 'button_01', file: 'button_01.mp3', category: 'ui', approxKb: 15.0 },
+  { id: 'button_02', file: 'button_02.mp3', category: 'ui', approxKb: 15.0 },
+  { id: 'complete', file: 'complete.mp3', category: 'ui', approxKb: 25.0 },
+  { id: 'finger_selected', file: 'finger_selected.mp3', category: 'roulette', approxKb: 20.0 },
+  { id: 'bonus_found', file: 'bonus_found.mp3', category: 'kaboom', approxKb: 20.0 },
 ] as const;
 
 export type SoundFileName = (typeof SOUND_MANIFEST)[number]['file'];
@@ -498,13 +503,13 @@ export class AudioManager {
   }
 
   // =========================================================================
-  // 4. Target Impact: Thunderous 808 Sub Thump + Shockwave Crackle
+  // 4. Target Impact / Finger Selected
   // =========================================================================
   public static playTargetImpact() {
     Haptics.targetSelected();
     if (!this.soundEnabled) return;
 
-    const played = this.playSample('target_impact.wav', { volume: 1.0 });
+    const played = this.playSample('finger_selected.mp3', { volume: 0.95 });
     if (!played) {
       const ctx = getAudioContext();
       if (!ctx) return;
@@ -525,6 +530,14 @@ export class AudioManager {
         subOsc.stop(now + 0.7);
       } catch (e) {}
     }
+  }
+
+  // =========================================================================
+  // 4b. Complete Sound
+  // =========================================================================
+  public static playComplete() {
+    if (!this.soundEnabled) return;
+    this.playSample('complete.mp3', { volume: 0.90 });
   }
 
   // =========================================================================
@@ -670,16 +683,16 @@ export class AudioManager {
   }
 
   // =========================================================================
-  // 9. UI Button Click: Ultra-crisp modern glass tap
+  // 9. UI Button Click: Randomly uses button_01.mp3 or button_02.mp3
   // =========================================================================
   public static playButtonClick() {
     Haptics.buttonClick();
     if (!this.soundEnabled) return;
 
-    // Subtle micro-pitch variation (0.97 - 1.03) for natural tactile feel
+    const variant = Math.random() < 0.5 ? 'button_01.mp3' : 'button_02.mp3';
     const randomRate = 0.97 + Math.random() * 0.06;
 
-    const played = this.playSample('button_click.wav', {
+    const played = this.playSample(variant, {
       volume: 0.85,
       playbackRate: randomRate,
     });
@@ -707,42 +720,46 @@ export class AudioManager {
   }
 
   // =========================================================================
-  // 10. Kaboom: Safe Ball Pop (Bubble burst + crystal glass chime)
+  // 10. Kaboom: Bonus Found / Safe Pop
   // =========================================================================
   public static playSafePop() {
     Haptics.safePop();
     if (!this.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      // Frequency dive bubble pop
-      const popOsc = ctx.createOscillator();
-      const popGain = ctx.createGain();
-      popOsc.type = 'sine';
-      popOsc.frequency.setValueAtTime(640, now);
-      popOsc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
-      popGain.gain.setValueAtTime(0.22 * this.masterVolume, now);
-      popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
-      popOsc.connect(popGain);
-      popGain.connect(ctx.destination);
-      popOsc.start(now);
-      popOsc.stop(now + 0.05);
 
-      // Uplifting harmonic crystal chime
-      const chimeOsc = ctx.createOscillator();
-      const chimeGain = ctx.createGain();
-      chimeOsc.type = 'triangle';
-      chimeOsc.frequency.setValueAtTime(987.77, now + 0.02); // B5
-      chimeOsc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.16); // E6
-      chimeGain.gain.setValueAtTime(0.001, now + 0.02);
-      chimeGain.gain.linearRampToValueAtTime(0.18 * this.masterVolume, now + 0.04);
-      chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
-      chimeOsc.connect(chimeGain);
-      chimeGain.connect(ctx.destination);
-      chimeOsc.start(now + 0.02);
-      chimeOsc.stop(now + 0.35);
-    } catch (e) {}
+    const played = this.playSample('bonus_found.mp3', { volume: 0.90 });
+    if (!played) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        // Frequency dive bubble pop
+        const popOsc = ctx.createOscillator();
+        const popGain = ctx.createGain();
+        popOsc.type = 'sine';
+        popOsc.frequency.setValueAtTime(640, now);
+        popOsc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
+        popGain.gain.setValueAtTime(0.22 * this.masterVolume, now);
+        popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+        popOsc.connect(popGain);
+        popGain.connect(ctx.destination);
+        popOsc.start(now);
+        popOsc.stop(now + 0.05);
+
+        // Uplifting harmonic crystal chime
+        const chimeOsc = ctx.createOscillator();
+        const chimeGain = ctx.createGain();
+        chimeOsc.type = 'triangle';
+        chimeOsc.frequency.setValueAtTime(987.77, now + 0.02); // B5
+        chimeOsc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.16); // E6
+        chimeGain.gain.setValueAtTime(0.001, now + 0.02);
+        chimeGain.gain.linearRampToValueAtTime(0.18 * this.masterVolume, now + 0.04);
+        chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        chimeOsc.connect(chimeGain);
+        chimeGain.connect(ctx.destination);
+        chimeOsc.start(now + 0.02);
+        chimeOsc.stop(now + 0.35);
+      } catch (e) {}
+    }
   }
 
   // =========================================================================

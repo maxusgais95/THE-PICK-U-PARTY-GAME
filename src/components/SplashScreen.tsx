@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import pickuPartyLogo from '../assets/images/PICKU_PARTY_LOGO_ART.webp';
+import pickuPartyLogo from '../assets/images/branding/PICKU_PARTY_LOGO_ART.webp';
 import splashBgVideo from '../assets/videos/Chibi Party Splash Screen Background Animation.mp4';
 import { preloadAllAssets, getAssetUrl, preloadFonts } from '../lib/assetPreloader';
 import { SoundEngine, Haptics } from '../lib/audio';

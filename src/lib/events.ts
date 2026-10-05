@@ -12,10 +12,10 @@ import {
   EventRewardType,
 } from '../types/events';
 import { addStars, unlockStoreSkin, getEconomyState } from './economy';
-import extremeBgImg from '../assets/images/Extreme Mode Background.webp';
-import ultimateBgImg from '../assets/images/Ultimate Mode Background.webp';
-import bombGameBgImg from '../assets/images/Bomb Game Background.webp';
-import chaosBgImg from '../assets/images/Chaos Mode Background.webp';
+import extremeBgImg from '../assets/images/backgrounds/Extreme Mode Background.webp';
+import ultimateBgImg from '../assets/images/backgrounds/Ultimate Mode Background.webp';
+import bombGameBgImg from '../assets/images/backgrounds/Bomb Game Background.webp';
+import chaosBgImg from '../assets/images/backgrounds/Chaos Mode Background.webp';
 
 // Bomb and Ball assets for event rewards and store previews
 import bombDynamoImg from '../assets/images/bombs/Bomb Dynamo.webp';

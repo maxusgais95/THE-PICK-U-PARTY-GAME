@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import pongCourtBg from '../assets/images/Pong Game Background.webp';
+import pongCourtBg from '../assets/images/backgrounds/Pong Game Background.webp';
 import { getAssetUrl } from '../lib/assetPreloader';
 
 // Module-level asset preloading for instant zero-latency rendering

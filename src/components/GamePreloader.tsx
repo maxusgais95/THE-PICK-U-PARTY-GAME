@@ -4,10 +4,10 @@
  */
 
 import React from 'react';
-import chibiFingersImg from '../assets/images/Chibi Fingers Game.webp';
-import chibiBottleImg from '../assets/images/Chibi Spinning Bottle.webp';
-import chibiBombImg from '../assets/images/Chibi Bomb Game.webp';
-import chibiBombPongImg from '../assets/images/Chibi Bomb Pong Game.webp';
+import chibiFingersImg from '../assets/images/games/Chibi Fingers Game.webp';
+import chibiBottleImg from '../assets/images/games/Chibi Spinning Bottle.webp';
+import chibiBombImg from '../assets/images/games/Chibi Bomb Game.webp';
+import chibiBombPongImg from '../assets/images/games/Chibi Bomb Pong Game.webp';
 import { GameModeId } from '../lib/assetPreloader';
 import { Loader2 } from 'lucide-react';
 

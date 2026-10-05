@@ -29,7 +29,7 @@ import {
   getTrophyImage,
 } from '../lib/trophies';
 import { AppStats } from '../types';
-import { getStats } from '../lib/db';
+import { getStats, getAllCustomSprites } from '../lib/db';
 import { EconomyState, addStars, getEconomyState } from '../lib/economy';
 import { SoundEngine, Haptics } from '../lib/audio';
 import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
@@ -224,6 +224,8 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
   const [selectedTrophy, setSelectedTrophy] = useState<AchievementTrophy | null>(null);
   const [inspectedTier, setInspectedTier] = useState<TrophyTier | null>(null);
 
+  const [customSpritesCount, setCustomSpritesCount] = useState<number>(0);
+
   // Live real-time stats and economy synchronization
   const [liveStats, setLiveStats] = useState<AppStats>(stats);
   const [liveEconomy, setLiveEconomy] = useState<EconomyState>(economy);
@@ -244,6 +246,9 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
     getStats().then(setLiveStats);
     setLiveEconomy(getEconomyState());
     setClaimMap(getTrophyClaimMap());
+    getAllCustomSprites()
+      .then((sprites) => setCustomSpritesCount(sprites.length))
+      .catch(() => {});
 
     const handleStatsEvent = (e: Event) => {
       const ce = e as CustomEvent<AppStats>;
@@ -278,47 +283,65 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
     };
   }, [isOpen]);
 
-  // When a trophy is selected for inspection, default to its highest unlocked tier (or bronze)
+  const DEFAULT_SKIN_IDS = new Set([
+    'bottle_btl_001',
+    'bomb_classic_tnt',
+    'ball_cyan_orbs',
+    'particle_classic_blaze',
+  ]);
+  const unlockedStoreItemsCount = (liveEconomy.unlockedItems || []).filter(
+    (id) => !DEFAULT_SKIN_IDS.has(id)
+  ).length;
+  const totalUnlockedSkins = unlockedStoreItemsCount + customSpritesCount;
+
+  // When a trophy is selected for inspection, default to its highest unclaimed tier or unlocked tier
   useEffect(() => {
     if (selectedTrophy) {
       const statsCtx = {
         totalRouletteRounds: liveStats.totalRouletteRounds || 0,
         totalBottleSpins: liveStats.totalBottleSpins || 0,
-        totalKaboomRounds: liveStats.totalKaboomRounds || 0,
+        totalKaboomRounds: liveStats.totalKaboomRounds || liveStats.kaboom?.totalRounds || 0,
         totalPongRounds: liveStats.totalPongRounds || liveStats.pong?.totalRounds || 0,
-        pongVictories: liveStats.pongVictories || liveStats.pong?.victories || 0,
-        pongHighestRally: liveStats.pongHighestRally || liveStats.pong?.highestRally || 0,
-        kaboomVictories: liveStats.kaboom?.victories || 0,
-        kaboomBonusCollected: liveStats.kaboom?.bonusCollected || 0,
-        unlockedItemCount: liveEconomy.unlockedItems?.length || 1,
+        pongVictories: liveStats.pongVictories ?? liveStats.pong?.victories ?? 0,
+        pongHighestRally: liveStats.pongHighestRally ?? liveStats.pong?.highestRally ?? 0,
+        kaboomVictories: liveStats.kaboomVictories ?? liveStats.kaboom?.victories ?? 0,
+        kaboomBonusCollected: liveStats.kaboomBonusCollected ?? liveStats.kaboom?.bonusCollected ?? 0,
+        unlockedItemCount: totalUnlockedSkins,
         totalLogins: Math.max(1, liveEconomy.totalLoginsCount || liveEconomy.dailyLoginRewards?.claimedDays?.length || 1),
         lifetimeStars: Math.max(liveEconomy.stars || 0, liveEconomy.lifetimeStarsEarned || liveEconomy.stars || 0),
-        milestoneChestsOpened: liveEconomy.milestoneChestsOpened || (liveEconomy.milestoneChestClaimed ? 1 : 0),
-        questsCompleted: liveEconomy.questsCompletedCount || (liveEconomy.dailyQuests?.filter((q) => q.currentCount >= q.targetCount).length || 0),
+        milestoneChestsOpened: Math.max(liveEconomy.milestoneChestsOpened || 0, liveEconomy.milestoneChestClaimed ? 1 : 0),
+        questsCompleted: Math.max(
+          liveEconomy.questsCompletedCount || 0,
+          (liveEconomy.dailyQuests || []).filter((q) => q.isClaimed || q.currentCount >= q.targetCount).length
+        ),
       };
       const p = calculateTrophyProgress(selectedTrophy, statsCtx, claimMap);
-      setInspectedTier(p.currentTier !== 'locked' ? p.currentTier : 'bronze');
+      const defaultTier = p.unclaimedTiers[0] || (p.currentTier !== 'locked' ? p.currentTier : 'bronze');
+      setInspectedTier(defaultTier);
     } else {
       setInspectedTier(null);
     }
-  }, [selectedTrophy]);
+  }, [selectedTrophy, totalUnlockedSkins, liveStats, liveEconomy, claimMap]);
 
   if (!isOpen) return null;
 
   const statsContext = {
     totalRouletteRounds: liveStats.totalRouletteRounds || 0,
     totalBottleSpins: liveStats.totalBottleSpins || 0,
-    totalKaboomRounds: liveStats.totalKaboomRounds || 0,
+    totalKaboomRounds: liveStats.totalKaboomRounds || liveStats.kaboom?.totalRounds || 0,
     totalPongRounds: liveStats.totalPongRounds || liveStats.pong?.totalRounds || 0,
-    pongVictories: liveStats.pongVictories || liveStats.pong?.victories || 0,
-    pongHighestRally: liveStats.pongHighestRally || liveStats.pong?.highestRally || 0,
-    kaboomVictories: liveStats.kaboom?.victories || 0,
-    kaboomBonusCollected: liveStats.kaboom?.bonusCollected || 0,
-    unlockedItemCount: liveEconomy.unlockedItems?.length || 1,
+    pongVictories: liveStats.pongVictories ?? liveStats.pong?.victories ?? 0,
+    pongHighestRally: liveStats.pongHighestRally ?? liveStats.pong?.highestRally ?? 0,
+    kaboomVictories: liveStats.kaboomVictories ?? liveStats.kaboom?.victories ?? 0,
+    kaboomBonusCollected: liveStats.kaboomBonusCollected ?? liveStats.kaboom?.bonusCollected ?? 0,
+    unlockedItemCount: totalUnlockedSkins,
     totalLogins: Math.max(1, liveEconomy.totalLoginsCount || liveEconomy.dailyLoginRewards?.claimedDays?.length || 1),
     lifetimeStars: Math.max(liveEconomy.stars || 0, liveEconomy.lifetimeStarsEarned || liveEconomy.stars || 0),
-    milestoneChestsOpened: liveEconomy.milestoneChestsOpened || (liveEconomy.milestoneChestClaimed ? 1 : 0),
-    questsCompleted: liveEconomy.questsCompletedCount || (liveEconomy.dailyQuests?.filter((q) => q.currentCount >= q.targetCount).length || 0),
+    milestoneChestsOpened: Math.max(liveEconomy.milestoneChestsOpened || 0, liveEconomy.milestoneChestClaimed ? 1 : 0),
+    questsCompleted: Math.max(
+      liveEconomy.questsCompletedCount || 0,
+      (liveEconomy.dailyQuests || []).filter((q) => q.isClaimed || q.currentCount >= q.targetCount).length
+    ),
   };
 
   const progressList = TROPHY_DEFINITIONS.map((trophy) =>

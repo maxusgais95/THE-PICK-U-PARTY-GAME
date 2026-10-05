@@ -319,10 +319,6 @@ export const AboutGuideModal: React.FC<AboutGuideModalProps> = ({
                   </p>
                   <div className="grid grid-cols-2 gap-1.5 text-[10px]">
                     <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
-                      <Shield className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                      <span><strong>Shield:</strong> Blocks 1 explosion</span>
-                    </div>
-                    <div className="flex items-center gap-1 bg-white/5 p-1.5 rounded-lg">
                       <Radio className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       <span><strong>Radar:</strong> Reveals safe spot</span>
                     </div>

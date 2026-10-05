@@ -10,16 +10,16 @@ import spectrumVideo from '../assets/videos/Neon DJ Disc Background Animation.mo
 import splashBgVideo from '../assets/videos/Chibi Party Splash Screen Background Animation.mp4';
 
 // Core Named Image Imports for Game Modes & Backgrounds
-import bombGameBg from '../assets/images/Bomb Game Background.webp';
-import rouletteGameBg from '../assets/images/Finger Roulette Background.webp';
-import btl001 from '../assets/images/Btl_E_001.webp';
-import btl002 from '../assets/images/Btl_E_002.webp';
-import btl003 from '../assets/images/Btl_E_003.webp';
-import btl004 from '../assets/images/Btl_E_004.webp';
+import bombGameBg from '../assets/images/backgrounds/Bomb Game Background.webp';
+import rouletteGameBg from '../assets/images/backgrounds/Finger Roulette Background.webp';
+import btl001 from '../assets/images/bottles/Btl_E_001.webp';
+import btl002 from '../assets/images/bottles/Btl_E_002.webp';
+import btl003 from '../assets/images/bottles/Btl_E_003.webp';
+import btl004 from '../assets/images/bottles/Btl_E_004.webp';
 import cyberBombSprite from '../assets/images/bombs/Bomb Sprite.webp';
 import cyberBallSprite from '../assets/images/balls/Ball Sprite.webp';
-import chibiBombPongImg from '../assets/images/Chibi Bomb Pong Game.webp';
-import pongCourtBg from '../assets/images/Pong Game Background.webp';
+import chibiBombPongImg from '../assets/images/games/Chibi Bomb Pong Game.webp';
+import pongCourtBg from '../assets/images/backgrounds/Pong Game Background.webp';
 
 import { preloadTransparentImages } from './bottleAlphaCache';
 import { AudioManager } from './audioManager';

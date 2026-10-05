@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import btlE001 from '../assets/images/Btl_E_001.webp';
-import btlE002 from '../assets/images/Btl_E_002.webp';
-import btlE003 from '../assets/images/Btl_E_003.webp';
-import btlE004 from '../assets/images/Btl_E_004.webp';
+import btlE001 from '../assets/images/bottles/Btl_E_001.webp';
+import btlE002 from '../assets/images/bottles/Btl_E_002.webp';
+import btlE003 from '../assets/images/bottles/Btl_E_003.webp';
+import btlE004 from '../assets/images/bottles/Btl_E_004.webp';
 import { BottleBlendMode, BottleBuiltinStyle } from '../types';
 import { preloadTransparentImages } from './bottleAlphaCache';
 

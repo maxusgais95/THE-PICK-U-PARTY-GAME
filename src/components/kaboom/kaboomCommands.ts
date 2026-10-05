@@ -109,14 +109,6 @@ export const KABOOM_COMMANDS: KaboomCommand[] = [
     tag: 'RADAR SCAN',
   },
   {
-    id: 'immunity_shield',
-    title: 'IMMUNITY SHIELD',
-    category: 'privilege',
-    description: 'Divine luck! If you tap the bomb on your very next turn, the blast is absorbed once!',
-    icon: 'ShieldAlert',
-    tag: 'SHIELD BUFF',
-  },
-  {
     id: 'double_tap',
     title: 'DOUBLE TAP CURSE',
     category: 'tactical',
@@ -124,6 +116,7 @@ export const KABOOM_COMMANDS: KaboomCommand[] = [
     icon: 'Zap',
     tag: 'PENALTY TRAP',
   },
+
   {
     id: 'drink_sip',
     title: 'SIP OR SHOT',

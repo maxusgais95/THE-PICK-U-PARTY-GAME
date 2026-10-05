@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
+import currencyStarImg from '../assets/images/sprites/Currency Star Sprite.webp';
 import { SoundEngine, Haptics } from '../lib/audio';
 import { EconomyState } from '../lib/economy';
 

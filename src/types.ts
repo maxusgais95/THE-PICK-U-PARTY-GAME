@@ -141,6 +141,8 @@ export interface AppStats {
   totalPongRounds?: number;
   pongVictories?: number;
   pongHighestRally?: number;
+  kaboomVictories?: number;
+  kaboomBonusCollected?: number;
   lastPlayedAt: number;
   kaboom: KaboomStats;
   pong?: PongStats;

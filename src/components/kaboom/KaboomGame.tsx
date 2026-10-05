@@ -10,7 +10,6 @@ import {
   Sparkles,
   Users,
   ChevronLeft,
-  Shield,
   Zap,
   ArrowRight,
   X,
@@ -157,7 +156,6 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
   // Turn management
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(0);
   const [isReverseOrder, setIsReverseOrder] = useState<boolean>(false);
-  const [activeShieldPlayer, setActiveShieldPlayer] = useState<number | null>(null);
   const [turnCount, setTurnCount] = useState<number>(1);
 
   // Flying star currency particles for bonus discoveries
@@ -191,8 +189,6 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
   // Mutable synchronous refs for instantaneous, stutter-free performance & zero-re-render tile taps
   const activePlayerIndexRef = useRef(activePlayerIndex);
   activePlayerIndexRef.current = activePlayerIndex;
-  const activeShieldPlayerRef = useRef(activeShieldPlayer);
-  activeShieldPlayerRef.current = activeShieldPlayer;
   const isReverseOrderRef = useRef(isReverseOrder);
   isReverseOrderRef.current = isReverseOrder;
   const isGameOverRef = useRef(isGameOver);
@@ -327,7 +323,6 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
       setExplosionActive(false);
       setActivePlayerIndex(0);
       setIsReverseOrder(false);
-      setActiveShieldPlayer(null);
       setTurnCount(1);
 
       addLog(
@@ -509,36 +504,6 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
       // OUTCOME 1: BOMB (KABOOM! - GAME OVER LOSS FOR THIS ROUND)
       // ========================================================================
       if (liveTile.type === 'bomb') {
-        // Check if player has Immunity Shield
-        if (activeShieldPlayerRef.current === currentPlayer) {
-          // Shield saves the player!
-          SoundEngine.playSafePop();
-          setActiveShieldPlayer(null);
-          showToast(
-            'info',
-            '🛡️ DEFUSED',
-            'Immunity Shield absorbed the blast! Bomb defused!',
-            3000
-          );
-          addLog(
-            'safe',
-            currentPlayer,
-            `🛡️ Immunity Shield absorbed the blast! Bomb defused!`
-          );
-          // Mark tile safe
-          const nextTiles = currentTiles.map((t) =>
-            t.id === liveTile.id ? { ...t, revealed: true, type: 'safe' as const } : t
-          );
-          tilesRef.current = nextTiles;
-          setTiles(nextTiles);
-
-          // Check if this was the last non-bomb
-          if (!checkAndApplyVictory(nextTiles, currentPlayer)) {
-            advanceToNextPlayer();
-          }
-          return;
-        }
-
         // Detonation! Game Over for this round.
         SoundEngine.playBombExplosion();
         setDetonatedPlayerIndex(currentPlayer);
@@ -620,8 +585,6 @@ export const KaboomGame: React.FC<KaboomGameProps> = ({
         // Apply instant bonus mechanics if tactical
         if (command.id === 'uno_reverse') {
           setIsReverseOrder((prev) => !prev);
-        } else if (command.id === 'immunity_shield') {
-          setActiveShieldPlayer(currentPlayer);
         }
 
         // Reveal this tapped bonus tile

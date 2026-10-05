@@ -13,7 +13,7 @@ import {
   TrailHistoryPoint,
   TrailParticle,
 } from '../lib/trailVisualFX';
-import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
+import currencyStarImg from '../assets/images/sprites/Currency Star Sprite.webp';
 import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
 import { SoundEngine, Haptics } from '../lib/audio';
 import { processSpriteImage } from '../lib/imageProcessing';

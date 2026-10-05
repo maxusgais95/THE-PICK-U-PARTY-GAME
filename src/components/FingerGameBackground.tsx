@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import rouletteBgImage from '../assets/images/Finger Roulette Background.webp';
+import rouletteBgImage from '../assets/images/backgrounds/Finger Roulette Background.webp';
 import rouletteBgVideo from '../assets/videos/Finger Roulette Background Animation.mp4';
 import { getAssetUrl } from '../lib/assetPreloader';
 import { ThemeId, TouchPlayer } from '../types';

@@ -35,6 +35,7 @@ import { BombPongBackground } from '../BombPongBackground';
 import defaultBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
 import fireParticleImgSrc from '../../assets/images/particle_blaze_fire.webp';
 import { processSpriteImage } from '../../lib/imageProcessing';
+import { recordPongEvent } from '../../lib/db';
 
 export interface BombPongGameProps {
   settings: AppSettings;
@@ -551,6 +552,14 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
       console.warn('Failed to save pong reward:', e);
     }
 
+    const isP1Winner = winner === 'player1';
+    const isVictory = isBotMode ? isP1Winner : true;
+    recordPongEvent({
+      winner: isP1Winner ? 1 : 2,
+      rallies: maxRally,
+      isVictory,
+    }).catch((err) => console.warn('Failed to record pong event:', err));
+
     setGameOverModalOpen(true);
   };
 
@@ -564,6 +573,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     setServingPlayer('p1');
     setOpponentReady(false);
     setRallyCount(0);
+    setMaxRally(0);
     setGameOverModalOpen(false);
     setDetonatedSide(null);
     setGamePhase('ready');
@@ -589,6 +599,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     setServingPlayer('p1');
     setOpponentReady(false);
     setRallyCount(0);
+    setMaxRally(0);
     setGameOverModalOpen(false);
     setDetonatedSide(null);
     setGamePhase('ready');
@@ -920,7 +931,11 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           SoundEngine.playPaddleHit(bomb.speed / bomb.baseSpeed);
           Haptics.medium();
 
-          setRallyCount((r) => r + 1);
+          setRallyCount((r) => {
+            const next = r + 1;
+            setMaxRally((m) => Math.max(m, next));
+            return next;
+          });
           setTotalBounces((b) => b + 1);
           setMaxSpeedRecorded((s) => Math.max(s, bomb.speed));
         }
@@ -976,7 +991,11 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           SoundEngine.playPaddleHit(bomb.speed / bomb.baseSpeed);
           Haptics.medium();
 
-          setRallyCount((r) => r + 1);
+          setRallyCount((r) => {
+            const next = r + 1;
+            setMaxRally((m) => Math.max(m, next));
+            return next;
+          });
           setTotalBounces((b) => b + 1);
           setMaxSpeedRecorded((s) => Math.max(s, bomb.speed));
         }
