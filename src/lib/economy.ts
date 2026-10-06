@@ -7,7 +7,7 @@ import { BottleBuiltinStyle } from '../types';
 import { BOTTLE_SKINS } from './bottleSkins';
 import kaboomBombImg from '../assets/images/bombs/Bomb Sprite.webp';
 import kaboomBallImg from '../assets/images/balls/Ball Sprite.webp';
-import day7BundleChestImg from '../assets/images/day7_bundle_chest.webp';
+import day7BundleChestImg from '../assets/images/sprites/day7_bundle_chest.webp';
 
 // Ball skin assets from src/assets/images/balls
 import ballCelestialImg from '../assets/images/balls/Ball Celestial.webp';
@@ -35,19 +35,19 @@ import bombSamuraiImg from '../assets/images/bombs/Bomb Samurai.webp';
 import bombSonicImg from '../assets/images/bombs/Bomb Sonic.webp';
 import bombSpriteImg from '../assets/images/bombs/Bomb Sprite.webp';
 // Particle effect assets
-import particleFlameClassicImg from '../assets/images/particle_blaze_fire.webp';
-import particleNeonTrailImg from '../assets/images/particle_neon_trail.webp';
-import particleMusicNotesImg from '../assets/images/particle_music_notes.webp';
-import particleStarSparkImg from '../assets/images/particle_star_spark.webp';
-import particleGalaxyTrailImg from '../assets/images/particle_galaxy_trail.webp';
-import particleSakuraImg from '../assets/images/particle_sakura.webp';
-import particleElectricShockImg from '../assets/images/particle_electric_shock.webp';
-import particleBlizzardIceImg from '../assets/images/particle_blizzard_ice.webp';
-import particleNatureLeavesImg from '../assets/images/particle_nature_leaves.webp';
-import diamondStarSparkleImg from '../assets/images/diamond_star_sparkle.webp';
-import diamondStarSpriteImg from '../assets/images/diamond_star_sprite.webp';
-import musicNoteSpriteImg from '../assets/images/Music Note Sprite.webp';
-import starSpriteImg from '../assets/images/Star Sprite.webp';
+import particleFlameClassicImg from '../assets/images/trail_thumbnails/particle_blaze_fire.webp';
+import particleNeonTrailImg from '../assets/images/trail_thumbnails/particle_neon_trail.webp';
+import particleMusicNotesImg from '../assets/images/trail_thumbnails/particle_music_notes.webp';
+import particleStarSparkImg from '../assets/images/trail_thumbnails/particle_star_spark.webp';
+import particleGalaxyTrailImg from '../assets/images/trail_thumbnails/particle_galaxy_trail.webp';
+import particleSakuraImg from '../assets/images/trail_thumbnails/particle_sakura.webp';
+import particleElectricShockImg from '../assets/images/trail_thumbnails/particle_electric_shock.webp';
+import particleBlizzardIceImg from '../assets/images/trail_thumbnails/particle_blizzard_ice.webp';
+import particleNatureLeavesImg from '../assets/images/trail_thumbnails/particle_nature_leaves.webp';
+import diamondStarSparkleImg from '../assets/images/sprites/diamond_star_sparkle.webp';
+import diamondStarSpriteImg from '../assets/images/sprites/diamond_star_sprite.webp';
+import musicNoteSpriteImg from '../assets/images/sprites/Music Note Sprite.webp';
+import starSpriteImg from '../assets/images/sprites/Star Sprite.webp';
 
 // 3 Independent .webp image files for each trail particle effect (27 independent files)
 import classicP1 from '../assets/images/trails/classic/particle_1.webp';
@@ -165,15 +165,15 @@ export const TRAIL_PARTICLE_DETAILS: Record<string, TrailParticleDetails> = {
 export const TRAIL_WEBP_PARTICLE_SPRITES: string[] = [classicP1, classicP2, classicP3];
 
 // WebP sprite assets for all trail themes
-import btlE1Img from '../assets/images/Btl_E_001.webp';
-import btlE2Img from '../assets/images/Btl_E_002.webp';
-import btlE3Img from '../assets/images/Btl_E_003.webp';
-import btlE4Img from '../assets/images/Btl_E_004.webp';
-import crystalRoseImg from '../assets/images/Crystal Rose Sprite.webp';
-import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
-import headsetsImg from '../assets/images/Headsets Sprite.webp';
-import keyImg from '../assets/images/Key Sprite.webp';
-import chestImg from '../assets/images/Chest Sprite.webp';
+import btlE1Img from '../assets/images/bottles/Btl_E_001.webp';
+import btlE2Img from '../assets/images/bottles/Btl_E_002.webp';
+import btlE3Img from '../assets/images/bottles/Btl_E_003.webp';
+import btlE4Img from '../assets/images/bottles/Btl_E_004.webp';
+import crystalRoseImg from '../assets/images/sprites/Crystal Rose Sprite.webp';
+import currencyStarImg from '../assets/images/sprites/Currency Star Sprite.webp';
+import headsetsImg from '../assets/images/sprites/Headsets Sprite.webp';
+import keyImg from '../assets/images/sprites/Key Sprite.webp';
+import chestImg from '../assets/images/sprites/Chest Sprite.webp';
 
 export const DAY7_BUNDLE_BOMB_ID = 'bomb_dynamo';
 export const DAY7_BUNDLE_BALL_ID = 'ball_celestial';
@@ -1390,9 +1390,22 @@ const DEFAULT_STATE: EconomyState = {
   claimedLoginDay: 1,
   milestoneChestsOpened: 0,
   totalLoginsCount: 1,
-  lifetimeStarsEarned: 100,
+  lifetimeStarsEarned: 1250,
   questsCompletedCount: 0,
 };
+
+export const DEFAULT_STARTER_ITEM_IDS: readonly string[] = [
+  'bottle_btl_001',
+  'bomb_classic_tnt',
+  'ball_cyan_orbs',
+  'particle_classic_blaze',
+];
+
+export function getCustomUnlockedItemCount(unlockedItems?: string[]): number {
+  if (!unlockedItems || !Array.isArray(unlockedItems)) return 0;
+  const starterSet = new Set(DEFAULT_STARTER_ITEM_IDS);
+  return unlockedItems.filter((id) => !starterSet.has(id)).length;
+}
 
 export function getEconomyState(): EconomyState {
   if (typeof window === 'undefined') return DEFAULT_STATE;
@@ -2002,10 +2015,6 @@ export function claimQuestReward(questId: string): { success: boolean; starsAdde
     ...state,
     stars: state.stars + quest.starReward,
     lifetimeStarsEarned: (state.lifetimeStarsEarned || state.stars) + quest.starReward,
-    questsCompletedCount: Math.max(
-      state.questsCompletedCount || 0,
-      updatedQuests.filter((q) => q.currentCount >= q.targetCount).length
-    ),
     dailyQuests: updatedQuests,
   };
 

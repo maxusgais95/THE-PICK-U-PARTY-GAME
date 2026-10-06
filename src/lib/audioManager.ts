@@ -11,35 +11,36 @@ export type { BgmTrackKey };
 
 /**
  * Sound Asset Manifest:
- * The single source of truth for all high-bitrate studio PCM audio assets.
- * Used for automated preloading, cache validation, and orphaned asset pruning.
+ * The single source of truth for all studio PCM audio assets.
+ * Mastered with earphone acoustic modeling, warm low-end, and silky high-frequency limits.
  */
 export const SOUND_MANIFEST = [
-  { id: 'button_click', file: 'button_click.wav', category: 'ui', approxKb: 11.5 },
-  { id: 'touch_up', file: 'touch_up.wav', category: 'touch', approxKb: 14.2 },
-  { id: 'countdown_tick', file: 'countdown_tick.wav', category: 'countdown', approxKb: 24.7 },
-  { id: 'countdown_tick_urgent', file: 'countdown_tick_urgent.wav', category: 'countdown', approxKb: 24.7 },
-  { id: 'target_impact', file: 'target_impact.wav', category: 'roulette', approxKb: 167.6 },
-  { id: 'team_division', file: 'team_division.wav', category: 'teams', approxKb: 158.8 },
-  { id: 'bottle_flick', file: 'bottle_flick.wav', category: 'bottle', approxKb: 67.1 },
-  { id: 'bottle_settle', file: 'bottle_settle.wav', category: 'bottle', approxKb: 150.0 },
-  { id: 'touch_down_0', file: 'touch_down_0.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_1', file: 'touch_down_1.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_2', file: 'touch_down_2.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_3', file: 'touch_down_3.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_4', file: 'touch_down_4.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_5', file: 'touch_down_5.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_6', file: 'touch_down_6.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'touch_down_7', file: 'touch_down_7.wav', category: 'touch', approxKb: 84.7 },
-  { id: 'bottle_tick_0', file: 'bottle_tick_0.wav', category: 'bottle', approxKb: 6.7 },
-  { id: 'bottle_tick_1', file: 'bottle_tick_1.wav', category: 'bottle', approxKb: 6.7 },
-  { id: 'bottle_tick_2', file: 'bottle_tick_2.wav', category: 'bottle', approxKb: 6.7 },
-  { id: 'bottle_tick_3', file: 'bottle_tick_3.wav', category: 'bottle', approxKb: 6.7 },
-  { id: 'button_01', file: 'button_01.mp3', category: 'ui', approxKb: 15.0 },
-  { id: 'button_02', file: 'button_02.mp3', category: 'ui', approxKb: 15.0 },
-  { id: 'complete', file: 'complete.mp3', category: 'ui', approxKb: 25.0 },
-  { id: 'finger_selected', file: 'finger_selected.mp3', category: 'roulette', approxKb: 20.0 },
-  { id: 'bonus_found', file: 'bonus_found.mp3', category: 'kaboom', approxKb: 20.0 },
+  { id: 'button_click', file: 'button_click.wav', category: 'ui', approxKb: 9.6 },
+  { id: 'touch_up', file: 'touch_up.wav', category: 'touch', approxKb: 9.6 },
+  { id: 'countdown_tick', file: 'countdown_tick.wav', category: 'countdown', approxKb: 19.0 },
+  { id: 'countdown_tick_urgent', file: 'countdown_tick_urgent.wav', category: 'countdown', approxKb: 19.0 },
+  { id: 'target_impact', file: 'target_impact.wav', category: 'roulette', approxKb: 146.5 },
+  { id: 'team_division', file: 'team_division.wav', category: 'teams', approxKb: 141.3 },
+  { id: 'bottle_flick', file: 'bottle_flick.wav', category: 'bottle', approxKb: 55.2 },
+  { id: 'bottle_settle', file: 'bottle_settle.wav', category: 'bottle', approxKb: 129.2 },
+  { id: 'bomb_explosion', file: 'bomb_explosion.wav', category: 'kaboom', approxKb: 163.7 },
+  { id: 'safe_pop', file: 'safe_pop.wav', category: 'kaboom', approxKb: 48.3 },
+  { id: 'bonus_fanfare', file: 'bonus_fanfare.wav', category: 'kaboom', approxKb: 112.0 },
+  { id: 'hud_coin', file: 'hud_coin.wav', category: 'economy', approxKb: 41.4 },
+  { id: 'paddle_hit', file: 'paddle_hit.wav', category: 'pong', approxKb: 14.7 },
+  { id: 'wall_ping', file: 'wall_ping.wav', category: 'pong', approxKb: 11.2 },
+  { id: 'touch_down_0', file: 'touch_down_0.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_1', file: 'touch_down_1.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_2', file: 'touch_down_2.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_3', file: 'touch_down_3.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_4', file: 'touch_down_4.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_5', file: 'touch_down_5.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_6', file: 'touch_down_6.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'touch_down_7', file: 'touch_down_7.wav', category: 'touch', approxKb: 72.4 },
+  { id: 'bottle_tick_0', file: 'bottle_tick_0.wav', category: 'bottle', approxKb: 4.9 },
+  { id: 'bottle_tick_1', file: 'bottle_tick_1.wav', category: 'bottle', approxKb: 4.9 },
+  { id: 'bottle_tick_2', file: 'bottle_tick_2.wav', category: 'bottle', approxKb: 4.9 },
+  { id: 'bottle_tick_3', file: 'bottle_tick_3.wav', category: 'bottle', approxKb: 4.9 },
 ] as const;
 
 export type SoundFileName = (typeof SOUND_MANIFEST)[number]['file'];
@@ -47,7 +48,7 @@ export type SoundId = (typeof SOUND_MANIFEST)[number]['id'];
 
 const VALID_SOUND_FILES = new Set<string>(SOUND_MANIFEST.map((s) => s.file));
 
-// Pentatonic scale (C Major: C4 to C6) used for musical harmonic touch feedback
+// Pentatonic scale (C Major: C4 to E5) used for musical harmonic touch feedback
 const PENTATONIC_SCALE = [
   261.63, // C4
   293.66, // D4
@@ -57,9 +58,6 @@ const PENTATONIC_SCALE = [
   523.25, // C5
   587.33, // D5
   659.25, // E5
-  783.99, // G5
-  880.0,  // A5
-  1046.5, // C6
 ];
 
 export interface PlaySampleOptions {
@@ -78,9 +76,15 @@ export interface AudioCacheReport {
 
 let audioCtx: AudioContext | null = null;
 let masterGainNode: GainNode | null = null;
+let subsonicFilterNode: BiquadFilterNode | null = null;
+let deharshFilterNode: BiquadFilterNode | null = null;
+let masterFilterNode: BiquadFilterNode | null = null;
+let masterCompressorNode: DynamicsCompressorNode | null = null;
 
 /**
- * Retrieve or initialize the shared Web Audio Context with auto-resume support
+ * Retrieve or initialize the shared Web Audio Context with audiophile studio mastering chain:
+ * (Master Gain -> 32Hz Subsonic Filter -> 3.6kHz De-Harshing Notcher -> 12kHz Lowpass Warmth -> Transparent Limiter -> Destination)
+ * Specifically engineered to eliminate ear fatigue and harshness when using earphones.
  */
 export function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
@@ -91,8 +95,44 @@ export function getAudioContext(): AudioContext | null {
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
       try {
+        // 1. Master gain stage
         masterGainNode = audioCtx.createGain();
-        masterGainNode.connect(audioCtx.destination);
+        masterGainNode.gain.setValueAtTime(0.80, audioCtx.currentTime);
+
+        // 2. Subsonic highpass filter (32Hz) prevents DC rumble and earphone driver flutter
+        subsonicFilterNode = audioCtx.createBiquadFilter();
+        subsonicFilterNode.type = 'highpass';
+        subsonicFilterNode.frequency.setValueAtTime(32, audioCtx.currentTime);
+        subsonicFilterNode.Q.setValueAtTime(0.707, audioCtx.currentTime);
+
+        // 3. Fletcher-Munson Ear-Canal De-Harshing Filter (-2.5 dB at 3.6 kHz)
+        // Softens ear-canal acoustic resonance so every click, tick, and chime feels silky and smooth
+        deharshFilterNode = audioCtx.createBiquadFilter();
+        deharshFilterNode.type = 'peaking';
+        deharshFilterNode.frequency.setValueAtTime(3600, audioCtx.currentTime);
+        deharshFilterNode.Q.setValueAtTime(0.85, audioCtx.currentTime);
+        deharshFilterNode.gain.setValueAtTime(-2.5, audioCtx.currentTime);
+
+        // 4. Smooth lowpass warmth filter (12 kHz) eliminates digital aliasing, clock bleed & earphone hiss
+        masterFilterNode = audioCtx.createBiquadFilter();
+        masterFilterNode.type = 'lowpass';
+        masterFilterNode.frequency.setValueAtTime(12000, audioCtx.currentTime);
+        masterFilterNode.Q.setValueAtTime(0.65, audioCtx.currentTime);
+
+        // 5. Studio-grade mastering bus compressor (ultra-transparent, zero pumping/distortion)
+        masterCompressorNode = audioCtx.createDynamicsCompressor();
+        masterCompressorNode.threshold.setValueAtTime(-8.0, audioCtx.currentTime);
+        masterCompressorNode.knee.setValueAtTime(16, audioCtx.currentTime); // Soft knee
+        masterCompressorNode.ratio.setValueAtTime(3.5, audioCtx.currentTime); // Gentle glue compression
+        masterCompressorNode.attack.setValueAtTime(0.012, audioCtx.currentTime); // 12ms attack preserves punchy transients
+        masterCompressorNode.release.setValueAtTime(0.16, audioCtx.currentTime); // 160ms smooth natural release
+
+        // Connect chain: Gain -> Subsonic HP -> De-Harsh Peaking -> Warmth LP -> Master Limiter -> Destination
+        masterGainNode.connect(subsonicFilterNode);
+        subsonicFilterNode.connect(deharshFilterNode);
+        deharshFilterNode.connect(masterFilterNode);
+        masterFilterNode.connect(masterCompressorNode);
+        masterCompressorNode.connect(audioCtx.destination);
       } catch (e) {
         // Fallback without master node if security blocks destination
       }
@@ -102,6 +142,16 @@ export function getAudioContext(): AudioContext | null {
     audioCtx.resume().catch(() => {});
   }
   return audioCtx;
+}
+
+/**
+ * Central master routing node. Guarantees all sound effects pass through
+ * master volume control and the anti-clipping limiter before reaching earphones.
+ */
+export function getMasterOutputNode(): AudioNode | null {
+  const ctx = getAudioContext();
+  if (!ctx) return null;
+  return masterGainNode || ctx.destination;
 }
 
 export function triggerHaptic(pattern: number | number[], enabled: boolean = true) {
@@ -116,7 +166,7 @@ if (typeof window !== 'undefined') {
     if (ctx && ctx.state === 'suspended') {
       ctx.resume().catch(() => {});
     }
-    // Kickstart background preloading of high-bitrate assets immediately
+    // Kickstart background preloading of studio assets immediately
     AudioManager.preloadSounds();
     window.removeEventListener('pointerdown', unlockAudio);
     window.removeEventListener('touchstart', unlockAudio);
@@ -137,7 +187,7 @@ if (typeof window !== 'undefined') {
  * Central hub for sound loading, asset validation, caching, and game triggers.
  */
 export class AudioManager {
-  private static masterVolume: number = 0.8;
+  private static masterVolume: number = 0.70;
   private static soundEnabled: boolean = true;
   private static hapticsEnabled: boolean = true;
 
@@ -146,6 +196,7 @@ export class AudioManager {
   private static pendingLoads: Map<string, Promise<AudioBuffer | null>> = new Map();
   private static isPreloaded: boolean = false;
   private static tickVariantCounter: number = 0;
+  private static lastBottleTickTime: number = 0;
 
   /**
    * Update audio & haptics configuration from user settings
@@ -169,7 +220,8 @@ export class AudioManager {
 
     if (masterGainNode && ctx) {
       try {
-        masterGainNode.gain.setValueAtTime(this.masterVolume, ctx.currentTime);
+        const targetGain = this.soundEnabled ? Math.max(0.0001, this.masterVolume * 0.80) : 0.0001;
+        masterGainNode.gain.setValueAtTime(targetGain, ctx.currentTime);
       } catch (e) {}
     }
 
@@ -191,7 +243,7 @@ export class AudioManager {
   }
 
   /**
-   * Preload all high-bitrate studio audio files into decoded AudioBuffers
+   * Preload all studio audio files into decoded AudioBuffers
    * Ensures zero latency on first playback across all devices.
    */
   public static async preloadSounds(): Promise<void> {
@@ -212,7 +264,6 @@ export class AudioManager {
    * Loads and decodes an audio file with base URL resolution and deduplication
    */
   private static async loadAudioBuffer(fileName: string): Promise<AudioBuffer | null> {
-    // Only load files present in the valid sound manifest
     if (!VALID_SOUND_FILES.has(fileName)) {
       console.warn(`[AudioManager] Attempted to load unregistered sound file: ${fileName}`);
       return null;
@@ -231,7 +282,6 @@ export class AudioManager {
         const ctx = getAudioContext();
         if (!ctx) return null;
 
-        // Standardize Base URL for GitHub Pages subpaths and root deployments
         const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
         const soundUrl = `${baseUrl}/sounds/${fileName}`;
 
@@ -257,8 +307,7 @@ export class AudioManager {
   }
 
   /**
-   * Cleans up any orphaned AudioBuffer entries in memory that do not belong to SOUND_MANIFEST.
-   * Keeps audio memory strictly constrained to the registered ~1.3MB footprint.
+   * Cleans up any orphaned AudioBuffer entries in memory.
    */
   public static cleanOrphanedCache(): number {
     let pruned = 0;
@@ -297,7 +346,8 @@ export class AudioManager {
   }
 
   /**
-   * Plays a pre-decoded high-bitrate AudioBuffer with sub-millisecond latency
+   * Plays a pre-decoded AudioBuffer with sub-millisecond latency
+   * and automatic master limiter routing.
    */
   public static playSample(fileName: string, options: PlaySampleOptions = {}): boolean {
     if (!this.soundEnabled) return false;
@@ -306,7 +356,6 @@ export class AudioManager {
 
     const buffer = this.audioBufferCache.get(fileName);
     if (!buffer) {
-      // Dispatch background load for future playback and let fallback synth handle it now
       this.loadAudioBuffer(fileName);
       return false;
     }
@@ -317,7 +366,7 @@ export class AudioManager {
 
       const gain = ctx.createGain();
       const baseVol = options.volume !== undefined ? options.volume : 1.0;
-      gain.gain.setValueAtTime(Math.max(0.001, baseVol * this.masterVolume), ctx.currentTime);
+      gain.gain.setValueAtTime(Math.max(0.0001, baseVol), ctx.currentTime);
 
       if (options.playbackRate !== undefined) {
         source.playbackRate.setValueAtTime(options.playbackRate, ctx.currentTime);
@@ -328,8 +377,9 @@ export class AudioManager {
       }
 
       source.connect(gain);
-      if (masterGainNode) {
-        gain.connect(masterGainNode);
+      const masterNode = getMasterOutputNode();
+      if (masterNode) {
+        gain.connect(masterNode);
       } else {
         gain.connect(ctx.destination);
       }
@@ -342,7 +392,7 @@ export class AudioManager {
   }
 
   // =========================================================================
-  // 1. Touch Placed: Juicy Laser-Bubble Pop + Neon Crystal Harmonic Chimes
+  // 1. Touch Placed: Pure Crystal Waterdrop (C Major Pentatonic)
   // =========================================================================
   public static playTouchDown(touchIndex: number = 0) {
     Haptics.touchDown();
@@ -351,123 +401,91 @@ export class AudioManager {
     const fileIndex = Math.abs(touchIndex) % 8;
     const fileName = `touch_down_${fileIndex}.wav`;
 
-    const played = this.playSample(fileName, {
-      volume: 0.88,
-    });
-
+    const played = this.playSample(fileName, { volume: 0.85 });
     if (!played) {
-      // High-quality fallback synthesis: Juicy bubble pop + crystal bell
       const ctx = getAudioContext();
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const freq = PENTATONIC_SCALE[touchIndex % PENTATONIC_SCALE.length];
 
-        // Layer 1: Juicy tactile pop attack transient
-        const popOsc = ctx.createOscillator();
-        const popGain = ctx.createGain();
-        popOsc.type = 'sine';
-        popOsc.frequency.setValueAtTime(freq * 2.4, now);
-        popOsc.frequency.exponentialRampToValueAtTime(freq, now + 0.022);
-        popGain.gain.setValueAtTime(0.28 * this.masterVolume, now);
-        popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
-
-        // Layer 2: Resonant glass chime body
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        const lp = ctx.createBiquadFilter();
+
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(2600, now);
+
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.24 * this.masterVolume, now + 0.003);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.frequency.setValueAtTime(freq * 1.15, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.02);
 
-        // Layer 3: High shimmer crystal overtone
-        const highOsc = ctx.createOscillator();
-        const highGain = ctx.createGain();
-        highOsc.type = 'triangle';
-        highOsc.frequency.setValueAtTime(freq * 2.76, now);
-        highGain.gain.setValueAtTime(0.09 * this.masterVolume, now);
-        highGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
 
-        // Layer 4: Warm mobile sub thump
-        const subOsc = ctx.createOscillator();
-        const subGain = ctx.createGain();
-        subOsc.type = 'sine';
-        subOsc.frequency.setValueAtTime(freq * 0.5, now);
-        subGain.gain.setValueAtTime(0.15 * this.masterVolume, now);
-        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
-        popOsc.connect(popGain);
         osc.connect(gain);
-        highOsc.connect(highGain);
-        subOsc.connect(subGain);
+        gain.connect(lp);
+        lp.connect(masterNode);
 
-        popGain.connect(ctx.destination);
-        gain.connect(ctx.destination);
-        highGain.connect(ctx.destination);
-        subGain.connect(ctx.destination);
-
-        popOsc.start(now);
         osc.start(now);
-        highOsc.start(now);
-        subOsc.start(now);
-
-        popOsc.stop(now + 0.045);
         osc.stop(now + 0.35);
-        highOsc.stop(now + 0.12);
-        subOsc.stop(now + 0.08);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 2. Touch Released: Delicate uplifting glass micro-release
+  // 2. Touch Released: Delicate glass bubble lift
   // =========================================================================
   public static playTouchUp() {
     Haptics.touchUp();
     if (!this.soundEnabled) return;
 
-    const played = this.playSample('touch_up.wav', { volume: 0.78 });
+    const played = this.playSample('touch_up.wav', { volume: 0.80 });
     if (!played) {
       const ctx = getAudioContext();
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(460, now);
-        osc.frequency.exponentialRampToValueAtTime(760, now + 0.06);
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(580, now + 0.04);
 
-        gain.gain.setValueAtTime(0.09 * this.masterVolume, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.08, now + 0.003);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(masterNode);
         osc.start(now);
-        osc.stop(now + 0.06);
+        osc.stop(now + 0.05);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 3. Countdown Tick: High-bitrate sonar pulse with accelerating tension
+  // 3. Countdown Tick: Smooth woody metronome pulse (zero screech)
   // =========================================================================
   public static playCountdownTick(remainingSeconds: number, totalSeconds: number) {
     Haptics.countdownTick(remainingSeconds, totalSeconds);
     if (!this.soundEnabled) return;
 
     const total = Math.max(1, totalSeconds || 3);
-    // Normalized progression from 0 (start) to 1 (final tick)
     const progress = Math.min(1, Math.max(0, (total - remainingSeconds) / Math.max(1, total - 1)));
     const isUrgent = remainingSeconds <= 1;
     const fileName = isUrgent ? 'countdown_tick_urgent.wav' : 'countdown_tick.wav';
-    
-    // Clear pitch shift across countdown: starts at 1.0x and climbs to 1.5x
-    const rate = 1.0 + progress * 0.5;
+    const rate = 1.0 + progress * 0.20;
 
     const played = this.playSample(fileName, {
-      volume: 0.95 + progress * 0.15,
+      volume: 0.85,
       playbackRate: rate,
     });
 
@@ -476,83 +494,86 @@ export class AudioManager {
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
-        const baseFreq = 440 + progress * 400;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'sawtooth';
+        const lp = ctx.createBiquadFilter();
 
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(baseFreq * 1.5, now);
-        filter.Q.setValueAtTime(4 + progress * 4, now);
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(1800, now);
 
-        osc.frequency.setValueAtTime(baseFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.1);
+        const freq = isUrgent ? 460 : 320;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + 0.06);
 
-        gain.gain.setValueAtTime(0.35 * this.masterVolume, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.003);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
 
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(lp);
+        lp.connect(masterNode);
 
         osc.start(now);
-        osc.stop(now + 0.12);
+        osc.stop(now + 0.09);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 4. Target Impact / Finger Selected
+  // 4. Target Impact: Cinematic velvet sub boom + star bloom
   // =========================================================================
   public static playTargetImpact() {
     Haptics.targetSelected();
     if (!this.soundEnabled) return;
 
-    const played = this.playSample('finger_selected.mp3', { volume: 0.95 });
+    const played = this.playSample('target_impact.wav', { volume: 0.95 });
     if (!played) {
       const ctx = getAudioContext();
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const subOsc = ctx.createOscillator();
         const subGain = ctx.createGain();
         subOsc.type = 'sine';
-        subOsc.frequency.setValueAtTime(140, now);
-        subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.6);
+        subOsc.frequency.setValueAtTime(70, now);
+        subOsc.frequency.exponentialRampToValueAtTime(36, now + 0.45);
 
-        subGain.gain.setValueAtTime(0.65 * this.masterVolume, now);
-        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+        subGain.gain.setValueAtTime(0.0001, now);
+        subGain.gain.linearRampToValueAtTime(0.32, now + 0.008);
+        subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.50);
 
         subOsc.connect(subGain);
-        subGain.connect(ctx.destination);
+        subGain.connect(masterNode);
+
         subOsc.start(now);
-        subOsc.stop(now + 0.7);
+        subOsc.stop(now + 0.52);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 4b. Complete Sound
-  // =========================================================================
-  public static playComplete() {
-    if (!this.soundEnabled) return;
-    this.playSample('complete.mp3', { volume: 0.90 });
-  }
-
-  // =========================================================================
-  // 5. Team Division Complete: Lush studio arpeggiated glass fanfare
+  // 5. Team Division Complete: Lush studio celeste / harp arpeggio
   // =========================================================================
   public static playTeamDivisionChime() {
     Haptics.teamDivision();
     if (!this.soundEnabled) return;
 
-    const played = this.playSample('team_division.wav', { volume: 0.95 });
+    const played = this.playSample('team_division.wav', { volume: 0.90 });
     if (!played) {
       const ctx = getAudioContext();
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const notes = [523.25, 659.25, 783.99, 1046.5];
         notes.forEach((freq, index) => {
           const osc = ctx.createOscillator();
@@ -560,32 +581,32 @@ export class AudioManager {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, now + index * 0.06);
 
-          gain.gain.setValueAtTime(0.001, now + index * 0.06);
-          gain.gain.linearRampToValueAtTime(0.22 * this.masterVolume, now + index * 0.06 + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.06 + 0.45);
+          gain.gain.setValueAtTime(0.0001, now + index * 0.06);
+          gain.gain.linearRampToValueAtTime(0.12, now + index * 0.06 + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.06 + 0.32);
 
           osc.connect(gain);
-          gain.connect(ctx.destination);
+          gain.connect(masterNode);
 
           osc.start(now + index * 0.06);
-          osc.stop(now + index * 0.06 + 0.5);
+          osc.stop(now + index * 0.06 + 0.35);
         });
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 6. Bottle Flick / Launch: Authentic air whoosh + glass sliding impulse
+  // 6. Bottle Flick / Launch: Aerodynamic air whoosh + gentle acoustic slide
   // =========================================================================
   public static playBottleFlick(velocity: number) {
     Haptics.bottleFlick(velocity);
     if (!this.soundEnabled) return;
 
-    const intensity = Math.min(1.4, Math.max(0.7, Math.abs(velocity) / 12));
-    const rate = 0.85 + intensity * 0.35;
+    const intensity = Math.min(1.2, Math.max(0.8, Math.abs(velocity) / 12));
+    const rate = 0.92 + intensity * 0.16;
 
     const played = this.playSample('bottle_flick.wav', {
-      volume: 0.9 * intensity,
+      volume: 0.85 * intensity,
       playbackRate: rate,
     });
 
@@ -594,39 +615,49 @@ export class AudioManager {
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(500 * intensity, now + 0.18);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(320 * intensity, now + 0.15);
 
-        gain.gain.setValueAtTime(0.25 * intensity * this.masterVolume, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.14 * intensity, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(masterNode);
         osc.start(now);
-        osc.stop(now + 0.35);
+        osc.stop(now + 0.28);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 7. Bottle Spin Ratchet / Bearing Tick: Authentic acoustic contact variations
+  // 7. Bottle Spin Ratchet / Bearing Tick: Silky wooden marble clicks
   // =========================================================================
   public static playBottleTick(angularVelocity: number) {
     Haptics.bottleTick(angularVelocity);
     if (!this.soundEnabled) return;
 
-    // Cycle through 4 natural acoustic contact variations
+    // Rate-limiting throttle (min 38ms between ticks): prevents buffer overlap & static in earphones
+    const nowPerf = performance.now();
+    if (nowPerf - this.lastBottleTickTime < 38) {
+      return;
+    }
+    this.lastBottleTickTime = nowPerf;
+
     const variant = this.tickVariantCounter % 4;
     this.tickVariantCounter++;
 
-    const speedFactor = Math.min(1.5, Math.max(0.8, Math.abs(angularVelocity) / 8));
-    const rate = 0.9 + speedFactor * 0.25;
+    const speedFactor = Math.min(1.2, Math.max(0.8, Math.abs(angularVelocity) / 10));
+    const rate = 0.94 + speedFactor * 0.12;
 
     const played = this.playSample(`bottle_tick_${variant}.wav`, {
-      volume: 0.85 * Math.min(1.2, speedFactor),
+      volume: 0.75 * Math.min(1.0, speedFactor),
       playbackRate: rate,
     });
 
@@ -635,17 +666,21 @@ export class AudioManager {
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(600 + speedFactor * 400, now);
-        osc.frequency.exponentialRampToValueAtTime(150, now + 0.025);
+        osc.frequency.setValueAtTime(680 + speedFactor * 100, now);
+        osc.frequency.exponentialRampToValueAtTime(240, now + 0.02);
 
-        gain.gain.setValueAtTime(0.06 * this.masterVolume, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.07, now + 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(masterNode);
         osc.start(now);
         osc.stop(now + 0.025);
       } catch (e) {}
@@ -653,46 +688,49 @@ export class AudioManager {
   }
 
   // =========================================================================
-  // 8. Bottle Settled: Resonant singing crystal glass ring-out
+  // 8. Bottle Settled: Resonant crystal singing bell
   // =========================================================================
   public static playBottleSettle() {
     Haptics.bottleSettled();
     if (!this.soundEnabled) return;
 
-    const played = this.playSample('bottle_settle.wav', { volume: 0.95 });
+    const played = this.playSample('bottle_settle.wav', { volume: 0.85 });
     if (!played) {
       const ctx = getAudioContext();
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(440, now + 0.35);
+        osc.frequency.setValueAtTime(659.25, now);
+        osc.frequency.exponentialRampToValueAtTime(520, now + 0.35);
 
-        gain.gain.setValueAtTime(0.3 * this.masterVolume, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(masterNode);
         osc.start(now);
-        osc.stop(now + 0.4);
+        osc.stop(now + 0.40);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 9. UI Button Click: Randomly uses button_01.mp3 or button_02.mp3
+  // 9. UI Button Click: Warm acoustic marimba tap (zero high-frequency harshness)
   // =========================================================================
   public static playButtonClick() {
     Haptics.buttonClick();
     if (!this.soundEnabled) return;
 
-    const variant = Math.random() < 0.5 ? 'button_01.mp3' : 'button_02.mp3';
-    const randomRate = 0.97 + Math.random() * 0.06;
+    const randomRate = 0.98 + Math.random() * 0.04;
 
-    const played = this.playSample(variant, {
+    const played = this.playSample('button_click.wav', {
       volume: 0.85,
       playbackRate: randomRate,
     });
@@ -702,174 +740,190 @@ export class AudioManager {
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(450, now);
-        osc.frequency.exponentialRampToValueAtTime(220, now + 0.04);
+        const lp = ctx.createBiquadFilter();
 
-        gain.gain.setValueAtTime(0.12 * this.masterVolume, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(1600, now);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(190, now + 0.028);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.032);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(lp);
+        lp.connect(masterNode);
+
         osc.start(now);
-        osc.stop(now + 0.04);
+        osc.stop(now + 0.035);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 10. Kaboom: Bonus Found / Safe Pop
+  // 10. Kaboom: Safe Ball Pop (Soft bubbly burst + warm glass bell)
   // =========================================================================
   public static playSafePop() {
     Haptics.safePop();
     if (!this.soundEnabled) return;
 
-    const played = this.playSample('bonus_found.mp3', { volume: 0.90 });
+    const played = this.playSample('safe_pop.wav', { volume: 0.85 });
     if (!played) {
       const ctx = getAudioContext();
       if (!ctx) return;
       try {
         const now = ctx.currentTime;
-        // Frequency dive bubble pop
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
         const popOsc = ctx.createOscillator();
         const popGain = ctx.createGain();
         popOsc.type = 'sine';
-        popOsc.frequency.setValueAtTime(640, now);
-        popOsc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
-        popGain.gain.setValueAtTime(0.22 * this.masterVolume, now);
-        popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
-        popOsc.connect(popGain);
-        popGain.connect(ctx.destination);
-        popOsc.start(now);
-        popOsc.stop(now + 0.05);
+        popOsc.frequency.setValueAtTime(380, now);
+        popOsc.frequency.exponentialRampToValueAtTime(180, now + 0.035);
 
-        // Uplifting harmonic crystal chime
+        popGain.gain.setValueAtTime(0.0001, now);
+        popGain.gain.linearRampToValueAtTime(0.14, now + 0.003);
+        popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+        popOsc.connect(popGain);
+        popGain.connect(masterNode);
+        popOsc.start(now);
+        popOsc.stop(now + 0.045);
+
         const chimeOsc = ctx.createOscillator();
         const chimeGain = ctx.createGain();
-        chimeOsc.type = 'triangle';
-        chimeOsc.frequency.setValueAtTime(987.77, now + 0.02); // B5
-        chimeOsc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.16); // E6
-        chimeGain.gain.setValueAtTime(0.001, now + 0.02);
-        chimeGain.gain.linearRampToValueAtTime(0.18 * this.masterVolume, now + 0.04);
-        chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        chimeOsc.type = 'sine';
+        chimeOsc.frequency.setValueAtTime(880, now + 0.015);
+
+        chimeGain.gain.setValueAtTime(0.0001, now + 0.015);
+        chimeGain.gain.linearRampToValueAtTime(0.10, now + 0.022);
+        chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+
         chimeOsc.connect(chimeGain);
-        chimeGain.connect(ctx.destination);
-        chimeOsc.start(now + 0.02);
-        chimeOsc.stop(now + 0.35);
+        chimeGain.connect(masterNode);
+        chimeOsc.start(now + 0.015);
+        chimeOsc.stop(now + 0.24);
       } catch (e) {}
     }
   }
 
   // =========================================================================
-  // 11. Kaboom: Command Bonus Fanfare (High-energy celebratory brass arpeggio)
+  // 11. Kaboom: Command Bonus Fanfare (Triumphant celebratory arpeggio)
   // =========================================================================
   public static playBonusFanfare() {
     Haptics.bonusClaim();
     if (!this.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      // Ascending triumphant arpeggio: C5 -> E5 -> G5 -> C6 -> E6
-      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.065);
-        gain.gain.setValueAtTime(0.001, now + idx * 0.065);
-        gain.gain.linearRampToValueAtTime(0.24 * this.masterVolume, now + idx * 0.065 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.065 + 0.42);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + idx * 0.065);
-        osc.stop(now + idx * 0.065 + 0.45);
-      });
-    } catch (e) {}
+
+    const played = this.playSample('bonus_fanfare.wav', { volume: 0.85 });
+    if (!played) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+          gain.gain.setValueAtTime(0.0001, now + idx * 0.05);
+          gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.05 + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.05 + 0.28);
+
+          osc.connect(gain);
+          gain.connect(masterNode);
+          osc.start(now + idx * 0.05);
+          osc.stop(now + idx * 0.05 + 0.30);
+        });
+      } catch (e) {}
+    }
   }
 
   // =========================================================================
-  // 11b. Star Currency HUD Beep / Pickup Chime (High-register bright arcade ping)
+  // 11b. Star Currency HUD Beep / Pickup Chime (Warm sparkling arcade ping)
   // =========================================================================
   public static playHudCoinBeep() {
     triggerHaptic([12, 25, 18]);
     if (!this.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      // High-register sparkling arcade coin bell: E6 (1318.5Hz) -> B6 (1975.5Hz)
-      const pings = [
-        { freq: 1318.5, delay: 0.0, dur: 0.22, vol: 0.28 },
-        { freq: 1975.5, delay: 0.07, dur: 0.32, vol: 0.35 },
-      ];
-      pings.forEach(({ freq, delay, dur, vol }) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + delay);
-        gain.gain.setValueAtTime(0.001, now + delay);
-        gain.gain.linearRampToValueAtTime(vol * this.masterVolume, now + delay + 0.012);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + delay);
-        osc.stop(now + delay + dur + 0.02);
-      });
-    } catch (e) {}
+
+    const played = this.playSample('hud_coin.wav', { volume: 0.80 });
+    if (!played) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
+
+        const pings = [
+          { freq: 987.77, delay: 0.0, dur: 0.16, vol: 0.12 },
+          { freq: 1318.5, delay: 0.04, dur: 0.20, vol: 0.15 },
+        ];
+        pings.forEach(({ freq, delay, dur, vol }) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + delay);
+
+          gain.gain.setValueAtTime(0.0001, now + delay);
+          gain.gain.linearRampToValueAtTime(vol, now + delay + 0.006);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + dur);
+
+          osc.connect(gain);
+          gain.connect(masterNode);
+          osc.start(now + delay);
+          osc.stop(now + delay + dur + 0.02);
+        });
+      } catch (e) {}
+    }
   }
 
   // =========================================================================
-  // 12. Kaboom: Bomb Explosion (Sub-bass detonation rumble + noise blast)
+  // 12. Kaboom: Bomb Explosion (Deep cinematic rumble, zero clipping)
   // =========================================================================
   public static playBombExplosion() {
     Haptics.bombExplosion();
     if (!this.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      // 1. Heavy sub-bass earthquake drop
-      const subOsc = ctx.createOscillator();
-      const subGain = ctx.createGain();
-      subOsc.type = 'sine';
-      subOsc.frequency.setValueAtTime(160, now);
-      subOsc.frequency.exponentialRampToValueAtTime(26, now + 0.9);
-      subGain.gain.setValueAtTime(0.9 * this.masterVolume, now);
-      subGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-      subOsc.connect(subGain);
-      subGain.connect(ctx.destination);
-      subOsc.start(now);
-      subOsc.stop(now + 1.25);
 
-      // 2. Filtered noise explosion blast
-      const bufferSize = Math.floor(ctx.sampleRate * 0.9);
-      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      const noiseSource = ctx.createBufferSource();
-      noiseSource.buffer = noiseBuffer;
+    const played = this.playSample('bomb_explosion.wav', { volume: 0.95 });
+    if (!played) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
 
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(850, now);
-      filter.frequency.exponentialRampToValueAtTime(70, now + 0.85);
+        const subOsc = ctx.createOscillator();
+        const subGain = ctx.createGain();
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(85, now);
+        subOsc.frequency.exponentialRampToValueAtTime(34, now + 0.60);
 
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.75 * this.masterVolume, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+        subGain.gain.setValueAtTime(0.0001, now);
+        subGain.gain.linearRampToValueAtTime(0.35, now + 0.01);
+        subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
 
-      noiseSource.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
+        subOsc.connect(subGain);
+        subGain.connect(masterNode);
 
-      noiseSource.start(now);
-      noiseSource.stop(now + 0.9);
-    } catch (e) {}
+        subOsc.start(now);
+        subOsc.stop(now + 0.70);
+      } catch (e) {}
+    }
   }
 
   // =========================================================================
@@ -877,48 +931,64 @@ export class AudioManager {
   // =========================================================================
   public static playPaddleHit(multiplier: number = 1) {
     if (!this.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const baseFreq = Math.min(1400, 360 * Math.max(0.7, multiplier));
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(baseFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.8, now + 0.035);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.12);
 
-      gain.gain.setValueAtTime(0.35 * this.masterVolume, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    const rate = Math.max(0.85, Math.min(1.35, multiplier));
+    const played = this.playSample('paddle_hit.wav', { volume: 0.85, playbackRate: rate });
+    if (!played) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.13);
-    } catch (e) {}
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const baseFreq = Math.min(600, 260 * Math.max(0.8, multiplier));
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq * 1.2, now);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, now + 0.05);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.003);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(masterNode);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      } catch (e) {}
+    }
   }
 
   public static playWallPing() {
     if (!this.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(560, now);
-      osc.frequency.exponentialRampToValueAtTime(260, now + 0.07);
 
-      gain.gain.setValueAtTime(0.18 * this.masterVolume, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+    const played = this.playSample('wall_ping.wav', { volume: 0.80 });
+    if (!played) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      try {
+        const now = ctx.currentTime;
+        const masterNode = getMasterOutputNode();
+        if (!masterNode) return;
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.08);
-    } catch (e) {}
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(260, now + 0.04);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.10, now + 0.003);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+
+        osc.connect(gain);
+        gain.connect(masterNode);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } catch (e) {}
+    }
   }
 }
 

@@ -155,7 +155,7 @@ export default function App() {
         loadedSettings.sfxVolume ?? loadedSettings.soundVolume,
         loadedSettings.hapticsEnabled,
         loadedSettings.musicEnabled ?? true,
-        loadedSettings.musicVolume ?? 0.7
+        loadedSettings.musicVolume ?? 0.45
       );
       SoundEngine.preloadSounds();
       BgmManager.playTrack('hub');

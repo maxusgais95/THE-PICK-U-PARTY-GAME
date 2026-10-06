@@ -62,7 +62,7 @@ import bronzeTrophy010 from '../assets/images/trophies/Bronze Trophy 010.webp';
 import silverTrophy010 from '../assets/images/trophies/Silver Trophy 010.webp';
 import goldTrophy010 from '../assets/images/trophies/Gold Trophy 010.webp';
 import platinumTrophy010 from '../assets/images/trophies/Platinum Trophy 010.webp';
-import { EconomyState, getEconomyState } from './economy';
+import { EconomyState, getEconomyState, getCustomUnlockedItemCount } from './economy';
 
 export type TrophyTier = 'locked' | 'bronze' | 'silver' | 'gold' | 'platinum';
 
@@ -619,7 +619,7 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
     tiers: {
       bronze: {
         tier: 'bronze',
-        threshold: 500,
+        threshold: 2500,
         title: 'Gold Seeker',
         badgeName: 'Bronze',
         colorName: 'Amber Bronze',
@@ -627,12 +627,12 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
         gradient: 'from-[#613612] via-[#8c4f1c] to-[#b36b2d]',
         borderColor: 'border-amber-700/60',
         glowColor: 'shadow-[0_0_15px_rgba(180,83,9,0.4)]',
-        starBonus: 50,
+        starBonus: 100,
         image: bronzeTrophy008,
       },
       silver: {
         tier: 'silver',
-        threshold: 2500,
+        threshold: 7500,
         title: 'Starlight Merchant',
         badgeName: 'Silver',
         colorName: 'Sterling Silver',
@@ -640,12 +640,12 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
         gradient: 'from-[#334155] via-[#64748b] to-[#94a3b8]',
         borderColor: 'border-slate-400/60',
         glowColor: 'shadow-[0_0_20px_rgba(148,163,184,0.5)]',
-        starBonus: 150,
+        starBonus: 250,
         image: silverTrophy008,
       },
       gold: {
         tier: 'gold',
-        threshold: 10000,
+        threshold: 20000,
         title: 'Cosmic Tycoon',
         badgeName: 'Gold',
         colorName: 'Radiant Gold',
@@ -653,12 +653,12 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
         gradient: 'from-[#854d0e] via-[#ca8a04] to-[#fde047]',
         borderColor: 'border-yellow-400/80',
         glowColor: 'shadow-[0_0_25px_rgba(234,179,8,0.6)]',
-        starBonus: 400,
+        starBonus: 600,
         image: goldTrophy008,
       },
       platinum: {
         tier: 'platinum',
-        threshold: 30000,
+        threshold: 50000,
         title: 'Midas Supreme',
         badgeName: 'Platinum',
         colorName: 'Cyber Platinum',
@@ -666,7 +666,7 @@ export const TROPHY_DEFINITIONS: AchievementTrophy[] = [
         gradient: 'from-[#083344] via-[#0891b2] to-[#67e8f9]',
         borderColor: 'border-cyan-300',
         glowColor: 'shadow-[0_0_30px_rgba(6,182,212,0.8)]',
-        starBonus: 1200,
+        starBonus: 1500,
         image: platinumTrophy008,
       },
     },
@@ -1026,7 +1026,6 @@ export function calculateTrophyProgress(
       highestRally?: number;
       totalRounds?: number;
     };
-    [key: string]: any;
   },
   claims: Record<string, TrophyTier[]>
 ): TrophyProgress {
@@ -1052,28 +1051,26 @@ export function calculateTrophyProgress(
       currentValue = stats.pongHighestRally ?? stats.pong?.highestRally ?? 0;
       break;
     case 'party_legend':
-      const kRounds = stats.totalKaboomRounds ?? stats.kaboom?.totalRounds ?? 0;
-      const pRounds = stats.totalPongRounds ?? stats.pong?.totalRounds ?? 0;
       currentValue =
         (stats.totalRouletteRounds || 0) +
         (stats.totalBottleSpins || 0) +
-        kRounds +
-        pRounds;
+        (stats.totalKaboomRounds || stats.kaboom?.totalRounds || 0) +
+        (stats.totalPongRounds || stats.pong?.totalRounds || 0);
       break;
     case 'collector_wardrobe':
-      currentValue = stats.unlockedItemCount ?? 0;
+      currentValue = stats.unlockedItemCount || 0;
       break;
     case 'total_logins':
-      currentValue = stats.totalLogins ?? stats.totalLoginsCount ?? 0;
+      currentValue = stats.totalLogins || 0;
       break;
     case 'midas_touch':
-      currentValue = stats.lifetimeStars ?? stats.lifetimeStarsEarned ?? stats.stars ?? 0;
+      currentValue = stats.lifetimeStars || 0;
       break;
     case 'milestone_chests':
-      currentValue = stats.milestoneChestsOpened ?? 0;
+      currentValue = stats.milestoneChestsOpened || 0;
       break;
     case 'quest_master':
-      currentValue = stats.questsCompleted ?? stats.questsCompletedCount ?? 0;
+      currentValue = stats.questsCompleted || 0;
       break;
     default:
       currentValue = 0;
@@ -1109,7 +1106,7 @@ export function calculateTrophyProgress(
     progressPercent = 100;
   } else {
     const prevThreshold = currentTierConfig ? currentTierConfig.threshold : 0;
-    const range = Math.max(1, nextTierConfig.threshold - prevThreshold);
+    const range = nextTierConfig.threshold - prevThreshold;
     const progressIntoRange = Math.max(0, currentValue - prevThreshold);
     progressPercent = Math.min(
       100,
@@ -1150,15 +1147,32 @@ export function getTrophyImage(
   return trophy.images?.[tier];
 }
 
-const DEFAULT_SKIN_IDS = new Set([
-  'bottle_btl_001',
-  'bomb_classic_tnt',
-  'ball_cyan_orbs',
-  'particle_classic_blaze',
-]);
-
 export function hasUnclaimedTrophies(
-  stats?: any,
+  stats?: {
+    totalRouletteRounds?: number;
+    totalBottleSpins?: number;
+    totalKaboomRounds?: number;
+    totalPongRounds?: number;
+    pongVictories?: number;
+    pongHighestRally?: number;
+    pong?: {
+      victories?: number;
+      highestRally?: number;
+      totalRounds?: number;
+    };
+    kaboomVictories?: number;
+    kaboomBonusCollected?: number;
+    kaboom?: {
+      victories?: number;
+      bonusCollected?: number;
+      totalRounds?: number;
+    };
+    unlockedItemCount?: number;
+    totalLogins?: number;
+    lifetimeStars?: number;
+    milestoneChestsOpened?: number;
+    questsCompleted?: number;
+  } | null,
   economy?: EconomyState | null,
   claims?: Record<string, TrophyTier[]>
 ): boolean {
@@ -1167,30 +1181,27 @@ export function hasUnclaimedTrophies(
     const currentEconomy =
       economy || (typeof window !== 'undefined' ? getEconomyState() : undefined);
 
-    const rawUnlocked = currentEconomy?.unlockedItems || [];
-    const unlockedNonDefault = rawUnlocked.filter((id) => !DEFAULT_SKIN_IDS.has(id)).length;
-
     const statsContext = {
       totalRouletteRounds: stats?.totalRouletteRounds || 0,
       totalBottleSpins: stats?.totalBottleSpins || 0,
       totalKaboomRounds: stats?.totalKaboomRounds || stats?.kaboom?.totalRounds || 0,
       totalPongRounds: stats?.totalPongRounds || stats?.pong?.totalRounds || 0,
-      pongVictories: stats?.pongVictories ?? stats?.pong?.victories ?? 0,
-      pongHighestRally: stats?.pongHighestRally ?? stats?.pong?.highestRally ?? 0,
+      pongVictories: stats?.pongVictories || stats?.pong?.victories || 0,
+      pongHighestRally: stats?.pongHighestRally || stats?.pong?.highestRally || 0,
       kaboomVictories: stats?.kaboomVictories ?? stats?.kaboom?.victories ?? 0,
       kaboomBonusCollected: stats?.kaboomBonusCollected ?? stats?.kaboom?.bonusCollected ?? 0,
-      unlockedItemCount: stats?.unlockedItemCount ?? unlockedNonDefault,
+      unlockedItemCount:
+        getCustomUnlockedItemCount(currentEconomy?.unlockedItems) ||
+        (stats?.unlockedItemCount !== undefined ? stats.unlockedItemCount : 0),
       totalLogins: Math.max(
         1,
         stats?.totalLogins ||
-          stats?.totalLoginsCount ||
           currentEconomy?.totalLoginsCount ||
           currentEconomy?.dailyLoginRewards?.claimedDays?.length ||
           1
       ),
       lifetimeStars: Math.max(
         stats?.lifetimeStars || 0,
-        stats?.lifetimeStarsEarned || 0,
         currentEconomy?.stars || 0,
         currentEconomy?.lifetimeStarsEarned || 0
       ),
@@ -1201,10 +1212,9 @@ export function hasUnclaimedTrophies(
       ),
       questsCompleted: Math.max(
         stats?.questsCompleted || 0,
-        stats?.questsCompletedCount || 0,
         currentEconomy?.questsCompletedCount || 0,
-        (currentEconomy?.dailyQuests || []).filter(
-          (q) => q.isClaimed || q.currentCount >= q.targetCount
+        currentEconomy?.dailyQuests?.filter(
+          (q) => q.currentCount >= q.targetCount
         ).length || 0
       ),
     };
@@ -1219,7 +1229,31 @@ export function hasUnclaimedTrophies(
 }
 
 export function getUnclaimedTrophiesCount(
-  stats?: any,
+  stats?: {
+    totalRouletteRounds?: number;
+    totalBottleSpins?: number;
+    totalKaboomRounds?: number;
+    totalPongRounds?: number;
+    pongVictories?: number;
+    pongHighestRally?: number;
+    pong?: {
+      victories?: number;
+      highestRally?: number;
+      totalRounds?: number;
+    };
+    kaboomVictories?: number;
+    kaboomBonusCollected?: number;
+    kaboom?: {
+      victories?: number;
+      bonusCollected?: number;
+      totalRounds?: number;
+    };
+    unlockedItemCount?: number;
+    totalLogins?: number;
+    lifetimeStars?: number;
+    milestoneChestsOpened?: number;
+    questsCompleted?: number;
+  } | null,
   economy?: EconomyState | null,
   claims?: Record<string, TrophyTier[]>
 ): number {
@@ -1228,30 +1262,27 @@ export function getUnclaimedTrophiesCount(
     const currentEconomy =
       economy || (typeof window !== 'undefined' ? getEconomyState() : undefined);
 
-    const rawUnlocked = currentEconomy?.unlockedItems || [];
-    const unlockedNonDefault = rawUnlocked.filter((id) => !DEFAULT_SKIN_IDS.has(id)).length;
-
     const statsContext = {
       totalRouletteRounds: stats?.totalRouletteRounds || 0,
       totalBottleSpins: stats?.totalBottleSpins || 0,
       totalKaboomRounds: stats?.totalKaboomRounds || stats?.kaboom?.totalRounds || 0,
       totalPongRounds: stats?.totalPongRounds || stats?.pong?.totalRounds || 0,
-      pongVictories: stats?.pongVictories ?? stats?.pong?.victories ?? 0,
-      pongHighestRally: stats?.pongHighestRally ?? stats?.pong?.highestRally ?? 0,
+      pongVictories: stats?.pongVictories || stats?.pong?.victories || 0,
+      pongHighestRally: stats?.pongHighestRally || stats?.pong?.highestRally || 0,
       kaboomVictories: stats?.kaboomVictories ?? stats?.kaboom?.victories ?? 0,
       kaboomBonusCollected: stats?.kaboomBonusCollected ?? stats?.kaboom?.bonusCollected ?? 0,
-      unlockedItemCount: stats?.unlockedItemCount ?? unlockedNonDefault,
+      unlockedItemCount:
+        getCustomUnlockedItemCount(currentEconomy?.unlockedItems) ||
+        (stats?.unlockedItemCount !== undefined ? stats.unlockedItemCount : 0),
       totalLogins: Math.max(
         1,
         stats?.totalLogins ||
-          stats?.totalLoginsCount ||
           currentEconomy?.totalLoginsCount ||
           currentEconomy?.dailyLoginRewards?.claimedDays?.length ||
           1
       ),
       lifetimeStars: Math.max(
         stats?.lifetimeStars || 0,
-        stats?.lifetimeStarsEarned || 0,
         currentEconomy?.stars || 0,
         currentEconomy?.lifetimeStarsEarned || 0
       ),
@@ -1262,10 +1293,9 @@ export function getUnclaimedTrophiesCount(
       ),
       questsCompleted: Math.max(
         stats?.questsCompleted || 0,
-        stats?.questsCompletedCount || 0,
         currentEconomy?.questsCompletedCount || 0,
-        (currentEconomy?.dailyQuests || []).filter(
-          (q) => q.isClaimed || q.currentCount >= q.targetCount
+        currentEconomy?.dailyQuests?.filter(
+          (q) => q.currentCount >= q.targetCount
         ).length || 0
       ),
     };

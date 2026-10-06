@@ -13,6 +13,7 @@ export {
   BgmManager,
   Haptics,
   getAudioContext,
+  getMasterOutputNode,
   triggerHaptic,
   SOUND_MANIFEST,
 } from './audioManager';

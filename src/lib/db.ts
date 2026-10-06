@@ -20,11 +20,11 @@ const DEFAULT_SETTINGS: AppSettings = {
   bottleFriction: 0.992,
   theme: 'cyber-neon',
   sfxEnabled: true,
-  sfxVolume: 0.8,
+  sfxVolume: 0.7,
   musicEnabled: true,
-  musicVolume: 0.7,
+  musicVolume: 0.45,
   soundEnabled: true,
-  soundVolume: 0.8,
+  soundVolume: 0.7,
   hapticsEnabled: true,
   fingerAnimation: {
     springPop: true,
@@ -119,8 +119,6 @@ export const DEFAULT_STATS: AppStats = {
   totalPongRounds: 0,
   pongVictories: 0,
   pongHighestRally: 0,
-  kaboomVictories: 0,
-  kaboomBonusCollected: 0,
   lastPlayedAt: Date.now(),
   kaboom: DEFAULT_KABOOM_STATS,
   pong: DEFAULT_PONG_STATS,
@@ -133,19 +131,14 @@ function normalizeStats(raw: Partial<AppStats> | null | undefined): AppStats {
   const totalRounds = typeof rawKaboom.totalRounds === 'number'
     ? rawKaboom.totalRounds
     : (raw.totalKaboomRounds || 0);
-  const victories = typeof rawKaboom.victories === 'number'
-    ? rawKaboom.victories
-    : (raw.kaboomVictories || 0);
-  const bonusCollected = typeof rawKaboom.bonusCollected === 'number'
-    ? rawKaboom.bonusCollected
-    : (raw.kaboomBonusCollected || 0);
+  const victories = rawKaboom.victories || 0;
   const winrate = totalRounds > 0
     ? Math.round((victories / totalRounds) * 1000) / 10
     : 0;
 
   const kaboom: KaboomStats = {
     victories,
-    bonusCollected,
+    bonusCollected: rawKaboom.bonusCollected || 0,
     bombHits: rawKaboom.bombHits || 0,
     totalRounds,
     winrate,
@@ -187,8 +180,6 @@ function normalizeStats(raw: Partial<AppStats> | null | undefined): AppStats {
     totalPongRounds: pongTotalRounds,
     pongVictories,
     pongHighestRally,
-    kaboomVictories: victories,
-    kaboomBonusCollected: bonusCollected,
     lastPlayedAt: raw.lastPlayedAt || Date.now(),
     kaboom,
     pong,
@@ -326,24 +317,12 @@ export async function resetAllStats(): Promise<AppStats> {
     totalRouletteRounds: 0,
     totalBottleSpins: 0,
     totalKaboomRounds: 0,
-    totalPongRounds: 0,
-    pongVictories: 0,
-    pongHighestRally: 0,
-    kaboomVictories: 0,
-    kaboomBonusCollected: 0,
     lastPlayedAt: Date.now(),
     kaboom: {
       victories: 0,
       bonusCollected: 0,
       bombHits: 0,
       totalRounds: 0,
-      winrate: 0,
-    },
-    pong: {
-      victories: 0,
-      totalRounds: 0,
-      highestRally: 0,
-      totalBounces: 0,
       winrate: 0,
     },
   };
@@ -384,8 +363,11 @@ export async function recordPongEvent(event: {
   if (isVictory) {
     current.pongVictories = (current.pongVictories || 0) + 1;
     current.pong.victories = (current.pong.victories || 0) + 1;
+    recordDailyQuestProgress('pong_victory', 1);
+    recordDailyQuestProgress('pong_match', 1);
     addEventExperience(50, 'pong_victory');
   } else {
+    recordDailyQuestProgress('pong_match', 1);
     addEventExperience(30, 'pong_match');
   }
 
@@ -416,6 +398,7 @@ export async function recordKaboomEvent(event: {
 
   if (event.type === 'bonus') {
     current.kaboom.bonusCollected += 1;
+    recordDailyQuestProgress('kaboom_bonus', 1);
     recordDailyQuestProgress('kaboom_tile', 1);
     addEventExperience(15, 'kaboom_bonus');
   } else if (event.type === 'victory') {

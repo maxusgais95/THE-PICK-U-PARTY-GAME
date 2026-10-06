@@ -23,6 +23,7 @@ import {
   TRAIL_WEBP_PARTICLE_SPRITES,
   TRAIL_PARTICLE_FILES,
   recordDailyQuestProgress,
+  addStars,
 } from '../../lib/economy';
 import { recordPongEvent } from '../../lib/db';
 import {
@@ -35,7 +36,7 @@ import {
 import { BombPongGameOverModal } from './BombPongGameOverModal';
 import { BombPongBackground } from '../BombPongBackground';
 import defaultBombImg from '../../assets/images/bombs/Bomb Sprite.webp';
-import fireParticleImgSrc from '../../assets/images/particle_blaze_fire.webp';
+import fireParticleImgSrc from '../../assets/images/trail_thumbnails/particle_blaze_fire.webp';
 import { processSpriteImage } from '../../lib/imageProcessing';
 
 export interface BombPongGameProps {
@@ -190,6 +191,7 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
 
   const [rallyCount, setRallyCount] = useState<number>(0);
   const [maxRally, setMaxRally] = useState<number>(0);
+  const maxRallyRef = useRef<number>(0);
   const [totalBounces, setTotalBounces] = useState<number>(0);
   const [maxSpeedRecorded, setMaxSpeedRecorded] = useState<number>(4.5);
   const [serveCountdown, setServeCountdown] = useState<number>(3);
@@ -540,23 +542,19 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     const coins = winner === 'player1' ? 45 : 20;
     setRewardCoins(coins);
 
+    const matchLongestRally = Math.max(maxRallyRef.current, maxRally, rallyCount);
+
     try {
       recordPongEvent({
         winner: winner === 'player1' ? 1 : 2,
-        rallies: rallyCount,
+        rallies: matchLongestRally,
         isVictory: winner === 'player1',
       });
       recordDailyQuestProgress('pong_match', 1);
       if (winner === 'player1') {
         recordDailyQuestProgress('pong_victory', 1);
       }
-      const state = getEconomyState();
-      const updated = {
-        ...state,
-        stars: (state.stars || 0) + coins,
-        lifetimeStarsEarned: (state.lifetimeStarsEarned || 0) + coins,
-      };
-      saveEconomyState(updated);
+      const updated = addStars(coins);
       if (onEconomyUpdated) onEconomyUpdated(updated);
     } catch (e) {
       console.warn('Failed to save pong reward:', e);
@@ -575,6 +573,8 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     setServingPlayer('p1');
     setOpponentReady(false);
     setRallyCount(0);
+    setMaxRally(0);
+    maxRallyRef.current = 0;
     setGameOverModalOpen(false);
     setDetonatedSide(null);
     setGamePhase('ready');
@@ -600,6 +600,8 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
     setServingPlayer('p1');
     setOpponentReady(false);
     setRallyCount(0);
+    setMaxRally(0);
+    maxRallyRef.current = 0;
     setGameOverModalOpen(false);
     setDetonatedSide(null);
     setGamePhase('ready');
@@ -931,8 +933,21 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
           SoundEngine.playPaddleHit(bomb.speed / bomb.baseSpeed);
           Haptics.medium();
 
-          setRallyCount((r) => r + 1);
+          setRallyCount((r) => {
+            const nextRally = r + 1;
+            setMaxRally((m) => {
+              const highest = Math.max(m, nextRally);
+              maxRallyRef.current = highest;
+              return highest;
+            });
+            if (nextRally >= 5) {
+              recordDailyQuestProgress('pong_rally_5', 1);
+            }
+            return nextRally;
+          });
           setTotalBounces((b) => b + 1);
+          recordDailyQuestProgress('pong_bounce', 1);
+          setMaxSpeedRecorded((s) => Math.max(s, bomb.speed));
           setMaxSpeedRecorded((s) => Math.max(s, bomb.speed));
         }
 
@@ -989,6 +1004,11 @@ export const BombPongGame: React.FC<BombPongGameProps> = ({
 
           setRallyCount((r) => {
             const nextRally = r + 1;
+            setMaxRally((m) => {
+              const highest = Math.max(m, nextRally);
+              maxRallyRef.current = highest;
+              return highest;
+            });
             if (nextRally >= 5) {
               recordDailyQuestProgress('pong_rally_5', 1);
             }

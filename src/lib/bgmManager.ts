@@ -24,7 +24,7 @@ export const BGM_TRACKS: Record<BgmTrackKey, string> = {
  */
 export class BgmManager {
   private static musicEnabled: boolean = true;
-  private static musicVolume: number = 0.7; // 0.0 - 1.0
+  private static musicVolume: number = 0.45; // 0.0 - 1.0 (balanced for clean earphones mix)
 
   // Dual audio channels for crossfading
   private static channelA: HTMLAudioElement | null = null;
@@ -39,6 +39,14 @@ export class BgmManager {
 
   // Track user interaction state for autoplay compliance
   private static hasUserInteracted: boolean = false;
+
+  /**
+   * Calibrates volume with an acoustic curve (0.65 headroom) so music never overpowers SFX or fatigues earphones.
+   */
+  public static getCalibratedVolume(): number {
+    if (!this.musicEnabled || this.musicVolume <= 0) return 0;
+    return Math.min(0.70, Math.pow(Math.max(0, Math.min(1, this.musicVolume)), 1.3) * 0.65);
+  }
 
   private static initChannels() {
     if (typeof window === 'undefined' || this.isInitialized) return;
@@ -105,15 +113,18 @@ export class BgmManager {
 
     this.initChannels();
 
-    // Immediately update volume on both channels
-    if (this.channelA) {
+    const calVol = this.getCalibratedVolume();
+    const active = this.activeChannelIndex === 0 ? this.channelA : this.channelB;
+    const inactive = this.activeChannelIndex === 0 ? this.channelB : this.channelA;
+
+    if (active) {
       try {
-        this.channelA.volume = (enabled && this.musicVolume > 0) ? this.musicVolume : 0;
+        active.volume = calVol;
       } catch (e) {}
     }
-    if (this.channelB) {
+    if (inactive && !this.isTransitioning) {
       try {
-        this.channelB.volume = (enabled && this.musicVolume > 0) ? this.musicVolume : 0;
+        inactive.volume = 0;
       } catch (e) {}
     }
 
@@ -196,7 +207,7 @@ export class BgmManager {
 
     const startTime = performance.now();
     const initialCurrentVol = currentChannel.volume;
-    const targetVol = this.musicVolume;
+    const targetVol = this.getCalibratedVolume();
 
     const step = (now: number) => {
       const elapsed = now - startTime;
@@ -219,7 +230,7 @@ export class BgmManager {
           currentChannel.pause();
           currentChannel.volume = 0;
           currentChannel.currentTime = 0;
-          nextChannel.volume = this.musicVolume;
+          nextChannel.volume = this.getCalibratedVolume();
         } catch (e) {}
       }
     };
@@ -303,7 +314,7 @@ export class BgmManager {
     } catch (e) {}
 
     const startTime = performance.now();
-    const targetVol = this.musicVolume;
+    const targetVol = this.getCalibratedVolume();
 
     const step = (now: number) => {
       const elapsed = now - startTime;
@@ -334,7 +345,7 @@ export class BgmManager {
 
     const active = this.activeChannelIndex === 0 ? this.channelA : this.channelB;
     try {
-      active.volume = Math.max(0, Math.min(1, this.musicVolume));
+      active.volume = this.getCalibratedVolume();
     } catch (e) {}
   }
 
@@ -362,7 +373,7 @@ export class BgmManager {
         active.src = trackUrl;
       }
       active.loop = true;
-      active.volume = this.musicVolume;
+      active.volume = this.getCalibratedVolume();
       const playPromise = active.play();
       if (playPromise) {
         playPromise.catch(() => {});

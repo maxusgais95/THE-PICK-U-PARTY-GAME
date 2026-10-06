@@ -30,14 +30,14 @@ import {
 } from '../lib/trophies';
 import { AppStats } from '../types';
 import { getStats, getAllCustomSprites } from '../lib/db';
-import { EconomyState, addStars, getEconomyState } from '../lib/economy';
+import { EconomyState, addStars, getEconomyState, getCustomUnlockedItemCount } from '../lib/economy';
 import { SoundEngine, Haptics } from '../lib/audio';
-import currencyStarImg from '../assets/images/Currency Star Sprite.webp';
-import diamondStarSparklePng from '../assets/images/diamond_star_sparkle.webp';
-import bronzeBlendBg from '../assets/images/Trophy BG Bronze 01.webp';
-import silverBlendBg from '../assets/images/Trophy BG Silver 01.webp';
-import goldBlendBg from '../assets/images/Trophy BG Gold 01.webp';
-import platBlendBg from '../assets/images/Trophy BG Platinum 01.webp';
+import currencyStarImg from '../assets/images/sprites/Currency Star Sprite.webp';
+import diamondStarSparklePng from '../assets/images/sprites/diamond_star_sparkle.webp';
+import bronzeBlendBg from '../assets/images/backgrounds/Trophy BG Bronze 01.webp';
+import silverBlendBg from '../assets/images/backgrounds/Trophy BG Silver 01.webp';
+import goldBlendBg from '../assets/images/backgrounds/Trophy BG Gold 01.webp';
+import platBlendBg from '../assets/images/backgrounds/Trophy BG Platinum 01.webp';
 
 const TIER_BLEND_BACKGROUNDS: Record<TrophyTier, string | null> = {
   bronze: bronzeBlendBg,
@@ -224,11 +224,10 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
   const [selectedTrophy, setSelectedTrophy] = useState<AchievementTrophy | null>(null);
   const [inspectedTier, setInspectedTier] = useState<TrophyTier | null>(null);
 
-  const [customSpritesCount, setCustomSpritesCount] = useState<number>(0);
-
   // Live real-time stats and economy synchronization
   const [liveStats, setLiveStats] = useState<AppStats>(stats);
   const [liveEconomy, setLiveEconomy] = useState<EconomyState>(economy);
+  const [customSpritesCount, setCustomSpritesCount] = useState<number>(0);
 
   useEffect(() => {
     setLiveStats(stats);
@@ -246,9 +245,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
     getStats().then(setLiveStats);
     setLiveEconomy(getEconomyState());
     setClaimMap(getTrophyClaimMap());
-    getAllCustomSprites()
-      .then((sprites) => setCustomSpritesCount(sprites.length))
-      .catch(() => {});
+    getAllCustomSprites().then((sprites) => setCustomSpritesCount(sprites?.length || 0));
 
     const handleStatsEvent = (e: Event) => {
       const ce = e as CustomEvent<AppStats>;
@@ -283,18 +280,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
     };
   }, [isOpen]);
 
-  const DEFAULT_SKIN_IDS = new Set([
-    'bottle_btl_001',
-    'bomb_classic_tnt',
-    'ball_cyan_orbs',
-    'particle_classic_blaze',
-  ]);
-  const unlockedStoreItemsCount = (liveEconomy.unlockedItems || []).filter(
-    (id) => !DEFAULT_SKIN_IDS.has(id)
-  ).length;
-  const totalUnlockedSkins = unlockedStoreItemsCount + customSpritesCount;
-
-  // When a trophy is selected for inspection, default to its highest unclaimed tier or unlocked tier
+  // When a trophy is selected for inspection, default to its highest unlocked tier (or bronze)
   useEffect(() => {
     if (selectedTrophy) {
       const statsCtx = {
@@ -304,24 +290,20 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
         totalPongRounds: liveStats.totalPongRounds || liveStats.pong?.totalRounds || 0,
         pongVictories: liveStats.pongVictories ?? liveStats.pong?.victories ?? 0,
         pongHighestRally: liveStats.pongHighestRally ?? liveStats.pong?.highestRally ?? 0,
-        kaboomVictories: liveStats.kaboomVictories ?? liveStats.kaboom?.victories ?? 0,
-        kaboomBonusCollected: liveStats.kaboomBonusCollected ?? liveStats.kaboom?.bonusCollected ?? 0,
-        unlockedItemCount: totalUnlockedSkins,
+        kaboomVictories: liveStats.kaboom?.victories || 0,
+        kaboomBonusCollected: liveStats.kaboom?.bonusCollected || 0,
+        unlockedItemCount: getCustomUnlockedItemCount(liveEconomy.unlockedItems) + customSpritesCount,
         totalLogins: Math.max(1, liveEconomy.totalLoginsCount || liveEconomy.dailyLoginRewards?.claimedDays?.length || 1),
-        lifetimeStars: Math.max(liveEconomy.stars || 0, liveEconomy.lifetimeStarsEarned || liveEconomy.stars || 0),
+        lifetimeStars: Math.max(liveEconomy.stars || 0, liveEconomy.lifetimeStarsEarned || 0),
         milestoneChestsOpened: Math.max(liveEconomy.milestoneChestsOpened || 0, liveEconomy.milestoneChestClaimed ? 1 : 0),
-        questsCompleted: Math.max(
-          liveEconomy.questsCompletedCount || 0,
-          (liveEconomy.dailyQuests || []).filter((q) => q.isClaimed || q.currentCount >= q.targetCount).length
-        ),
+        questsCompleted: Math.max(liveEconomy.questsCompletedCount || 0, liveEconomy.dailyQuests?.filter((q) => q.currentCount >= q.targetCount).length || 0),
       };
       const p = calculateTrophyProgress(selectedTrophy, statsCtx, claimMap);
-      const defaultTier = p.unclaimedTiers[0] || (p.currentTier !== 'locked' ? p.currentTier : 'bronze');
-      setInspectedTier(defaultTier);
+      setInspectedTier(p.currentTier !== 'locked' ? p.currentTier : 'bronze');
     } else {
       setInspectedTier(null);
     }
-  }, [selectedTrophy, totalUnlockedSkins, liveStats, liveEconomy, claimMap]);
+  }, [selectedTrophy]);
 
   if (!isOpen) return null;
 
@@ -332,16 +314,13 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
     totalPongRounds: liveStats.totalPongRounds || liveStats.pong?.totalRounds || 0,
     pongVictories: liveStats.pongVictories ?? liveStats.pong?.victories ?? 0,
     pongHighestRally: liveStats.pongHighestRally ?? liveStats.pong?.highestRally ?? 0,
-    kaboomVictories: liveStats.kaboomVictories ?? liveStats.kaboom?.victories ?? 0,
-    kaboomBonusCollected: liveStats.kaboomBonusCollected ?? liveStats.kaboom?.bonusCollected ?? 0,
-    unlockedItemCount: totalUnlockedSkins,
+    kaboomVictories: liveStats.kaboom?.victories || 0,
+    kaboomBonusCollected: liveStats.kaboom?.bonusCollected || 0,
+    unlockedItemCount: getCustomUnlockedItemCount(liveEconomy.unlockedItems) + customSpritesCount,
     totalLogins: Math.max(1, liveEconomy.totalLoginsCount || liveEconomy.dailyLoginRewards?.claimedDays?.length || 1),
-    lifetimeStars: Math.max(liveEconomy.stars || 0, liveEconomy.lifetimeStarsEarned || liveEconomy.stars || 0),
+    lifetimeStars: Math.max(liveEconomy.stars || 0, liveEconomy.lifetimeStarsEarned || 0),
     milestoneChestsOpened: Math.max(liveEconomy.milestoneChestsOpened || 0, liveEconomy.milestoneChestClaimed ? 1 : 0),
-    questsCompleted: Math.max(
-      liveEconomy.questsCompletedCount || 0,
-      (liveEconomy.dailyQuests || []).filter((q) => q.isClaimed || q.currentCount >= q.targetCount).length
-    ),
+    questsCompleted: Math.max(liveEconomy.questsCompletedCount || 0, liveEconomy.dailyQuests?.filter((q) => q.currentCount >= q.targetCount).length || 0),
   };
 
   const progressList = TROPHY_DEFINITIONS.map((trophy) =>
@@ -972,7 +951,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
                           ) : (
                             <span className="text-gray-500 text-[10px] flex items-center gap-1">
                               <Lock className="w-3 h-3 text-gray-500" />
-                              {tierCfg.threshold - p.currentValue} left
+                              {Math.max(0, tierCfg.threshold - p.currentValue)} left
                             </span>
                           )}
                         </div>

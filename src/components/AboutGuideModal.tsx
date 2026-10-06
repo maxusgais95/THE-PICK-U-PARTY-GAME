@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { SoundEngine, Haptics } from '../lib/audio';
 import { EconomyState } from '../lib/economy';
-import appIconImg from '../assets/images/PICKU_PARTY_APP_ICON.webp';
+import appIconImg from '../assets/images/branding/PICKU_PARTY_APP_ICON.webp';
 
 export interface AboutGuideModalProps {
   isOpen: boolean;

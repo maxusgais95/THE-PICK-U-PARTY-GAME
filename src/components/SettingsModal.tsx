@@ -269,15 +269,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => {
                       const currentSfx = settings.sfxEnabled ?? settings.soundEnabled;
                       const nextSfx = !currentSfx;
-                      const currentVol = settings.sfxVolume ?? settings.soundVolume;
-                      const nextVol = nextSfx ? (currentVol === 0 ? 0.8 : currentVol) : 0;
+                      const currentVol = settings.sfxVolume ?? settings.soundVolume ?? 0.7;
+                      const nextVol = nextSfx ? (currentVol === 0 ? 0.7 : currentVol) : 0;
                       onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx, sfxVolume: nextVol, soundVolume: nextVol });
                       SoundEngine.updateConfig(
                         nextSfx,
                         nextVol,
                         settings.hapticsEnabled,
                         settings.musicEnabled ?? true,
-                        settings.musicVolume ?? 0.7
+                        settings.musicVolume ?? 0.45
                       );
                       if (nextSfx) {
                         SoundEngine.playButtonClick();
@@ -319,7 +319,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-black text-cyan-300">
                       {(settings.sfxEnabled ?? settings.soundEnabled)
-                        ? `${Math.round((settings.sfxVolume ?? settings.soundVolume) * 100)}%`
+                        ? `${Math.round((settings.sfxVolume ?? settings.soundVolume ?? 0.7) * 100)}%`
                         : '0%'}
                     </span>
                     {/* Toggle Switch */}
@@ -328,15 +328,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onClick={() => {
                         const currentSfx = settings.sfxEnabled ?? settings.soundEnabled;
                         const nextSfx = !currentSfx;
-                        const currentVol = settings.sfxVolume ?? settings.soundVolume;
-                        const nextVol = nextSfx ? (currentVol === 0 ? 0.8 : currentVol) : 0;
+                        const currentVol = settings.sfxVolume ?? settings.soundVolume ?? 0.7;
+                        const nextVol = nextSfx ? (currentVol === 0 ? 0.7 : currentVol) : 0;
                         onUpdateSettings({ sfxEnabled: nextSfx, soundEnabled: nextSfx, sfxVolume: nextVol, soundVolume: nextVol });
                         SoundEngine.updateConfig(
                           nextSfx,
                           nextVol,
                           settings.hapticsEnabled,
                           settings.musicEnabled ?? true,
-                          settings.musicVolume ?? 0.7
+                          settings.musicVolume ?? 0.45
                         );
                         if (nextSfx) {
                           SoundEngine.playButtonClick();
@@ -369,7 +369,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   min="0"
                   max="1"
                   step="0.05"
-                  value={settings.sfxVolume ?? settings.soundVolume}
+                  value={settings.sfxVolume ?? settings.soundVolume ?? 0.7}
                   onChange={(e) => {
                     const vol = parseFloat(e.target.value);
                     const shouldEnable = vol > 0;
@@ -384,7 +384,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       vol,
                       settings.hapticsEnabled,
                       settings.musicEnabled ?? true,
-                      settings.musicVolume ?? 0.7
+                      settings.musicVolume ?? 0.45
                     );
                   }}
                   className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-800 accent-cyan-400 opacity-100 transition-opacity"
@@ -399,8 +399,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClick={() => {
                       const currentMusic = settings.musicEnabled ?? true;
                       const nextMusic = !currentMusic;
-                      const currentMusicVol = settings.musicVolume ?? 0.7;
-                      const nextMusicVol = nextMusic ? (currentMusicVol === 0 ? 0.7 : currentMusicVol) : 0;
+                      const currentMusicVol = settings.musicVolume ?? 0.45;
+                      const nextMusicVol = nextMusic ? (currentMusicVol === 0 ? 0.45 : currentMusicVol) : 0;
                       onUpdateSettings({ musicEnabled: nextMusic, musicVolume: nextMusicVol });
                       SoundEngine.updateConfig(
                         settings.sfxEnabled ?? settings.soundEnabled,
@@ -449,7 +449,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-black text-pink-300">
                       {(settings.musicEnabled ?? true)
-                        ? `${Math.round((settings.musicVolume ?? 0.7) * 100)}%`
+                        ? `${Math.round((settings.musicVolume ?? 0.45) * 100)}%`
                         : '0%'}
                     </span>
                     {/* Toggle Switch */}
@@ -458,8 +458,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onClick={() => {
                         const currentMusic = settings.musicEnabled ?? true;
                         const nextMusic = !currentMusic;
-                        const currentMusicVol = settings.musicVolume ?? 0.7;
-                        const nextMusicVol = nextMusic ? (currentMusicVol === 0 ? 0.7 : currentMusicVol) : 0;
+                        const currentMusicVol = settings.musicVolume ?? 0.45;
+                        const nextMusicVol = nextMusic ? (currentMusicVol === 0 ? 0.45 : currentMusicVol) : 0;
                         onUpdateSettings({ musicEnabled: nextMusic, musicVolume: nextMusicVol });
                         SoundEngine.updateConfig(
                           settings.sfxEnabled ?? settings.soundEnabled,
@@ -499,7 +499,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   min="0"
                   max="1"
                   step="0.05"
-                  value={settings.musicVolume ?? 0.7}
+                  value={settings.musicVolume ?? 0.45}
                   onChange={(e) => {
                     const vol = parseFloat(e.target.value);
                     const shouldEnable = vol > 0;
@@ -541,7 +541,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         settings.sfxVolume ?? settings.soundVolume,
                         nextVal,
                         settings.musicEnabled ?? true,
-                        settings.musicVolume ?? 0.7
+                        settings.musicVolume ?? 0.45
                       );
                       if (nextVal) {
                         Haptics.buttonClick();
